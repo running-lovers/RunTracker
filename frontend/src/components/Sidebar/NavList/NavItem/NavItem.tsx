@@ -1,7 +1,5 @@
-import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import React from 'react'
-import { MessageSquare, Map, User, Heart, Users, Layout, Dumbbell } from "lucide-react"
 
 interface NavItemProps {
     label: string;

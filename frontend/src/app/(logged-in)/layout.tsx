@@ -1,4 +1,4 @@
-import Sidebar from '@/components/Sidebar/Sidebar';
+import LeftSidebar from '@/components/Sidebar/LeftSidebar';
 import React from 'react'
 
 export default function Mainlayout({
@@ -8,7 +8,7 @@ export default function Mainlayout({
   }>) {
   return (
     <div className='flex'>
-        <Sidebar />
+        <LeftSidebar />
         <main>{children}</main>
     </div>
   )
