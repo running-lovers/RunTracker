@@ -1,4 +1,4 @@
-import LeftSidebar from '@/components/Sidebar/LeftSidebar';
+import LeftSidebar from '@/components/LeftSidebar/LeftSidebar';
 import React from 'react'
 
 export default function Mainlayout({
