@@ -1,4 +1,4 @@
-import RecentActivityCard from "./components/RecentActivityCard";
+import RecentActivityCard from "./_components/RecentActivityCard";
 
 export default function Homepage() {
   return (
