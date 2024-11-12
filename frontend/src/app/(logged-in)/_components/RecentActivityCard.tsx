@@ -31,9 +31,9 @@ export default function RecentActivityCard() {
         <>
         <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
             {activities.map((activity) => (
-                <Card className="space-y-6 mx-3 mt-2">
+                <Card  key={activity.id} className="space-y-6 mx-3 mt-2">
                     <CardContent>
-                        <div key={activity.id}>
+                        <div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4 space-y-5">
                                     <div>{activity.icon}</div>
