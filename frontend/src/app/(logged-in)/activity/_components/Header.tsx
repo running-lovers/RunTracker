@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select"
 import { Button } from '@/components/ui/Button'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Header() {
     return (
@@ -51,7 +52,9 @@ export default function Header() {
                 </SelectContent>
             </Select>
             <Button className='bg-orange-500 hover:bg-orange-600 w-full sm:w-auto'>
+                <Link href={'activity/create'}>
                 <Plus className="mr-2 h-4 w-4" /> New Activity
+                </Link>
             </Button>
         </div>
     )
