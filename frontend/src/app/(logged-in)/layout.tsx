@@ -10,7 +10,7 @@ export default function Mainlayout({
   return (
     <div className='flex flex-1'>
         <LeftSidebar />
-        <main className='flex-grow'>{children}</main>
+        <main className='flex-grow h-screen overflow-y-auto'>{children}</main>
         <RightSidebar />
     </div>
   )
