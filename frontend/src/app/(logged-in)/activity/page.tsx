@@ -51,7 +51,7 @@ export default function page() {
                 <div className='max-w-6xl mx-auto p-6'>
                     <Header />
                 </div>
-                <div className='flex flex-col gap-y-3'>
+                <div className='flex flex-col mx-5 gap-y-3'>
                     {activities.map((activity) => (
                         <ActivityCard
                             key={activity.id} 
