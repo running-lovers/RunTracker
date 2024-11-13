@@ -1,4 +1,5 @@
 import LeftSidebar from '@/components/LeftSidebar/LeftSidebar';
+import RightSidebar from '@/components/RightSidebar/RightSidebar';
 import React from 'react'
 
 export default function Mainlayout({
@@ -7,9 +8,10 @@ export default function Mainlayout({
     children: React.ReactNode;
   }>) {
   return (
-    <div className='flex'>
+    <div className='flex flex-1'>
         <LeftSidebar />
-        <main>{children}</main>
+        <main className='flex-grow'>{children}</main>
+        <RightSidebar />
     </div>
   )
 }
