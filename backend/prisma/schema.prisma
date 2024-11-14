@@ -1,14 +1,126 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
+// Database connection configuration
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Main connection URL using connection pooler (port 6543)
+  // Used for regular database operations
+  url      = env("SUPABASE_DATABASE_URL")
+  
+  // Direct connection URL (port 5432)
+  // Required for database migrations and schema changes
+  // Bypasses connection pooler for administrative tasks
+  directUrl = env("SUPABASE_DIRECT_URL")
+}
+
+model User {
+  id              Int           @id @default(autoincrement())
+  username        String
+  email           String        @unique
+  password        String
+  strava_id       String?
+  profile_picture String?
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  deleted_at      DateTime?
+  
+  // Relations
+  connections     Connection[]  @relation("UserConnections")
+  following       Connection[]  @relation("UserFollowing")
+  routes          Route[]
+  activities      Activity[]
+  goals          Goal[]
+  messages       UserMessage[]
+}
+
+model Connection {
+  id                Int       @id @default(autoincrement())
+  user_id           Int
+  following_user_id Int
+  created_at        DateTime  @default(now())
+  deleted_at        DateTime?
+  
+  // Relations
+  user             User      @relation("UserConnections", fields: [user_id], references: [id])
+  following_user   User      @relation("UserFollowing", fields: [following_user_id], references: [id])
+}
+
+model Route {
+  id             Int       @id @default(autoincrement())
+  user_id        Int
+  route_name     String
+  coordinates    Json
+  distance       Float
+  elevation_data Json
+  is_favorite    Boolean   @default(false)
+  created_at     DateTime  @default(now())
+  deleted_at     DateTime?
+  
+  // Relations
+  user           User      @relation(fields: [user_id], references: [id])
+  activities     Activity[]
+}
+
+model Activity {
+  id                Int       @id @default(autoincrement())
+  user_id           Int
+  route_id          Int
+  activity_type     String
+  distance          Float
+  duration          Int
+  average_speed     Float
+  max_speed         Float
+  avg_heartRate     Int?
+  max_heartRate     Int?
+  calories          Int
+  start_time        DateTime
+  end_time          DateTime
+  route_data        Json
+  description       String?
+  strava_activity_id String?
+  
+  // Relations
+  user             User      @relation(fields: [user_id], references: [id])
+  route            Route     @relation(fields: [route_id], references: [id])
+}
+
+model Goal {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  goal_type   String
+  target      Float
+  current     Float     @default(0)
+  start_date  DateTime
+  end_date    DateTime
+  deleted_at  DateTime?
+  
+  // Relations
+  user        User      @relation(fields: [user_id], references: [id])
+}
+
+model Message {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+  
+  // Relations
+  userMessages UserMessage[]
+}
+
+model UserMessage {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  message_id  Int
+  deleted_at  DateTime?
+  
+  // Relations
+  user        User      @relation(fields: [user_id], references: [id])
+  message     Message   @relation(fields: [message_id], references: [id])
+
+  @@unique([user_id, message_id])
 }
