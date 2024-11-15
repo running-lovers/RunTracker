@@ -6,7 +6,7 @@ const HomePage: React.FC = () => {
     <div>
       {/* Header */}
       <header className="bg-black text-white flex justify-between items-center p-5">
-        <div className="text-2xl font-bold">STRAVA</div>
+        <div className="text-2xl font-bold">RunTracker</div>
         <div>
           <button className="text-white mr-4">Log In</button>
           <button className="bg-orange-500 text-white px-5 py-2 rounded">Join for Free</button>
