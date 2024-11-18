@@ -1,14 +1,28 @@
+'use client'
+
 // HomePage.tsx
 import React from "react";
 
 const HomePage: React.FC = () => {
+
+  const handleLogin = async() => {
+    try {
+      const res = await fetch('http://localhost:8080/api/strava/auth')
+      const data = await res.json()
+      window.location.href = data.authUrl
+    } catch (error) {
+      console.error('Error initiating Strava auth:', error)
+    }
+  }
   return (
     <div>
       {/* Header */}
       <header className="bg-black text-white flex justify-between items-center p-5">
         <div className="text-2xl font-bold">RunTracker</div>
         <div>
-          <button className="text-white mr-4">Log In</button>
+          <button 
+            onClick={handleLogin}
+            className="text-white mr-4">Log In</button>
           <button className="bg-orange-500 text-white px-5 py-2 rounded">Join for Free</button>
         </div>
       </header>
