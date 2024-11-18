@@ -8,11 +8,6 @@ datasource db {
   // Main connection URL using connection pooler (port 6543)
   // Used for regular database operations
   url      = env("SUPABASE_DATABASE_URL")
-  
-  // Direct connection URL (port 5432)
-  // Required for database migrations and schema changes
-  // Bypasses connection pooler for administrative tasks
-  directUrl = env("SUPABASE_DIRECT_URL")
 }
 
 model User {
