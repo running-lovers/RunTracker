@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import dotenv from 'dotenv';
 import prisma from "../../lib/prisma";
 import { access } from "fs";
@@ -94,5 +94,28 @@ export const postToken = async(req: Request, res: Response) => {
     } catch (error) {
         console.error('Error exchanging token:', error);
         res.status(500).json({ error: 'Failed to exchange token' });
+    }
+}
+
+export const checkAuth = async (req: Request, res: Response) => {
+    const strava_id = req.headers['x-strava-id'];
+
+    if (!strava_id) {
+        res.status(401).json({ authenticated: false });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { strava_id: Number(strava_id) },
+        });
+
+        if (user && user.accessToken) {
+            res.json({ authenticated: true, user });
+        } else {
+            res.status(401).json({ authenticated: false });
+        }
+    } catch (error) {
+        console.error('Error checking authentication:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }

@@ -10,10 +10,9 @@ import { log } from "util";
 export default function LeftSidebar() {
 
     const { user, setUser } = useUser();
-    console.log('stravaId:', user?.strava_id);
+    console.log('stravaId:', user);
 
     const handleLogout = async () => {
-        console.log('user in leftsidebar:', user);
         
         if (!user?.strava_id) {
             console.error('Strava ID is missing');
@@ -47,7 +46,7 @@ export default function LeftSidebar() {
                 <Button onClick={handleLogout}>Logout</Button>
                 <div className="flex items-center absolute bottom-4 left-4">
                     <FaRegUserCircle className="text-gray-300 text-3xl" />
-                    <div className="ml-2 text-gray-300 text-xl">Yasuhito Komano</div>
+                    <div className="ml-2 text-gray-300 text-xl">{user?.name}</div>
                 </div>
             </aside>
         </div>
