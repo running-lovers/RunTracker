@@ -1,20 +1,9 @@
 'use client'
 
-import { handleStravaCallback } from "@/lib/handleStravaCallback";
-import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const HomePage: React.FC = () => {
-  const [user, setUser] = useState(null)
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-      const code = searchParams.get('code');
-      if (code && typeof code === 'string') {
-        handleStravaCallback(code, setUser);
-      }
-  }, [searchParams])
-
+  
   const handleLogin = async() => {
     try {
       const res = await fetch('http://localhost:8080/api/strava/auth')

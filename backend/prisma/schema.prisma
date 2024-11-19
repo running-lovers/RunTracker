@@ -14,9 +14,9 @@ model User {
   id              Int           @id @default(autoincrement())
   name            String
   strava_id       Int           @unique
-  accessToken     String
-  refreshToken    String
-  TokenExpiresAt  DateTime
+  accessToken     String?
+  refreshToken    String?
+  TokenExpiresAt  DateTime?
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
   deleted_at      DateTime?

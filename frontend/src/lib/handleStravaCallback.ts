@@ -1,7 +1,7 @@
 
 export const handleStravaCallback = async(code: string, setUser:React.Dispatch<React.SetStateAction<null>>) => {
     try {
-      const res = await fetch('Update your `frontend/src/pages/index.tsx` file to include a function that handles the callback:', {
+      const res = await fetch('http://localhost:8080/api/strava/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -13,8 +13,9 @@ export const handleStravaCallback = async(code: string, setUser:React.Dispatch<R
         throw new Error('Failed to exchange token');
       }
 
-      const data = await res.json();
+      const data = await res.json();      
       setUser(data.user);
+      console.log('Updated User in callback:', data.user);
 
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
