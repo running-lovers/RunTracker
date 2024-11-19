@@ -1,9 +1,19 @@
 'use client'
 
-// HomePage.tsx
-import React from "react";
+import { handleStravaCallback } from "@/lib/handleStravaCallback";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 const HomePage: React.FC = () => {
+  const [user, setUser] = useState(null)
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+      const code = searchParams.get('code');
+      if (code && typeof code === 'string') {
+        handleStravaCallback(code, setUser);
+      }
+  }, [searchParams])
 
   const handleLogin = async() => {
     try {
@@ -14,6 +24,7 @@ const HomePage: React.FC = () => {
       console.error('Error initiating Strava auth:', error)
     }
   }
+
   return (
     <div>
       {/* Header */}
