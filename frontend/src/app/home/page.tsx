@@ -1,10 +1,19 @@
 'use client'
 
 import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 const HomePage: React.FC = () => {
-  
-  const handleLogin = async() => {
+
+  const handleLogin = async () => {
     try {
       const res = await fetch('http://localhost:8080/api/strava/auth')
       const data = await res.json()
@@ -20,9 +29,18 @@ const HomePage: React.FC = () => {
       <header className="bg-black text-white flex justify-between items-center p-5">
         <div className="text-2xl font-bold">RunTracker</div>
         <div>
-          <button 
+          <button
             onClick={handleLogin}
-            className="text-white mr-4">Log In</button>
+            className="text-white mr-4">
+            Log In
+          </button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <DialogContent>
+
+              </DialogContent>
+            </DialogTrigger>
+          </Dialog>
           <button className="bg-orange-500 text-white px-5 py-2 rounded">Join for Free</button>
         </div>
       </header>
@@ -44,7 +62,7 @@ const HomePage: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-center gap-40">
           {/* Feature 1 */}
           <div className="max-w-xs text-center">
-            <img src="https://web-assets.strava.com/assets/landing-pages/_next/static/media/ALP-tracker-activity-running-en-US@1x.c143bb29.png" alt="Share Your Achievements" className="w-full h-52 object-cover rounded mb-4"/>
+            <img src="https://web-assets.strava.com/assets/landing-pages/_next/static/media/ALP-tracker-activity-running-en-US@1x.c143bb29.png" alt="Share Your Achievements" className="w-full h-52 object-cover rounded mb-4" />
             <h3 className="text-2xl font-semibold mb-2">Share Your Achievements</h3>
             <p className="text-base">
               Get encouragement from friends and fellow runners around the world.
@@ -53,7 +71,7 @@ const HomePage: React.FC = () => {
 
           {/* Feature 2 */}
           <div className="max-w-xs text-center">
-            <img src="https://web-assets.strava.com/assets/landing-pages/_next/static/media/ALP-tracker-you-running-en-US@1x.8eeda7d0.png" alt="Analyze Your Progress" className="w-full h-52 object-cover rounded mb-4"/>
+            <img src="https://web-assets.strava.com/assets/landing-pages/_next/static/media/ALP-tracker-you-running-en-US@1x.8eeda7d0.png" alt="Analyze Your Progress" className="w-full h-52 object-cover rounded mb-4" />
             <h3 className="text-2xl font-semibold mb-2">Analyze Your Progress</h3>
             <p className="text-base">
               See a detailed breakdown of each run, plus an overall look at how you’re improving.
@@ -62,7 +80,7 @@ const HomePage: React.FC = () => {
 
           {/* Feature 3 */}
           <div className="max-w-xs text-center">
-            <img src="https://web-assets.strava.com/assets/landing-pages/_next/static/media/ALP-tracker-maps-running-en-US@1x.0ef6263a.png" alt="Explore New Routes" className="w-full h-52 object-cover rounded mb-4"/>
+            <img src="https://web-assets.strava.com/assets/landing-pages/_next/static/media/ALP-tracker-maps-running-en-US@1x.0ef6263a.png" alt="Explore New Routes" className="w-full h-52 object-cover rounded mb-4" />
             <h3 className="text-2xl font-semibold mb-2">Explore New Routes</h3>
             <p className="text-base">
               Browse popular roads and trails, or go your own way with our running route planner.
