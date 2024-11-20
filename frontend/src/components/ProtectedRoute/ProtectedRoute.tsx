@@ -1,27 +1,41 @@
 'use client'
 
 import { useUser } from '@/context/userContext';
-import { useRouter } from 'next/navigation';
+import { handleStravaCallback } from '@/lib/handleStravaCallback';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react'
 
 type Props = {
-    children: React.ReactNode
+  children: React.ReactNode
 }
 
 export default function ProtectedRoute({ children }: Props) {
-    const { user, isLoading } = useUser(); // useUserフックからユーザー情報を取得
-    const router = useRouter();
-    useEffect(() => {
-        if (!isLoading && !user) {
-          router.push("/home");
-        }
-      }, [user, isLoading]);
-    
-      if (isLoading) {
-        return <div>Loading...</div>
-      }
+  const { user, isLoading, setUser: updateUser, setIsLoading } = useUser(); // useUserフックからユーザー情報を取得
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-      if(!isLoading && user) {
-        return <>{children}</>
-      }
+  const code = searchParams.get('code');
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/home");
+    }
+  }, [user, isLoading]);
+
+  useEffect(() => {
+    
+    if(code) {
+      handleStravaCallback(code, updateUser, setIsLoading, )
+    } else {
+      setIsLoading(false)
+    }
+  }, [code])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!isLoading && user) {
+    return <>{children}</>
+  }
 }

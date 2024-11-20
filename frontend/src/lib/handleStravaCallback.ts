@@ -1,5 +1,6 @@
+import { UserType } from "@/model/userModel";
 
-export const handleStravaCallback = async(code: string, setUser:React.Dispatch<React.SetStateAction<null>>, setIsLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+export const handleStravaCallback = async(code: string, updateUser: (user: UserType | null) => void, setIsLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
     try {
       const res = await fetch('http://localhost:8080/api/strava/token', {
         method: 'POST',
@@ -14,10 +15,10 @@ export const handleStravaCallback = async(code: string, setUser:React.Dispatch<R
       }
 
       const data = await res.json();      
-      setUser(data.user);
+      updateUser(data.user)
       console.log('Updated User in callback:', data.user);
 
-      // window.history.replaceState({}, document.title, window.location.pathname);
+      window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
       console.error('Error in Strava callback:', error);
     } finally {

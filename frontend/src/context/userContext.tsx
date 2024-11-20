@@ -1,11 +1,13 @@
 'use client'
 
+
 import { UserType } from '@/model/userModel';
-import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from 'react'
+import { User } from 'lucide-react';
+import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
 interface UserContextType {
     user: UserType | null
-    setUser: Dispatch<SetStateAction<null>>
+    setUser: React.Dispatch<React.SetStateAction<UserType | null>>
     isLoading: boolean;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -13,8 +15,25 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<UserType | null>(null);
+    const [isLoading, setIsLoading] = useState(true);   
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user')
+        if(storedUser) {
+            setUser(JSON.parse(storedUser))
+        }
+        setIsLoading(false);
+    }, [])
+
+    const updateUser = (newUser: UserType | null) => {
+        setUser(newUser)
+        if(newUser) {
+            localStorage.setItem('user', JSON.stringify(newUser))
+        } else {
+            localStorage.removeItem('user')
+        }
+    }
 
     return (
         <UserContext.Provider value={{ user, setUser, isLoading, setIsLoading }}>
