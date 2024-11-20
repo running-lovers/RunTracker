@@ -5,16 +5,19 @@ import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, 
 
 interface UserContextType {
     user: UserType | null
-    setUser:Dispatch<SetStateAction<null>>
+    setUser: Dispatch<SetStateAction<null>>
+    isLoading: boolean;
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({children}: {children: ReactNode}) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     return (
-        <UserContext.Provider value={{user, setUser}}>
+        <UserContext.Provider value={{ user, setUser, isLoading, setIsLoading }}>
             {children}
         </UserContext.Provider>
     )
@@ -22,7 +25,7 @@ export const UserProvider = ({children}: {children: ReactNode}) => {
 
 export const useUser = () => {
     const context = useContext(UserContext);
-    if(!context){
+    if (!context) {
         throw new Error('useUser must be used within a UserProvider')
     }
 
