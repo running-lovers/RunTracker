@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default function ProtectedRoute({ children }: Props) {
-  const { user, isLoading, setUser: updateUser, setIsLoading } = useUser(); // useUserフックからユーザー情報を取得
+  const { user, isLoading, setUser, setIsLoading } = useUser(); // useUserフックからユーザー情報を取得
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -25,7 +25,7 @@ export default function ProtectedRoute({ children }: Props) {
   useEffect(() => {
     
     if(code) {
-      handleStravaCallback(code, updateUser, setIsLoading, )
+      handleStravaCallback(code, setUser, setIsLoading, )
     } else {
       setIsLoading(false)
     }

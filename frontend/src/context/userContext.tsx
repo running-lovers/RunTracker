@@ -18,22 +18,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(null);
     const [isLoading, setIsLoading] = useState(true);   
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user')
-        if(storedUser) {
-            setUser(JSON.parse(storedUser))
-        }
-        setIsLoading(false);
-    }, [])
+    // useEffect(() => {
+    //     const storedUser = localStorage.getItem('user')
+    //     if(storedUser) {
+    //         setUser(JSON.parse(storedUser))
+    //     }
+    //     setIsLoading(false);
+    // }, [])
 
-    const updateUser = (newUser: UserType | null) => {
-        setUser(newUser)
-        if(newUser) {
-            localStorage.setItem('user', JSON.stringify(newUser))
-        } else {
-            localStorage.removeItem('user')
-        }
-    }
+    // const updateUser = (newUser: UserType | null) => {
+    //     setUser(newUser)
+    //     if(newUser) {
+    //         localStorage.setItem('user', JSON.stringify(newUser))
+    //     } else {
+    //         localStorage.removeItem('user')
+    //     }
+    // }
 
     return (
         <UserContext.Provider value={{ user, setUser, isLoading, setIsLoading }}>
