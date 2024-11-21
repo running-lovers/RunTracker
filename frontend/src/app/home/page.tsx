@@ -10,13 +10,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/Button";
+import { useClientData } from "@/context/clientDataContext";
 
 const HomePage: React.FC = () => {
+  const {clientId, setClientId, clientSecret, setClientSecret} = useClientData();
 
   const handleLogin = async () => {
+
     try {
-      const res = await fetch('http://localhost:8080/api/strava/auth')
+      const res = await fetch('http://localhost:8080/api/strava/auth', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({clientId})
+      })
+
       const data = await res.json()
+      localStorage.setItem('clientId', JSON.stringify(clientId))
+      localStorage.setItem('clientSecret', JSON.stringify(clientSecret))
       window.location.href = data.authUrl
     } catch (error) {
       console.error('Error initiating Strava auth:', error)
@@ -29,17 +40,39 @@ const HomePage: React.FC = () => {
       <header className="bg-black text-white flex justify-between items-center p-5">
         <div className="text-2xl font-bold">RunTracker</div>
         <div>
-          <button
-            onClick={handleLogin}
-            className="text-white mr-4">
-            Log In
-          </button>
           <Dialog>
             <DialogTrigger asChild>
-              <DialogContent>
-
-              </DialogContent>
+              <button
+                className="text-white mr-4">
+                Log In
+              </button>
             </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] flex flex-col justify-center items-center">
+              <DialogTitle>
+                <DialogHeader>Login to RunTracker with Strava</DialogHeader>
+              </DialogTitle>
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2">
+                    <label>Strava Client ID</label>
+                    <input
+                      type="text"
+                      value={clientId}
+                      onChange={(e) => setClientId(e.target.value)}
+                      className="border border-gray-500 rounded-sm" />
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <label>Strava Client Secret</label>
+                    <input 
+                      type="text"
+                      value={clientSecret}
+                      onChange={(e) => setClientSecret(e.target.value)}
+                      className="border border-gray-500 rounded-sm" />
+                  </div>
+                </div>
+                <Button onClick={handleLogin}>Login</Button>
+              </div>
+            </DialogContent>
           </Dialog>
           <button className="bg-orange-500 text-white px-5 py-2 rounded">Join for Free</button>
         </div>

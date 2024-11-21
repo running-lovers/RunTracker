@@ -3,7 +3,7 @@ import { checkAuth, getAuthURL, logoutUser, postToken } from "../controllers/str
 
 export const router = Router();
 
-router.get('/auth', getAuthURL)
+router.post('/auth', getAuthURL)
 router.put('/logout', logoutUser)
 router.post('/token', postToken)
 router.get('/auth/check', checkAuth)

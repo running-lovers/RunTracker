@@ -1,13 +1,13 @@
 import { UserType } from "@/model/userModel";
 
-export const handleStravaCallback = async(code: string, setUser:React.Dispatch<React.SetStateAction<UserType | null>>, setIsLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+export const handleStravaCallback = async(code: string, setUser:React.Dispatch<React.SetStateAction<UserType | null>>, setIsLoading: React.Dispatch<React.SetStateAction<boolean>>, parsedClientId: string, parsedClientSecret: string) => {
     try {
       const res = await fetch('http://localhost:8080/api/strava/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({code}),
+        body: JSON.stringify({code, parsedClientId, parsedClientSecret}),
       });
       
       if(!res.ok) {

@@ -26,9 +26,11 @@ export default function LeftSidebar() {
             body: JSON.stringify({ strava_id: user?.strava_id })
         })
         if (res.ok) {
-            setUser(null); // ログアウト後のユーザー情報をクリア
+            setUser(null); 
             localStorage.removeItem('user')
-            window.location.href = 'http://localhost:3000/home'; // リダイレクト
+            localStorage.removeItem('clientId')
+            localStorage.removeItem('clientSecret')
+            window.location.href = 'http://localhost:3000/home'; 
         } else {
             console.error('Failed to log out user');
         }

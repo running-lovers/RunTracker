@@ -6,6 +6,7 @@ import { UserType } from '@/model/userModel';
 import { User } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
+import { useClientData } from './clientDataContext';
 
 interface UserContextType {
     user: UserType | null
@@ -30,13 +31,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                     const parsedUser = JSON.parse(storedUser)
                     setUser(parsedUser);
                 }
-                
-                const stravaCode = searchParams.get('code')
 
-                if(stravaCode) {
-                    await handleStravaCallback(stravaCode, setUser, setIsLoading)
-                    router.push('/')
-                } 
+                const storedClientId = localStorage.getItem('clientId')
+                const storedClientSecret = localStorage.getItem('clientSecret')
+                
+                if(storedClientId && storedClientSecret) {
+                    const parsedClientId = JSON.parse(storedClientId)
+                    const parsedClientSecret = JSON.parse(storedClientSecret)
+                    const stravaCode = searchParams.get('code')
+                    if(stravaCode) {
+                        await handleStravaCallback(stravaCode, setUser, setIsLoading, parsedClientId, parsedClientSecret )
+                        router.push('/')
+                    } 
+                }
+
             } catch (error) {
                 console.log('Authentication error:', error);
                 localStorage.removeItem('user')
