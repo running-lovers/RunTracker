@@ -134,23 +134,22 @@ const ChatPage: React.FC = () => {
                   handleDeleteGroup(group.id);
                 }}
                 className="text-red-500 ml-2"
-              >
-                      {/* ถังขยะจาก FontAwesome */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18.75V8.25M6 8.25V4.875C6 4.39175 6.39175 4 6.875 4H17.125C17.6082 4 18 4.39175 18 4.875V8.25M6 8.25H18M6 8.25L5.25 19.875C5.25 20.3582 5.64175 20.75 6.125 20.75H17.875C18.3582 20.75 18.75 20.3582 18.75 19.875L18 8.25M10.5 13.5V16.5M13.5 13.5V16.5"
-                        />
-                      </svg>
-                </button>
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18.75V8.25M6 8.25V4.875C6 4.39175 6.39175 4 6.875 4H17.125C17.6082 4 18 4.39175 18 4.875V8.25M6 8.25H18M6 8.25L5.25 19.875C5.25 20.3582 5.64175 20.75 6.125 20.75H17.875C18.3582 20.75 18.75 20.3582 18.75 19.875L18 8.25M10.5 13.5V16.5M13.5 13.5V16.5"
+                  />
+                </svg>
+              </button>
             </li>
           ))}
         </ul>
@@ -187,7 +186,7 @@ const ChatPage: React.FC = () => {
                 onChange={(e) => setNewMessage(e.target.value)}
               />
               <button
-                onClick={handleSendMessage} // ฟังก์ชันส่งข้อความ
+                onClick={handleSendMessage}
                 className="ml-2 bg-black text-white px-4 py-2 rounded"
               >
                 Send
