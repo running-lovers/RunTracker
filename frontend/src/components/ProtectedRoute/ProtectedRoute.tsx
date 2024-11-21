@@ -29,7 +29,7 @@ export default function ProtectedRoute({ children }: Props) {
     } else {
       setIsLoading(false)
     }
-  }, [code])
+  }, [code, setUser, setIsLoading])
 
   if (isLoading) {
     return <div>Loading...</div>

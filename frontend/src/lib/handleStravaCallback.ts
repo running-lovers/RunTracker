@@ -14,9 +14,9 @@ export const handleStravaCallback = async(code: string, setUser:React.Dispatch<R
         throw new Error('Failed to exchange token');
       }
 
-      const data = await res.json();      
-      setUser(data.user);
-      console.log('Updated User in callback:', data.user);
+      const data = await res.json();    
+      setUser(data.user)  
+      localStorage.setItem('user', JSON.stringify(data.user));
 
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {

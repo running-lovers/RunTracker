@@ -1,8 +1,10 @@
+'use client'
+
 import LeftSidebar from '@/components/LeftSidebar/LeftSidebar';
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import RightSidebar from '@/components/RightSidebar/RightSidebar';
-import { UserProvider } from '@/context/userContext';
-import React from 'react'
+import { UserProvider, useUser } from '@/context/userContext';
+import React, { useEffect } from 'react'
 
 export default function Mainlayout({
   children,
@@ -11,8 +13,8 @@ export default function Mainlayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
+  const {setUser, setIsLoading} = useUser()
   return (
-    <UserProvider>
       <ProtectedRoute>
         <div className='flex flex-1'>
           <LeftSidebar />
@@ -20,6 +22,5 @@ export default function Mainlayout({
           <RightSidebar />
         </div>
       </ProtectedRoute>
-    </UserProvider>
   )
 }
