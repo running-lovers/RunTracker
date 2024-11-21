@@ -27,6 +27,7 @@ export default function LeftSidebar() {
         })
         if (res.ok) {
             setUser(null); // ログアウト後のユーザー情報をクリア
+            localStorage.removeItem('user')
             window.location.href = 'http://localhost:3000/home'; // リダイレクト
         } else {
             console.error('Failed to log out user');
