@@ -29,7 +29,7 @@ const routes: Route[] = [
     elevationGain: "250m",
     difficulty: "Hard",
     estTime: "1h",
-    imageUrl: "https://via.placeholder.com/300",  //test
+    imageUrl: "https://via.placeholder.com/150",  //test
   },
 ];
 
