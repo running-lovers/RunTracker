@@ -21,7 +21,5 @@ export const handleStravaCallback = async(code: string, setUser:React.Dispatch<R
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
       console.error('Error in Strava callback:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   }

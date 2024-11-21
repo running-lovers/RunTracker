@@ -1,8 +1,10 @@
 'use client'
 
 
+import { handleStravaCallback } from '@/lib/handleStravaCallback';
 import { UserType } from '@/model/userModel';
 import { User } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
 interface UserContextType {
@@ -17,14 +19,35 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<UserType | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
-      }, []);
+        const checkUserAuthentication = async() => {
+            try {
+                const storedUser = localStorage.getItem('user');
+                if(storedUser) {
+                    const parsedUser = JSON.parse(storedUser)
+                    setUser(parsedUser);
+                }
+                
+                const stravaCode = searchParams.get('code')
+
+                if(stravaCode) {
+                    await handleStravaCallback(stravaCode, setUser, setIsLoading)
+                    router.push('/')
+                } 
+            } catch (error) {
+                console.log('Authentication error:', error);
+                localStorage.removeItem('user')
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        checkUserAuthentication()
+    }, [])
 
     return (
         <UserContext.Provider value={{ user, setUser, isLoading, setIsLoading }}>

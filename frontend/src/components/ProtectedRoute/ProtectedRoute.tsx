@@ -10,26 +10,14 @@ type Props = {
 }
 
 export default function ProtectedRoute({ children }: Props) {
-  const { user, isLoading, setUser, setIsLoading } = useUser(); // useUserフックからユーザー情報を取得
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const code = searchParams.get('code');
+  const { user, isLoading } = useUser(); 
+  const router = useRouter();  
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/home");
     }
   }, [user, isLoading]);
-
-  useEffect(() => {
-    
-    if(code) {
-      handleStravaCallback(code, setUser, setIsLoading, )
-    } else {
-      setIsLoading(false)
-    }
-  }, [code, setUser, setIsLoading])
 
   if (isLoading) {
     return <div>Loading...</div>
