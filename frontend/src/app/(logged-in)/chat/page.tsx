@@ -112,7 +112,7 @@ const ChatPage: React.FC = () => {
               className={`p-2 border rounded cursor-pointer ${
                 selectedGroup?.id === group.id ? "bg-gray-100" : ""
               }`}
-              onClick={() => handleSelectGroup(group)} // เมื่อคลิกให้เลือกกลุ่ม
+              onClick={() => handleSelectGroup(group)}
             >
               <div>
                 <h3 className="font-semibold">{group.name}</h3>
