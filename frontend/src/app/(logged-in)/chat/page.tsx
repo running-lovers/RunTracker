@@ -27,12 +27,12 @@ const ChatPage: React.FC = () => {
     { id: 3, name: "Local Runners", description: "Anyone up for a group run?" },
   ]);
 
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null); // กลุ่มที่เลือก
-  const [messages, setMessages] = useState<Message[]>([]); // ข้อความในกลุ่มที่เลือก
-  const [newMessage, setNewMessage] = useState(""); // เก็บข้อความใหม่ที่พิมพ์
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal ควบคุมเปิด/ปิด
-  const [newGroupName, setNewGroupName] = useState(""); // ชื่อกลุ่มใหม่
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]); // ผู้ใช้ที่เลือกใน Modal
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [newGroupName, setNewGroupName] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
 
   const users: User[] = [
     { id: 1, name: "Alice Runner" },
@@ -41,30 +41,30 @@ const ChatPage: React.FC = () => {
     { id: 4, name: "Diana Marathon" },
   ];
 
-  // ฟังก์ชันเลือกกลุ่มแชท
+  // select group
   const handleSelectGroup = (group: Group) => {
-    setSelectedGroup(group); // ตั้งค่า selectedGroup
+    setSelectedGroup(group);
     setMessages([
-      // Mock ข้อมูลข้อความในกลุ่มที่เลือก
+      // Mock data
       { id: 1, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
       { id: 2, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
     ]);
   };
 
-  // ฟังก์ชันส่งข้อความ
+  // Send message
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return; // ไม่ทำงานถ้าข้อความว่างเปล่า
+    if (!newMessage.trim()) return;
     const newMsg: Message = {
       id: messages.length + 1,
       sender: "You",
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       content: newMessage,
     };
-    setMessages([...messages, newMsg]); // เพิ่มข้อความใหม่ใน State
-    setNewMessage(""); // เคลียร์ข้อความที่พิมพ์
+    setMessages([...messages, newMsg]);
+    setNewMessage(""); //clear message
   };
 
-  // ฟังก์ชันสร้างกลุ่มใหม่
+  // Create New Group
   const handleCreateGroup = () => {
     if (!newGroupName.trim()) {
       alert("Please enter a group name.");
@@ -77,13 +77,13 @@ const ChatPage: React.FC = () => {
       description: `Created with ${selectedUsers.length} members`,
     };
 
-    setGroups([...groups, newGroup]); // เพิ่มกลุ่มใหม่
-    setNewGroupName(""); // รีเซ็ตฟอร์ม
-    setSelectedUsers([]); // รีเซ็ตผู้ใช้ที่เลือก
-    setIsModalOpen(false); // ปิด Modal
+    setGroups([...groups, newGroup]); //add group
+    setNewGroupName("");
+    setSelectedUsers([]);
+    setIsModalOpen(false);
   };
 
-  // ฟังก์ชันเลือก/ยกเลิกการเลือกผู้ใช้ใน Modal
+  // select and Unselect User in modal
   const toggleUserSelection = (userId: number) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter((id) => id !== userId));
@@ -166,7 +166,7 @@ const ChatPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal สำหรับสร้างกลุ่มใหม่ */}
+      {/* Modal create new group */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
@@ -204,13 +204,13 @@ const ChatPage: React.FC = () => {
             </div>
             <div className="flex justify-end">
               <button
-                onClick={() => setIsModalOpen(false)} // ปิด Modal
+                onClick={() => setIsModalOpen(false)}
                 className="px-4 py-2 mr-2 bg-gray-200 rounded"
               >
                 Cancel
               </button>
               <button
-                onClick={handleCreateGroup} // สร้างกลุ่มใหม่
+                onClick={handleCreateGroup} // create new group
                 className="px-4 py-2 bg-black text-white rounded"
               >
                 Create Group
