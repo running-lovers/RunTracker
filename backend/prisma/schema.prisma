@@ -11,25 +11,25 @@ datasource db {
 }
 
 model User {
-  id              Int           @id @default(autoincrement())
-  name            String
-  client_id       String?
-  client_secret   String?
-  strava_id       Int           @unique
-  accessToken     String?
-  refreshToken    String?
-  TokenExpiresAt  DateTime?
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-  deleted_at      DateTime?
-  
+  id             Int       @id @default(autoincrement())
+  name           String
+  client_id      String?
+  client_secret  String?
+  strava_id      Int       @unique
+  accessToken    String?
+  refreshToken   String?
+  TokenExpiresAt DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  deleted_at     DateTime?
+
   // Relations
-  connections     Connection[]  @relation("UserConnections")
-  following       Connection[]  @relation("UserFollowing")
-  routes          Route[]
-  activities      Activity[]
-  goals          Goal[]
-  messages       UserMessage[]
+  connections Connection[]  @relation("UserConnections")
+  following   Connection[]  @relation("UserFollowing")
+  routes      Route[]
+  activities  Activity[]
+  goals       Goal[]
+  messages    UserMessage[]
 }
 
 model Connection {
@@ -38,10 +38,10 @@ model Connection {
   following_user_id Int
   created_at        DateTime  @default(now())
   deleted_at        DateTime?
-  
+
   // Relations
-  user             User      @relation("UserConnections", fields: [user_id], references: [id])
-  following_user   User      @relation("UserFollowing", fields: [following_user_id], references: [id])
+  user           User @relation("UserConnections", fields: [user_id], references: [id])
+  following_user User @relation("UserFollowing", fields: [following_user_id], references: [id])
 }
 
 model Route {
@@ -54,70 +54,72 @@ model Route {
   is_favorite    Boolean   @default(false)
   created_at     DateTime  @default(now())
   deleted_at     DateTime?
-  
+
   // Relations
-  user           User      @relation(fields: [user_id], references: [id])
-  activities     Activity[]
+  user       User       @relation(fields: [user_id], references: [id])
+  activities Activity[]
 }
 
 model Activity {
-  id                Int       @id @default(autoincrement())
-  user_id           Int
-  route_id          Int
-  activity_type     String
-  distance          Float
-  duration          Int
-  average_speed     Float
-  max_speed         Float
-  avg_heartRate     Int?
-  max_heartRate     Int?
-  calories          Int
-  start_time        DateTime
-  end_time          DateTime
-  route_data        Json
-  description       String?
+  id                 Int      @id @default(autoincrement())
+  user_id            Int
+  route_id           Int
+  activity_type      String
+  distance           Float
+  duration           Int
+  average_speed      Float
+  max_speed          Float
+  avg_heartRate      Int?
+  max_heartRate      Int?
+  calories           Int
+  start_time         DateTime
+  end_time           DateTime
+  route_data         Json
+  description        String?
   strava_activity_id String?
-  
+
   // Relations
-  user             User      @relation(fields: [user_id], references: [id])
-  route            Route     @relation(fields: [route_id], references: [id])
+  user  User  @relation(fields: [user_id], references: [id])
+  route Route @relation(fields: [route_id], references: [id])
 }
 
 model Goal {
-  id          Int       @id @default(autoincrement())
-  user_id     Int
-  goal_type   String
-  target      Float
-  current     Float     @default(0)
-  start_date  DateTime
-  end_date    DateTime
-  deleted_at  DateTime?
-  
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  year_month      String //('2024-11')
+  total_distance  Float     @default(0)
+  avarage_page    Float     @default(0)
+  calories_burned Float     @default(0)
+  current         Float     @default(0)
+  start_date      DateTime
+  end_date        DateTime
+  deleted_at      DateTime?
+
   // Relations
-  user        User      @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
 
 model Message {
-  id          Int       @id @default(autoincrement())
-  title       String
-  content     String
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  deleted_at  DateTime?
-  
+  id         Int       @id @default(autoincrement())
+  title      String
+  content    String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
   // Relations
   userMessages UserMessage[]
 }
 
 model UserMessage {
-  id          Int       @id @default(autoincrement())
-  user_id     Int
-  message_id  Int
-  deleted_at  DateTime?
-  
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  message_id Int
+  deleted_at DateTime?
+
   // Relations
-  user        User      @relation(fields: [user_id], references: [id])
-  message     Message   @relation(fields: [message_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+  message Message @relation(fields: [message_id], references: [id])
 
   @@unique([user_id, message_id])
 }
