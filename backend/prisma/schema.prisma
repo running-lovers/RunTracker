@@ -86,13 +86,14 @@ model Activity {
 model Goal {
   id              Int       @id @default(autoincrement())
   user_id         Int
-  year_month      String //('2024-11')
+  year            String
+  month           String
   total_distance  Float     @default(0)
-  avarage_page    Float     @default(0)
+  average_pace    Float     @default(0)
   calories_burned Float     @default(0)
-  current         Float     @default(0)
-  start_date      DateTime
-  end_date        DateTime
+  current         Float?    @default(0)
+  start_date      DateTime?
+  end_date        DateTime?
   deleted_at      DateTime?
 
   // Relations
