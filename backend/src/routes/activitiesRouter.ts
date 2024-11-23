@@ -1,13 +1,10 @@
 import { Request, Response, Router } from "express";
+import { deleteActivity, getActivities, getActivitiesByUserId, postActivity, updateActivity } from "../controllers/activitiesController";
 
 export const router = Router();
 
-router.get('/',(req: Request, res: Response) => {
-    res.send("hello, activities")
-})
-
-router.get('/:id', (req: Request, res: Response) => {
-    res.send("hello, eachActivities")
-})
-
-router.post('/', )
+router.get('/', getActivities)
+router.get('/:userId', getActivitiesByUserId)
+router.post('/', postActivity)
+router.put('/:activityId', updateActivity)
+router.delete('/:activityId', deleteActivity)
