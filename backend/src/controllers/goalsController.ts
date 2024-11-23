@@ -15,7 +15,10 @@ export const createNewGoal = async(req: Request, res: Response) => {
                 calories_burned: burnedCallories
             }
         })
+
+        res.json(newGoal);
     } catch (error) {
+        console.error("Error creating goal:", error);
         res.status(500).json({error: 'Fail to create new goal'})
     }
 }
@@ -60,6 +63,7 @@ export const deleteGoal = async(req: Request, res: Response) => {
         const deletedGoal = await prisma.goal.delete({
             where: {id: Number(goalId)}
         })
+        res.json(deletedGoal)
     } catch (error) {
         res.status(500).json({error: 'fail to delete goal'})
     }
