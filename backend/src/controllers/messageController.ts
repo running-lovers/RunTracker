@@ -51,11 +51,11 @@ export const updateMessage = async(req: Request, res: Response) => {
 }
 
 export const deleteMessage = async(req: Request, res: Response) => {
-    const {chatroomId} = req.params;
+    const {messageId} = req.params;
 
     try {
         const deletedMessage = await prisma.message.delete({
-            where: {id: parseInt(chatroomId)},
+            where: {id: parseInt(messageId)},
         });
 
         res.json(deletedMessage);
