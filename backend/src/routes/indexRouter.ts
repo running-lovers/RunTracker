@@ -11,6 +11,6 @@ export const router = Router();
 router.use('/activities', activitiesRouter)
 router.use('/strava', stravaRouter)
 router.use('/goals', goalsRouter)
-router.use('/chatroom', chatroomRouter)
-router.use('/message', messageRouter)
+router.use('/chatrooms', chatroomRouter)
+router.use('/messages', messageRouter)
 router.use('/chatroomUser', chatroomUserRouter)
