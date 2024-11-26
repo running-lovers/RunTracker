@@ -12,11 +12,13 @@ datasource db {
 
 model User {
   id              Int           @id @default(autoincrement())
-  username        String
-  email           String        @unique
-  password        String
-  strava_id       String?
-  profile_picture String?
+  name            String
+  client_id       String?
+  client_secret   String?
+  strava_id       Int           @unique
+  accessToken     String?
+  refreshToken    String?
+  TokenExpiresAt  DateTime?
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
   deleted_at      DateTime?
