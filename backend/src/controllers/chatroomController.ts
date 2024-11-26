@@ -22,20 +22,20 @@ export const postChatroom = async(req: Request, res: Response) => {
 }
 
 // Get all chat rooms By userId
-export const getChatroomsByUserId = async(req: Request, res: Response) => {
-    const {userId} = req.params
+// export const getChatroomsByUserId = async(req: Request, res: Response) => {
+//     const {userId} = req.params
 
-    try {
-        const chatrooms = await prisma.chatRoom.findMany({
-            where: {users: {some: {userId: Number(userId)}}},
-            include: {users: true}
-        });
+//     try {
+//         const chatrooms = await prisma.chatRoom.findMany({
+//             where: {users: {some: {userId: Number(userId)}}},
+//             include: {users: {include: {user: true}}}
+//         });
 
-        res.json(chatrooms)
-    } catch (error) {
-        res.status(500).json({error: 'fail to fetch chatrooms'})
-    }
-}
+//         res.json(chatrooms)
+//     } catch (error) {
+//         res.status(500).json({error: 'fail to fetch chatrooms'})
+//     }
+// }
 
 //Get specific chatroom 
 export const getChatroomByChatroomId = async(req: Request, res: Response) => {
