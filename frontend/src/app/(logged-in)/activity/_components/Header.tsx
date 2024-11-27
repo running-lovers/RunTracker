@@ -11,6 +11,10 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Header() {
+    function setIsModalOpen(arg0: boolean): void {
+        throw new Error('Function not implemented.')
+    }
+
     return (
         <div className='flex flex-wrap gap-2 sm:gap-4'>
             <Select>
@@ -51,11 +55,17 @@ export default function Header() {
                     <SelectItem value="Route2">Route2</SelectItem>
                 </SelectContent>
             </Select>
-            <Button className='bg-orange-500 hover:bg-orange-600 w-full sm:w-auto'>
+            {/* <Button className='bg-orange-500 hover:bg-orange-600 w-full sm:w-auto'>
                 <Link href={'activity/create'}>
                 <Plus className="mr-2 h-4 w-4" /> New Activity
                 </Link>
-            </Button>
+            </Button> */}
+            {/* <button
+                className="bg-orange-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsModalOpen(true)} // เพิ่มปุ่มเปิด Modal
+                >
+                + New Activity
+            </button> */}
         </div>
     )
 }
