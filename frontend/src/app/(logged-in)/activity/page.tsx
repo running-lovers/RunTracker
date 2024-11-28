@@ -4,6 +4,7 @@ import { Activity } from '@/types/activityType'
 import React, { useState } from 'react'
 import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
+import { useUser } from "@/context/userContext";
 
 export default function page() {
     const [activities, setActivities] = useState<Activity[]>([
@@ -47,6 +48,7 @@ export default function page() {
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const { user } = useUser();
     const [newActivity, setNewActivity] = useState<Activity>({
         id: 0,
         title: '',
@@ -55,7 +57,7 @@ export default function page() {
         Distance: 0,
         Duration: '',
         Calories: 0,
-        user: 'Yasuhito Komano',
+        user: user?.name || "Unknown",
         status: 'planned',
         description: ''
     })
