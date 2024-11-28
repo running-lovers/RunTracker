@@ -1,38 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { io, Socket } from "socket.io-client";
 
+// interface
 interface Group {
   id: number;
   name: string;
   description: string;
 }
-
 interface Message {
   id: number;
   sender: string;
   time: string;
   content: string;
 }
-
 interface User {
   id: number;
   name: string;
 }
-
+//main component
 const ChatPage: React.FC = () => {
+  //state
   const [groups, setGroups] = useState<Group[]>([
     { id: 1, name: "Running Club", description: "Great job everyone!" },
     { id: 2, name: "Marathon Training", description: "Don't forget the long run this week!" },
     { id: 3, name: "Local Runners", description: "Anyone up for a group run?" },
   ]);
-
+  
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   const users: User[] = [
     { id: 1, name: "Alice Runner" },
@@ -41,9 +43,27 @@ const ChatPage: React.FC = () => {
     { id: 4, name: "Diana Marathon" },
   ];
 
+    // Connect to Socket.IO
+    useEffect(() => {
+      const socketConnection = io("http://localhost:8080");
+      setSocket(socketConnection);
+  
+      // Listen for new messages
+      socketConnection.on("newMessage", (message: Message) => {
+        setMessages((prev) => [...prev, message]);
+      });
+  
+      // Cleanup on unmount
+      return () => {
+        socketConnection.off("newMessage");
+        socketConnection.disconnect();
+      };
+    }, []);
+
   // select group
   const handleSelectGroup = (group: Group) => {
     setSelectedGroup(group);
+    setMessages([]); // Clear messages and fetch new ones (mocked for now)
     setMessages([
       // Mock data
       { id: 1, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
@@ -53,14 +73,20 @@ const ChatPage: React.FC = () => {
 
   // Send message
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !selectedGroup) return;
+
     const newMsg: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       sender: "You",
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       content: newMessage,
     };
-    setMessages([...messages, newMsg]);
+
+
+    // Emit message to server
+    socket?.emit("sendMessage", { ...newMsg, groupId: selectedGroup.id });
+
+    // setMessages((prev) => [...prev, newMsg]); // Optimistic UI update
     setNewMessage(""); //clear message
   };
 
