@@ -103,9 +103,9 @@ export default function page() {
             {/* Modal */}
             {isModalOpen && (
                 <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
-                    <div className='bg-white p-6 rounded w-[400px]'>
+                    <div className='bg-white p-6 rounded w-[400px] max-h-[70vh] overflow-y-auto'>
                         <h2 className='text-xl font-bold mb-4'>Add New Activity</h2>
-                        <p>Activity</p>
+                        <p className='font-semibold'>Activity</p>
                         <div className='flex flex-col gap-3'>
                             <select
                                 className="border p-2 rounded"
@@ -119,7 +119,7 @@ export default function page() {
                                 <option value="Evening Jog">Evening Jog</option>
                                 <option value="Afternoon Run">Afternoon Run</option>
                             </select>
-                            <p>Distance (km)</p>
+                            <p className='font-semibold'>Distance (km)</p>
                             <input
                                 type="text"
                                 placeholder="Distance (km)"
@@ -129,7 +129,7 @@ export default function page() {
                                     setNewActivity({ ...newActivity, Distance: parseFloat(e.target.value) })
                                 }
                             />
-                            <p>Duration</p>
+                            <p className='font-semibold'>Duration</p>
                             <input
                                 type="text"
                                 placeholder="Duration (HH:MM:SS)"
@@ -139,7 +139,7 @@ export default function page() {
                                     setNewActivity({ ...newActivity, Duration: e.target.value })
                                 }
                             />
-                            <p>Date</p>
+                            <p className='font-semibold'>Date</p>
                             <input
                                 type="date"
                                 className="border p-2 rounded"
@@ -148,7 +148,7 @@ export default function page() {
                                     setNewActivity({ ...newActivity, date: e.target.value })
                                 }
                             />
-                            <p>Start Time</p>
+                            <p className='font-semibold'>Start Time</p>
                             <input
                                 type="time"
                                 className="border p-2 rounded"
@@ -157,7 +157,7 @@ export default function page() {
                                     setNewActivity({ ...newActivity, time: e.target.value })
                                 }
                             />
-                            <p>Description</p>
+                            <p className='font-semibold'>Description</p>
                             <textarea
                                 placeholder="Description"
                                 className="border p-2 rounded"
