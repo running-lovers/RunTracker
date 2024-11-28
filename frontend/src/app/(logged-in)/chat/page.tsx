@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
+import { useUser } from "@/context/userContext";
+
 
 // interface
 interface Group {
@@ -22,6 +24,9 @@ interface User {
 //main component
 const ChatPage: React.FC = () => {
   //state
+  const { user } = useUser();
+  // console.log("User from context:", user);
+  // console.log("ID", user?.strava_id)
   const [groups, setGroups] = useState<Group[]>([
     { id: 1, name: "Running Club", description: "Great job everyone!" },
     { id: 2, name: "Marathon Training", description: "Don't forget the long run this week!" },
@@ -77,7 +82,7 @@ const ChatPage: React.FC = () => {
 
     const newMsg: Message = {
       id: Date.now(),
-      sender: "You",
+      sender: user?.name || "Unknown",
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       content: newMessage,
     };
@@ -127,6 +132,7 @@ const ChatPage: React.FC = () => {
       setMessages([]);
     }
   };
+
 
   return (
     <div className="flex h-screen p-6">
