@@ -27,11 +27,16 @@ app.use('/api', indexRouter);
 io.on("connection", (socket) => {
     console.log("A user connected");
   
-    
+    //send message
     socket.on("sendMessage", (data) => {
       console.log("Message received: ", data);
       io.emit("newMessage", data);
     });
+
+    //create new group
+    socket.on("createGroup", (newGroup) => {
+        io.emit("newGroup", newGroup);
+      });
   
     socket.on("disconnect", () => {
       console.log("A user disconnected");

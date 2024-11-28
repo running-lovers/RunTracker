@@ -57,10 +57,16 @@ const ChatPage: React.FC = () => {
       socketConnection.on("newMessage", (message: Message) => {
         setMessages((prev) => [...prev, message]);
       });
+
+      // Listen for new groups
+      socketConnection.on("newGroup", (newGroup: Group) => {
+        setGroups((prev) => [...prev, newGroup]);
+      });
   
       // Cleanup on unmount
       return () => {
         socketConnection.off("newMessage");
+        socketConnection.off("newGroup");
         socketConnection.disconnect();
       };
     }, []);
@@ -103,12 +109,15 @@ const ChatPage: React.FC = () => {
     }
 
     const newGroup: Group = {
-      id: groups.length + 1,
+      id: Date.now(),
       name: newGroupName,
       description: `Created with ${selectedUsers.length} members`,
     };
 
-    setGroups([...groups, newGroup]); //add group
+    // setGroups([...groups, newGroup]); //add group
+    // setGroups((prev) => [...prev, newGroup]);
+    socket?.emit("createGroup", newGroup);
+
     setNewGroupName("");
     setSelectedUsers([]);
     setIsModalOpen(false);
