@@ -13,7 +13,6 @@ export default function Mainlayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  const {setUser, setIsLoading} = useUser()
   return (
       <ProtectedRoute>
         <div className='flex flex-1'>
