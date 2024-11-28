@@ -103,7 +103,7 @@ export default function page() {
             {/* Modal */}
             {isModalOpen && (
                 <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
-                    <div className='bg-white p-6 rounded w-[400px] max-h-[70vh] overflow-y-auto'>
+                    <div className='bg-white p-6 rounded w-[30%] h-[70%] overflow-y-auto'>
                         <h2 className='text-xl font-bold mb-4'>Add New Activity</h2>
                         <p className='font-semibold'>Activity</p>
                         <div className='flex flex-col gap-3'>
