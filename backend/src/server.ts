@@ -36,12 +36,19 @@ io.on("connection", (socket) => {
     //create new group
     socket.on("createGroup", (newGroup) => {
         io.emit("newGroup", newGroup);
-      });
+    });
   
+    // Delete Group
+    socket.on("deleteGroup", (groupId) => {
+      io.emit("groupDeleted", groupId);
+    });
+
     socket.on("disconnect", () => {
       console.log("A user disconnected");
     });
   });
+
+  
 
 // app.listen(PORT, () => {
 //     console.log(`Server is listening to http://localhost:${PORT}`);

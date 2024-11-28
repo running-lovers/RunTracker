@@ -62,11 +62,18 @@ const ChatPage: React.FC = () => {
       socketConnection.on("newGroup", (newGroup: Group) => {
         setGroups((prev) => [...prev, newGroup]);
       });
+
+      // Listen for deleted groups
+      socketConnection.on("groupDeleted", (groupId: number) => {
+        setGroups((prev) => prev.filter((group) => group.id !== groupId));
+        setSelectedGroup((prev) => (prev?.id === groupId ? null : prev));
+      });
   
       // Cleanup on unmount
       return () => {
         socketConnection.off("newMessage");
         socketConnection.off("newGroup");
+        socketConnection.off("groupDeleted");
         socketConnection.disconnect();
       };
     }, []);
@@ -132,14 +139,15 @@ const ChatPage: React.FC = () => {
     }
   };
 
-   // Delete Group
-   const handleDeleteGroup = (groupId: number) => {
-    setGroups(groups.filter((group) => group.id !== groupId));
+  //Delete group
+  const handleDeleteGroup = (groupId: number) => {
+      //   setGroups(groups.filter((group) => group.id !== groupId));
 
-    if (selectedGroup?.id === groupId) {
-      setSelectedGroup(null);
-      setMessages([]);
-    }
+  //   if (selectedGroup?.id === groupId) {
+  //     setSelectedGroup(null);
+  //     setMessages([]);
+  //   }
+    socket?.emit("deleteGroup", groupId);
   };
 
 
