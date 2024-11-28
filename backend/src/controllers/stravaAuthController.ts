@@ -101,6 +101,7 @@ export const checkAuth = async (req: Request, res: Response) => {
 
     if (!strava_id) {
         res.status(401).json({ authenticated: false });
+        return;
     }
 
     try {
