@@ -8,6 +8,7 @@ import {router as chatroomUserRouter} from "./chatroomUserRouter"
 
 export const router = Router();
 
+// http://localhost:8080/api/
 router.use('/activities', activitiesRouter)
 router.use('/strava', stravaRouter)
 router.use('/goals', goalsRouter)
