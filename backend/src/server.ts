@@ -16,12 +16,12 @@ const io = new Server(httpServer, {
       origin: "http://localhost:3000",
       methods: ["GET", "POST"]
     },
-  });
+});
 
 app.use(express.json());
 app.use(cors());
 
-app.use('/api', indexRouter);
+app.use('/api', indexRouter); //use indexRouter
 
 //Socket.IO
 io.on("connection", (socket) => {
