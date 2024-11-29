@@ -1,11 +1,18 @@
 import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
+//Get all activities
 export const getActivities = async (req: Request, res: Response) => {
-    const activities = await prisma.activity.findMany();
-    res.json(activities);
-}
+    try {
+        const activities = await prisma.activity.findMany();
+        res.json(activities);
+    }catch (error) {
+        res.status(500).json({ error: 'Failed to fetch activities' });
+    }
+};
 
+
+//Get activity by userId
 export const getActivitiesByUserId = async(req: Request, res: Response) => {
     const {userId} = req.params;
 
@@ -20,27 +27,41 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
     }
 }
 
-export const postActivity = async(req: Request, res: Response) => {
-    const {userId, activityType, distance, duration, description, time} = req.body;
+
+//Create a new activity
+export const createActivity = async(req: Request, res: Response) => {
+    const {        
+        userId,
+        activityType,
+        distance,
+        duration,
+       startTime,
+        description,
+    } = req.body;
 
     try {
+        const data: any = {
+            user_id: Number(userId),
+            activity_type: activityType || null,
+            distance: distance || 0,
+            duration: duration || 0,
+            start_time: new Date(startTime),
+            description: description || null
+        };
+
         const newActivity = await prisma.activity.create({
-            data: {
-                activity_type: activityType,
-                user_id: Number(userId),
-                distance: distance,
-                duration: duration,
-                start_time: time,
-                description: description
-            }
-        })
-        
+            data,
+        });
+
         res.json(newActivity)
     } catch (error) {
+        console.error("Error creating activity:", error);
         res.status(500).json({error: 'fail to create new activity'})
     }
 }
 
+
+//update an activity
 export const updateActivity = async(req: Request, res: Response) => {
     const {activityId} = req.params;
     const {activityType, distance, duration, description, time} = req.body;
@@ -63,13 +84,16 @@ export const updateActivity = async(req: Request, res: Response) => {
     }
 }
 
+
+//delete an activity
 export const deleteActivity = async(req: Request, res: Response) => {
     const {activityId} = req.params;
 
     try {
-        const deletedActivity = await prisma.activity.delete({
+        await prisma.activity.delete({
             where: {id: Number(activityId)}
-        })
+        });
+        res.json({ message: 'Activity deleted successfully' });
     } catch (error) {
         res.status(500).json({error: 'fail to delete activity'})
     }
