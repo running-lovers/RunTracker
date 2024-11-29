@@ -5,6 +5,7 @@ import {router as goalsRouter} from "./goalsRouter"
 import {router as chatroomRouter} from "./chatroomRouter"
 import {router as messageRouter} from "./messageRouter"
 import {router as chatroomUserRouter} from "./chatroomUserRouter"
+import {router as connectionsRouter} from "./connectionsRouter"
 
 export const router = Router();
 
@@ -15,3 +16,4 @@ router.use('/goals', goalsRouter)
 router.use('/chatrooms', chatroomRouter)
 router.use('/messages', messageRouter)
 router.use('/chatroomUser', chatroomUserRouter)
+router.use('/connections', connectionsRouter)
