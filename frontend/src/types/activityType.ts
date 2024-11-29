@@ -1,8 +1,7 @@
-export interface Activity {
+export interface ActivityType {
     id: number
     title: string
-    date: string
-    time: string
+    start_time: Date
     Distance?: number
     Duration?: string
     Calories?: number
