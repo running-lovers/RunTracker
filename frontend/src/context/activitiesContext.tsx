@@ -1,0 +1,3 @@
+interface ActivitiesContextType {
+    activities:
+}

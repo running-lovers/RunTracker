@@ -16,20 +16,15 @@ import { GoalsType } from '@/types/goalType'
 import { useGoals } from '@/context/goalsContext'
 
 export default function MonthlyGoal() {
-    const {goals, setGoals} = useGoals();
-    console.log("goals:", goals);
+    const {goals} = useGoals();
     const now = new Date()
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth()+1;
     
     const goalOfThisMonth = goals.find(
         (g) => Number(g.year) === currentYear && Number(g.month) === currentMonth
-    )
-
-    console.log('goalOfThisMonth:', goalOfThisMonth);
+    )  
     
-    
-
     return (
         <Card className='bg-white mr-4 mt-5'>
             <CardHeader>

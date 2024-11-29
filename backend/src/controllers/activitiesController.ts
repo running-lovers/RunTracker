@@ -12,6 +12,7 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
     try {
         const activities = await prisma.activity.findMany({
             where: {user_id: Number(userId)},
+            include: {route: true},
         });
 
         res.json(activities)
