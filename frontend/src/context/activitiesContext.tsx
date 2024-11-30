@@ -1,6 +1,7 @@
+'use client'
+
 import { ActivityType } from "@/types/activityType";
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
-import { useUser } from "./userContext";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
 import { getActivitiesFromStrava } from "@/lib/activity";
 
 interface ActivitiesContextType {
@@ -8,21 +9,39 @@ interface ActivitiesContextType {
     setActivities: Dispatch<SetStateAction<ActivityType[]>>
 }
 
+const ActivitiesContext = createContext<ActivitiesContextType | undefined>(undefined);
+
 export const ActivitiesProvider = ({children}: {children: ReactNode}) => {
     const [activities, setActivities] = useState<ActivityType[]>([])
-    const {user} = useUser();
-    const userId = user!.id;
 
     useEffect(() => {
-        if(!userId) {
-            throw new Error('userId is required')
-        }
 
-        const fetchActivities = async() => {
-            const activities = await getActivitiesFromStrava();
-            setActivities(activities);
+        try {
+            const fetchActivities = async() => {
+                const activities = await getActivitiesFromStrava();
+                setActivities(activities);
+                console.log('activityFromStrava:', activities);
+                
+            }
+    
+            fetchActivities();
+        } catch (error) {
+            throw new Error('fail to get activities from strava')
         }
-
-        fetchActivities();
     }, [])
+
+    return (
+        <ActivitiesContext.Provider value={{activities, setActivities}}>
+            {children}
+        </ActivitiesContext.Provider>
+    )
+}
+
+export const useActivities = () => {
+    const context = useContext(ActivitiesContext);
+    if(!context) {
+        throw new Error('useActivities must be used within a UserProvider')
+    }
+
+    return context;
 }

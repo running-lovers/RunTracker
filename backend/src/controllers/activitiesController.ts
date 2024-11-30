@@ -28,6 +28,38 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
     }
 }
 
+//save new activities from strava
+export const saveNewActivity = async(req: Request, res: Response) => {
+    const {userId, activities }= req.body as {userId: number , activities: any[]}
+
+    try {
+        const existingActivities = await prisma.activity.findMany({
+            where: {
+                strava_activity_id: {
+                    in: activities.map((activity) => activity.strava_activity_id)
+                }
+            }
+        })
+
+        const existingActivityIds = new Set(existingActivities.map((activity) => activity.strava_activity_id))
+
+        const newActivities = activities.filter((activity) => !existingActivityIds.has(activity.strava_activity_id))
+
+        const savedActivities = await prisma.activity.createMany({
+            data: newActivities.map((activity) => ({
+                activity_type: activity.activity_type,
+                user_id: userId,
+                distance: activity.distance,
+                duration: activity.moving_time,
+                start_time: activity.start_date,
+            }))
+        })
+
+        res.json({ savedActivities, message: "Activities saved to database successfully" } )
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create activities' });
+    }
+}
 
 //Create a new activity
 export const createActivity = async(req: Request, res: Response) => {

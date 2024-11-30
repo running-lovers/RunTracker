@@ -3,8 +3,8 @@
 import LeftSidebar from '@/components/LeftSidebar/LeftSidebar';
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import RightSidebar from '@/components/RightSidebar/RightSidebar';
+import { ActivitiesProvider } from '@/context/activitiesContext';
 import { GoalsProvider } from '@/context/goalsContext';
-import { UserProvider, useUser } from '@/context/userContext';
 import React, { useEffect } from 'react'
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL
@@ -24,13 +24,15 @@ export default function Mainlayout({
 
   return (
     <ProtectedRoute>
-      <GoalsProvider>
-        <div className='flex flex-1'>
-          <LeftSidebar />
-          <main className='flex-grow h-screen overflow-y-auto'>{children}</main>
-          <RightSidebar />
-        </div>
-      </GoalsProvider>
+      <ActivitiesProvider>
+        <GoalsProvider>
+          <div className='flex flex-1'>
+            <LeftSidebar />
+            <main className='flex-grow h-screen overflow-y-auto'>{children}</main>
+            <RightSidebar />
+          </div>
+        </GoalsProvider>
+      </ActivitiesProvider>
     </ProtectedRoute>
   )
 }
