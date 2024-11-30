@@ -1,20 +1,18 @@
 import { useUser } from "@/context/userContext"
+import { ActivityType } from "@/types/activityType";
 
-type PostActivityParams = {
-    userId: number;
-    activityType: string;
-    distance: number;
-    duration: number; 
-    description?: string;
-    time: Date; 
-  };
+// type PostActivityParams = {
+//     userId: number;
+//     activityType: string;
+//     distance: number;
+//     duration: number; 
+//     description?: string;
+//     time: Date; 
+//   };
 
 const apiUrl= process.env.NEXT_PUBLIC_BACKEND_URL
-const user = localStorage.getItem('user');
-const parsedUser = JSON.parse(user!);
-const access_token = parsedUser.accessToken;
 
-export const getActivitiesFromStrava = async() => {
+export const getActivitiesFromStrava = async(access_token: string) => {
     const res = await fetch("https://www.strava.com/api/v3/athlete/activities", {
         method: 'GET',
         headers: {
@@ -27,22 +25,20 @@ export const getActivitiesFromStrava = async() => {
     return activitiesData;
 }
 
-// export const postActivities = async(params: PostActivityParams[], userId: number) => {
-//     const body = {
-//         userId,
-//         activities: params,
-//     }
-//     const res = await fetch(`${apiUrl}/api/activities/save`, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         ,},
-//         body: JSON.stringify(body)
-//     })
+export const postActivities = async(params: ActivityType[], userId: number) => {
+    const body = {
+        userId,
+        activities: params,
+    }
+    const res = await fetch(`${apiUrl}/api/activities/save`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        ,},
+        body: JSON.stringify(body)
+    })
 
-//     if(!res) {
-//         throw new Error('fail to post activities')
-//     }
-
-//     const data = await res.json();
-// }
+    if(!res) {
+        throw new Error('fail to post activities')
+    }
+}
