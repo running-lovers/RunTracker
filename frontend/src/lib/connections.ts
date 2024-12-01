@@ -30,14 +30,12 @@ export const filterUsersByType = (
   type: 'searchResults' | 'following' | 'followers',
   currentUserId?: number
 ) => {
-  // デバッグ用のログ出力を追加
   console.log('Filtering users:', {
       totalUsers: users.length,
       type,
       currentUserId
   });
 
-  // 重複を除去するためのユニークなIDの配列を作成
   const uniqueUsers = Array.from(
       new Map(users.map(user => [user.id, user])).values()
   );
