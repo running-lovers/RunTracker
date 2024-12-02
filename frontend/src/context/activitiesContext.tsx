@@ -2,7 +2,7 @@
 
 import { ActivityType } from "@/types/activityType";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
-import { getActivitiesFromStrava, postActivities } from "@/lib/activity";
+import { getActivitiesFromDb, getActivitiesFromStrava, postActivities } from "@/lib/activity";
 
 interface ActivitiesContextType {
     activities: ActivityType[],
@@ -23,11 +23,16 @@ export const ActivitiesProvider = ({children}: {children: ReactNode}) => {
         const fetchAndSaveActivities = async() => {
             try {
                 const activities = await getActivitiesFromStrava(accessToken);
-                setActivities(activities);
                 console.log('activitiesfromstrava:', activities);
+                if(!activities) {
+                    throw new Error('fail to get activities from strava')
+                }
                 
-
                 await postActivities(activities, userId);
+
+                const activitiesFromDb = await getActivitiesFromDb(userId);
+                console.log('activitiesFromDb:', activitiesFromDb);
+                setActivities(activitiesFromDb);
             } catch (error) {
                 throw new Error('fail to get activities from strava')
             }

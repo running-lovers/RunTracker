@@ -21,7 +21,8 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
             where: {user_id: Number(userId)},
             include: {route: true},
         });
-
+        console.log('activities:', activities);
+        
         res.json(activities)
     } catch (error) {
         res.status(500).json({error: 'fail to get user activity data'})

@@ -42,3 +42,19 @@ export const postActivities = async(params: ActivityType[], userId: number) => {
         throw new Error('fail to post activities')
     }
 }
+
+export const getActivitiesFromDb = async(userId: number) => {
+    const res = await fetch(`${apiUrl}/api/activities/${userId}`, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+    if(!res.ok) {
+        throw new Error('fail to get activities data from database')
+    }
+
+    const data = await res.json();    
+
+    return data;
+}
