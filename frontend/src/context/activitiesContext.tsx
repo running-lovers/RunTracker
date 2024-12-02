@@ -9,9 +9,14 @@ interface ActivitiesContextType {
     setActivities: Dispatch<SetStateAction<ActivityType[]>>
 }
 
+interface ActivitiesProviderProps {
+    children: ReactNode;
+    onLoad?: () => void;
+}
+
 const ActivitiesContext = createContext<ActivitiesContextType | undefined>(undefined);
 
-export const ActivitiesProvider = ({children}: {children: ReactNode}) => {
+export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) => {
     const [activities, setActivities] = useState<ActivityType[]>([])
 
     useEffect(() => {
@@ -35,6 +40,8 @@ export const ActivitiesProvider = ({children}: {children: ReactNode}) => {
                 setActivities(activitiesFromDb);
             } catch (error) {
                 throw new Error('fail to get activities from strava')
+            } finally{
+                onLoad?.()
             }
         }
 

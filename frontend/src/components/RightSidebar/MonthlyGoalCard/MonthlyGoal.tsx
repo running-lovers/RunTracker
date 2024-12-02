@@ -24,8 +24,7 @@ export default function MonthlyGoal() {
     const currentMonth = now.getMonth()+1;
     const{activities} = useActivities();
 
-    console.log('activities:', activities);
-    const ActivitiesOfThisMonth = useMemo(() => {
+    const ActivitiesOfThisMonth = useMemo(() => {      
         return activities.filter((activity) => {
             const activityDate = new Date(activity.start_time);            
             

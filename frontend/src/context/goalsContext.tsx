@@ -8,9 +8,14 @@ interface GoalsContextType {
     setGoals: React.Dispatch<React.SetStateAction<GoalsType[]>>
 }
 
+interface GoalsProviderProps {
+    children: ReactNode
+    onLoad?: () => void
+  }
+
 const GoalsContext = createContext<GoalsContextType | undefined>(undefined);
 
-export const GoalsProvider = ({children}: {children: ReactNode}) => {
+export const GoalsProvider = ({children, onLoad}: GoalsProviderProps) => {
     const [goals, setGoals] = useState<GoalsType[]>([]);
     const {user} = useUser();
     const userId= user!.id;
@@ -26,10 +31,13 @@ export const GoalsProvider = ({children}: {children: ReactNode}) => {
             } catch (error) {
                 console.error('Error fetching goals:', error )
             }
+            finally{
+                onLoad?.()
+            }
         }
 
         fetchGoals();
-    },[])
+    },[onLoad])
 
     return (
         <GoalsContext.Provider value={{goals, setGoals}}>
