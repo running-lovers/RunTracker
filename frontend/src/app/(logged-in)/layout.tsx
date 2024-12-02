@@ -5,23 +5,14 @@ import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import RightSidebar from '@/components/RightSidebar/RightSidebar';
 import { ActivitiesProvider } from '@/context/activitiesContext';
 import { GoalsProvider } from '@/context/goalsContext';
-import React, { useEffect } from 'react'
-
-const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+import React from 'react'
 
 export default function Mainlayout({
   children,
-  modal
 }: Readonly<{
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  // const user = localStorage.getItem('user');
-  // const parsedUser = JSON.parse(user!);
-  // console.log(parsedUser);
-  // const userId = parsedUser.id;
-  // console.log('userId:', userId)
-
   return (
     <ProtectedRoute>
       <ActivitiesProvider>

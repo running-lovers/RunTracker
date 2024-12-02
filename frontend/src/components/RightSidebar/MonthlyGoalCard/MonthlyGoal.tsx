@@ -1,18 +1,13 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { useUser } from '@/context/userContext'
-import { getMonthlyGoals } from '@/lib/goal/goals';
-import { GoalsType } from '@/types/goalType'
 import { useGoals } from '@/context/goalsContext'
 
 export default function MonthlyGoal() {

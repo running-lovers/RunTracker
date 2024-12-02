@@ -2,12 +2,8 @@ import { Button } from "@/components/ui/Button";
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
 } from "@/components/ui/card"
-import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, Plus, MapPin } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { FaRegUserCircle } from "react-icons/fa";
 
 type ActivityType = {

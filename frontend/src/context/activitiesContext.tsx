@@ -29,6 +29,7 @@ export const ActivitiesProvider = ({children}: {children: ReactNode}) => {
 
                 await postActivities(activities, userId);
             } catch (error) {
+                console.log('error message:', error);
                 throw new Error('fail to get activities from strava')
             }
         }
