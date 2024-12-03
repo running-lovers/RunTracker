@@ -10,6 +10,7 @@ import {
 import { Progress } from "@/components/ui/progress"
 import { useGoals } from '@/context/goalsContext'
 import { useActivities } from '@/context/activitiesContext'
+import { calculateAverageSpeed, calculateTotalDistance } from '@/lib/goal/goals'
 
 export default function MonthlyGoal() {
     const {goals} = useGoals();
@@ -33,13 +34,11 @@ export default function MonthlyGoal() {
     }, [goals, currentMonth])
 
     const totalDistance = useMemo(() => {
-        console.log(activitiesOfThisMonth[0].distance);
-        return Math.round(activitiesOfThisMonth.reduce((sum, activity) => sum + activity.distance!, 0) / 1000)
+        return calculateTotalDistance(activitiesOfThisMonth);
     }, [activitiesOfThisMonth])
 
     const averageSpeed = useMemo(() => {
-        const speed = activitiesOfThisMonth.reduce((sum, activity) => sum + activity.average_speed!, 0)/ activitiesOfThisMonth.length;
-        return Math.round(speed * 100) / 100;
+        return calculateAverageSpeed(activitiesOfThisMonth);
     }, [activitiesOfThisMonth])
     
     return (
