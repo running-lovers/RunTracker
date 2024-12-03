@@ -1,6 +1,6 @@
 import React from 'react'
 import NavItem from './NavItem/NavItem'
-import { Activity, MessageSquare, Map, User, Heart, Users, Layout, Dumbbell } from "lucide-react"
+import { MessageSquare, Map, User, Users, Layout, Dumbbell } from "lucide-react"
 
 type NavItemType = {
     id: number,

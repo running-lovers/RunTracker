@@ -11,7 +11,7 @@ const REDIRECT_URI = 'http://localhost:3000';
 export const getAuthURL = (req: Request, res: Response) => {
     const {clientId}= req.body;
 
-    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=read,activity:read&approval_prompt=force`;
+    const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${REDIRECT_URI}&scope=read,activity:read,activity:write&approval_prompt=force`;
     res.json({ authUrl });
 }
 

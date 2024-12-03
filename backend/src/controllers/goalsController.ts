@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
 export const createNewGoal = async(req: Request, res: Response) => {
-    const {userId, year, month, totalDistance, averagePace, burnedCallories} = req.body;
+    const {userId, year, month, total_distance, average_pace, calories_burned} = req.body;
 
     try {
         const newGoal = await prisma.goal.create({
@@ -10,9 +10,9 @@ export const createNewGoal = async(req: Request, res: Response) => {
                 user_id: userId,
                 year: year,
                 month: month,
-                total_distance: totalDistance,
-                average_pace: averagePace,
-                calories_burned: burnedCallories
+                total_distance: total_distance,
+                average_pace: average_pace,
+                calories_burned: calories_burned
             }
         })
 
@@ -38,15 +38,15 @@ export const getGoals = async(req: Request, res: Response) => {
 
 export const updateGoal = async(req: Request, res: Response) => {
     const {goalId} = req.params
-    const {totalDistance, averagePace, burnedCallories} = req.body;
+    const {total_distance, average_pace, calories_burned} = req.body;
 
     try {
         const updatedGoal = await prisma.goal.update({
             where: {id: Number(goalId)},
             data: {
-                total_distance: totalDistance,
-                average_pace: averagePace,
-                calories_burned: burnedCallories
+                total_distance: total_distance,
+                average_pace: average_pace,
+                calories_burned: calories_burned
             }
         });
 

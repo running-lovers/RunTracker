@@ -6,9 +6,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Button } from '@/components/ui/Button'
-import { Plus } from 'lucide-react'
-import Link from 'next/link'
 
 export default function Header() {
     function setIsModalOpen(arg0: boolean): void {

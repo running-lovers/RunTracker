@@ -6,7 +6,7 @@ import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
 import { useUser } from "@/context/userContext";
 
-export default function page() {
+export default function Activitypage() {
     const [activities, setActivities] = useState<Activity[]>([
         {
             id: 1,
