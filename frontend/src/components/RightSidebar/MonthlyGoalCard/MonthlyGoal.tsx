@@ -23,7 +23,7 @@ export default function MonthlyGoal() {
         return activities.filter((activity) => {
             const activityDate = new Date(activity.start_time);            
             
-            return activityDate.getMonth() === currentMonth - 2;
+            return activityDate.getMonth() === currentMonth - 1;
         })
     }, [activities, currentMonth]) 
     
