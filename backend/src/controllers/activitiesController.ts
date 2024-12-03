@@ -55,6 +55,7 @@ export const saveNewActivity = async(req: Request, res: Response) => {
                 activity_type: activity.sport_type,
                 user_id: userId,
                 distance: activity.distance,
+                average_speed: activity.average_speed,
                 duration: activity.moving_time,
                 start_time: activity.start_date,
                 strava_activity_id: String(activity.id),
@@ -75,6 +76,7 @@ export const createActivity = async(req: Request, res: Response) => {
         userId,
         activityType,
         distance,
+        average_speed,
         duration,
        startTime,
         description,
@@ -85,6 +87,7 @@ export const createActivity = async(req: Request, res: Response) => {
             user_id: Number(userId),
             activity_type: activityType || null,
             distance: distance || 0,
+            average_speed: activityType || 0,
             duration: duration || 0,
             start_time: new Date(startTime),
             description: description || null
