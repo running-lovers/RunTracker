@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
+import { error } from "console";
 
 export const createNewGoal = async(req: Request, res: Response) => {
     const {userId, year, month, total_distance, average_pace, calories_burned} = req.body;
@@ -30,6 +31,13 @@ export const getGoals = async(req: Request, res: Response) => {
         const goals = await prisma.goal.findMany({
             where: {user_id: Number(userId), deleted_at: null},
         });
+
+        // if (goals.length === 0) {
+        //     console.error(error);
+            
+        //     return res.status(404).json({ error: 'No goals found for this user' });
+        // }
+
         res.json(goals)
     } catch (error) {
         res.status(500).json({error: 'fail to fetch goals data'})

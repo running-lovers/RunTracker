@@ -30,8 +30,12 @@ export default function MonthlyGoal() {
     console.log('Activity of this month:', activitiesOfThisMonth);
     
     const goalOfThisMonth = useMemo(() => {
-        return  goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
+        const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
+        return goal;
     }, [goals, currentMonth])
+
+    console.log('goalOfThisMonth',goalOfThisMonth);
+    
 
     const totalDistance = useMemo(() => {
         return calculateTotalDistance(activitiesOfThisMonth);
@@ -50,14 +54,14 @@ export default function MonthlyGoal() {
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Total Distance</span>
-                        <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth?.total_distance}km</span>
+                        <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth ? goalOfThisMonth.total_distance : ' -- '}km</span>
                     </div>
                         <Progress value={70} className='h-2' />
                 </div>
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Average Pace</span>
-                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth?.average_pace}km/h</span>
+                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth ? goalOfThisMonth.average_pace : ' -- '}km/h</span>
                     </div>
                         <Progress value={85} className='h-2' />
                 </div>
