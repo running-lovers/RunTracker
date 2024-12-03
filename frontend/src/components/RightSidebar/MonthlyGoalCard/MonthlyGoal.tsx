@@ -1,20 +1,14 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { useUser } from '@/context/userContext'
-import { getMonthlyGoals } from '@/lib/goal/goals';
-import { GoalsType } from '@/types/goalType'
 import { useGoals } from '@/context/goalsContext'
-import { getActivitiesFromDb } from '@/lib/activity'
 import { useActivities } from '@/context/activitiesContext'
 
 export default function MonthlyGoal() {
@@ -24,20 +18,24 @@ export default function MonthlyGoal() {
     const currentMonth = now.getMonth()+1;
     const{activities} = useActivities();
 
-    const ActivitiesOfThisMonth = useMemo(() => {      
+    const activitiesOfThisMonth = useMemo(() => {      
         return activities.filter((activity) => {
             const activityDate = new Date(activity.start_time);            
             
             return activityDate.getMonth() === currentMonth - 2;
         })
-    }, [activities]) 
+    }, [activities, currentMonth]) 
     
-    console.log('Activity of this month:', ActivitiesOfThisMonth);
+    console.log('Activity of this month:', activitiesOfThisMonth);
     
-    
-    const goalOfThisMonth = goals.find(
-        (g) => Number(g.year) === currentYear && Number(g.month) === currentMonth
-    )  
+    const goalOfThisMonth = useMemo(() => {
+        return  goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
+    }, [goals, currentMonth])
+
+    const totalDistance = useMemo(() => {
+        console.log(activitiesOfThisMonth[0].distance);
+        return Math.round(activitiesOfThisMonth.reduce((sum, activity) => sum + activity.distance!, 0) / 1000)
+    }, [activitiesOfThisMonth])
     
     return (
         <Card className='bg-white mr-4 mt-5'>
@@ -48,7 +46,7 @@ export default function MonthlyGoal() {
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Total Distance</span>
-                        <span className='text-sm text-muted-foreground'>56.7/{goalOfThisMonth?.total_distance}km</span>
+                        <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth?.total_distance}km</span>
                     </div>
                         <Progress value={70} className='h-2' />
                 </div>
