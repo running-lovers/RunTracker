@@ -27,13 +27,14 @@ export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) 
 
         const fetchAndSaveActivities = async() => {
             try {
-                const activities = await getActivitiesFromStrava(accessToken);
-                console.log('activitiesfromstrava:', activities);
+                const activities:ActivityType[] = await getActivitiesFromStrava(accessToken);
                 if(!activities) {
                     throw new Error('fail to get activities from strava')
                 }
+                console.log('activitiesfromstrava:', activities);
+                const RunActivities = activities.filter(activity => activity.sport_type === "Run");
                 
-                await postActivities(activities, userId);
+                await postActivities(RunActivities, userId);
 
                 const activitiesFromDb = await getActivitiesFromDb(userId);
                 console.log('activitiesFromDb:', activitiesFromDb);
