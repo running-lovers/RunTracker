@@ -1,3 +1,12 @@
+interface RawUserConnection {
+  id: number;
+  name: string;
+  strava_id?: string | null;
+  relationship?: 'following' | 'follower';
+  isFollowing?: boolean;
+  isFollower?: boolean;
+}
+
 import { ConnectionUser } from "@/types/connectionUserType";
 
 export const fetchUserConnections = async (userId: number) => {
@@ -15,7 +24,7 @@ export const fetchUserConnections = async (userId: number) => {
   return response.json();
 };
 
-export const formatUserConnections = (connections: any[]): ConnectionUser[] => {
+export const formatUserConnections = (connections: RawUserConnection[]): ConnectionUser[] => {
   return connections.map((user) => ({
       id: user.id,
       name: user.name,
@@ -81,7 +90,7 @@ export const fetchAndFormatUsers = async (currentUserId: number): Promise<Connec
       const data = await response.json();
       console.log('Raw data from backend:', data);
 
-      const formattedUsers = data.map((user: any) => ({
+      const formattedUsers = data.map((user: RawUserConnection) => ({
           id: user.id,
           name: user.name,
           username: user.strava_id?.toString() || '',

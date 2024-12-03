@@ -26,11 +26,15 @@ interface FriendProfile {
   isFollowing?: boolean;
 }
 
+interface FollowingUser {
+  id: number;
+}
+
 const FriendProfile: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const { user: currentUser } = useUser();
-  const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">("weekly");
+  const [activeTab] = useState<"weekly" | "monthly" | "yearly">("weekly");
   const [friend, setFriend] = useState<FriendProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,8 +78,8 @@ const FriendProfile: React.FC = () => {
         const data = await response.json();
 
         const followStatusResponse = await fetch(`http://localhost:8080/api/connections/${currentUser?.id}/following`);
-        const followingUsers = await followStatusResponse.json();
-        const isFollowing = followingUsers.some((u: any) => u.id === parseInt(params.userId as string));
+        const followingUsers = await followStatusResponse.json() as FollowingUser[];
+        const isFollowing = followingUsers.some((u) => u.id === parseInt(params.userId as string));
 
         setFriend({ ...data, isFollowing });
       } catch (error) {
