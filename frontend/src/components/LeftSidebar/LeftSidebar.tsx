@@ -5,12 +5,10 @@ import { FaRegUserCircle } from "react-icons/fa";
 import NavList from "./NavList/NavList"
 import { Button } from "../ui/Button";
 import { useUser } from "@/context/userContext";
-import { log } from "util";
 
 export default function LeftSidebar() {
 
     const { user, setUser } = useUser();
-    console.log('stravaId:', user);
 
     const handleLogout = async () => {
         

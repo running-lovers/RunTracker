@@ -3,24 +3,27 @@
 import LeftSidebar from '@/components/LeftSidebar/LeftSidebar';
 import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import RightSidebar from '@/components/RightSidebar/RightSidebar';
-import { UserProvider, useUser } from '@/context/userContext';
-import React, { useEffect } from 'react'
+import { ActivitiesProvider } from '@/context/activitiesContext';
+import { GoalsProvider } from '@/context/goalsContext';
+import React from 'react'
 
 export default function Mainlayout({
   children,
-  modal
 }: Readonly<{
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  const {setUser, setIsLoading} = useUser()
   return (
-      <ProtectedRoute>
-        <div className='flex flex-1'>
-          <LeftSidebar />
-          <main className='flex-grow h-screen overflow-y-auto'>{children}</main>
-          <RightSidebar />
-        </div>
-      </ProtectedRoute>
+    <ProtectedRoute>
+      <ActivitiesProvider>
+        <GoalsProvider>
+          <div className='flex flex-1'>
+            <LeftSidebar />
+            <main className='flex-grow h-screen overflow-y-auto'>{children}</main>
+            <RightSidebar />
+          </div>
+        </GoalsProvider>
+      </ActivitiesProvider>
+    </ProtectedRoute>
   )
 }
