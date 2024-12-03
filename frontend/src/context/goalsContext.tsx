@@ -35,8 +35,9 @@
                     onLoad?.()
                 }
             }
+            
             fetchGoals();
-        },[onLoad])
+        },[])
         
 
         return (
