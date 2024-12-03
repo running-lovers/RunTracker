@@ -1,105 +1,167 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useUser } from "@/context/userContext";
+import { followUser, unfollowUser } from "@/lib/connections";
 
-  
-
-// (hardcoded)
-const friendProfile = {
-  id: 1,
-  name: "John Doe",
-  username: "@johndoe",
-  bio: "Passionate runner, always striving to improve my personal best. Love exploring new routes!",
-  location: "Tokyo, Japan",
-  joined: "March 2023",
+const STATIC_DATA = {
   stats: {
-    weekly: { distance: "42.5 km", pace: "5'20\"/km", time: "3h 45m", calories: "2,450 kcal" },
-    monthly: { distance: "180.3 km", pace: "5'15\"/km", time: "15h 20m", calories: "10,500 kcal" },
-    yearly: { distance: "1,500 km", pace: "5'10\"/km", time: "120h 30m", calories: "90,000 kcal" },
+    weekly: { distance: "●●● km", pace: "●'●●\"/km", time: "●h ●●m", calories: "●,●●● kcal" },
+    monthly: { distance: "XXX km", pace: "X'XX\"/km", time: "XXh XXm", calories: "XX,XXX kcal" },
+    yearly: { distance: "■■■ km", pace: "■'■■\"/km", time: "■■■h ■■m", calories: "■■■,■■■ kcal" },
   },
   activities: [
-    { id: 1, title: "Morning Run", distance: "10.2 km", time: "52:30", pace: "5'08\"/km", date: "2 days ago" },
-    { id: 2, title: "Evening Run", distance: "8.5 km", time: "45:10", pace: "5'18\"/km", date: "3 days ago" },
+    { id: 1, title: "Sample Activity A", distance: "●●.● km", time: "●●:●●", pace: "●'●●\"/km", date: "X days ago" },
+    { id: 2, title: "Sample Activity B", distance: "■■.■ km", time: "■■:■■", pace: "■'■■\"/km", date: "X days ago" },
   ],
 };
 
+interface FriendProfile {
+  id: number;
+  name: string;
+  strava_id: string;
+  followersCount: number;
+  followingCount: number;
+  isFollowing?: boolean;
+}
+
 const FriendProfile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">("weekly"); // สำหรับการเลือกแท็บ Activity Summary
+  const params = useParams();
   const router = useRouter();
+  const { user: currentUser } = useUser();
+  const [activeTab, setActiveTab] = useState<"weekly" | "monthly" | "yearly">("weekly");
+  const [friend, setFriend] = useState<FriendProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFollowToggle = async () => {
+    if (!currentUser || !friend) return;
+
+    try {
+      if (friend.isFollowing) {
+        await unfollowUser(currentUser.id, friend.id);
+      } else {
+        await followUser(currentUser.id, friend.id);
+      }
+
+      setFriend(prev => prev ? {
+        ...prev,
+        isFollowing: !prev.isFollowing,
+        followersCount: prev.isFollowing ? prev.followersCount - 1 : prev.followersCount + 1
+      } : null);
+
+    } catch (error) {
+      console.error('Error:', error);
+      if (error instanceof Error) {
+        alert(`Failed to ${friend.isFollowing ? 'unfollow' : 'follow'} user: ${error.message}`);
+      } else {
+        alert('An unexpected error occurred. Please try again.');
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchFriendDetail = async () => {
+      try {
+        console.log('Fetching friend detail for userId:', params.userId);
+        const response = await fetch(`http://localhost:8080/api/connections/friend/${params.userId}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Server response:', errorData);
+          throw new Error('Failed to fetch friend detail');
+        }
+        const data = await response.json();
+
+        const followStatusResponse = await fetch(`http://localhost:8080/api/connections/${currentUser?.id}/following`);
+        const followingUsers = await followStatusResponse.json();
+        const isFollowing = followingUsers.some((u: any) => u.id === parseInt(params.userId as string));
+
+        setFriend({ ...data, isFollowing });
+      } catch (error) {
+        console.error('Error details:', error);
+        setError('Failed to load friend details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.userId && currentUser) {
+      fetchFriendDetail();
+    }
+  }, [params.userId, currentUser]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+  if (!friend) return <div>Friend not found</div>;
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-      <button onClick={() => router.push("/friends")} className="text-gray-600">
+        <button onClick={() => router.push("/friends")} className="text-gray-600">
           ← Back to friends
         </button>
         <div className="flex gap-4">
           <button className="px-4 py-2 bg-gray-200 rounded">Start Chat</button>
-          <button className="px-4 py-2 bg-black text-white rounded">Follow</button>
+          <button
+            onClick={handleFollowToggle}
+            className={`
+              px-4 py-2 rounded transition-all duration-200
+              ${friend?.isFollowing
+                ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-black text-white hover:bg-gray-800"
+              }
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black
+            `}
+          >
+            {friend?.isFollowing ? "Unfollow" : "Follow"}
+          </button>
         </div>
       </div>
 
       {/* Friend Info */}
       <div className="p-6 bg-gray-100 rounded shadow">
-        <h2 className="text-2xl font-bold">{friendProfile.name}</h2>
-        <p className="text-gray-500">{friendProfile.username}</p>
-        <p className="mt-2">{friendProfile.bio}</p>
-        <p className="mt-4 text-gray-500">
-          📍 {friendProfile.location} · 📅 Joined {friendProfile.joined}
-        </p>
+        <h2 className="text-2xl font-bold">{friend.name}</h2>
+        <div className="mt-4 flex gap-4 text-gray-500">
+          <div>
+            <span className="font-semibold">{friend.followersCount}</span> followers
+          </div>
+          <div>
+            <span className="font-semibold">{friend.followingCount}</span> following
+          </div>
+        </div>
       </div>
 
       {/* Activity Summary */}
       <div className="p-6 bg-gray-100 rounded shadow">
         <h3 className="text-xl font-semibold">Activity Summary</h3>
-        <div className="flex space-x-4 mt-4">
-          {["weekly", "monthly", "yearly"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as "weekly" | "monthly" | "yearly")}
-              className={`px-4 py-2 rounded ${
-                activeTab === tab ? "bg-white font-semibold" : "text-gray-500"
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
+        {/* ... タブ部分 ... */}
         <div className="mt-6 grid grid-cols-2 gap-y-4">
-            {/* Total Distance */}
-            <div>
-                <p className="text-sm text-gray-500">Total Distance</p>
-                <p className="text-2xl font-bold">{friendProfile.stats[activeTab].distance}</p>
-            </div>
-
-            {/* Avg. Pace */}
-            <div>
-                <p className="text-sm text-gray-500">Avg. Pace</p>
-                <p className="text-2xl font-bold">{friendProfile.stats[activeTab].pace}</p>
-            </div>
-
-            {/* Total Time */}
-            <div>
-                <p className="text-sm text-gray-500">Total Time</p>
-                <p className="text-2xl font-bold">{friendProfile.stats[activeTab].time}</p>
-            </div>
-
-            {/* Calories Burned */}
-            <div>
-                <p className="text-sm text-gray-500">Calories Burned</p>
-                <p className="text-2xl font-bold">{friendProfile.stats[activeTab].calories}</p>
-            </div>
+          <div>
+            <p className="text-sm text-gray-500">Total Distance</p>
+            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].distance}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Avg. Pace</p>
+            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].pace}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Total Time</p>
+            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].time}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Calories Burned</p>
+            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].calories}</p>
+          </div>
         </div>
-
       </div>
 
       {/* Recent Activities */}
       <div className="p-6 bg-gray-100 rounded shadow">
         <h3 className="text-xl font-semibold">Recent Activities</h3>
         <ul className="mt-4 space-y-4">
-          {friendProfile.activities.map((activity) => (
+          {STATIC_DATA.activities.map((activity) => (
             <li key={activity.id} className="flex justify-between">
               <div>
                 <h4 className="font-semibold">{activity.title}</h4>
