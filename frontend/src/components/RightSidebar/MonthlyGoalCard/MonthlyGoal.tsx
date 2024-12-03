@@ -25,17 +25,14 @@ export default function MonthlyGoal() {
             
             return activityDate.getMonth() === currentMonth - 1;
         })
-    }, [activities, currentMonth]) 
-    
+    }, [activities, currentMonth])  
     console.log('Activity of this month:', activitiesOfThisMonth);
     
     const goalOfThisMonth = useMemo(() => {
         const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
         return goal;
     }, [goals, currentMonth])
-
     console.log('goalOfThisMonth',goalOfThisMonth);
-    
 
     const totalDistance = useMemo(() => {
         return calculateTotalDistance(activitiesOfThisMonth);
