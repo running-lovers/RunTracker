@@ -1,12 +1,14 @@
 'use client'
 
 import { ActivityType } from "@/types/activityType";
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 import { getActivitiesFromDb, getActivitiesFromStrava, postActivities } from "@/lib/activity";
+import { errorMonitor } from "events";
 
 interface ActivitiesContextType {
     activities: ActivityType[],
-    setActivities: Dispatch<SetStateAction<ActivityType[]>>
+    setActivities: Dispatch<SetStateAction<ActivityType[]>>,
+    activitiesOfThisMonth: ActivityType[]
 }
 
 interface ActivitiesProviderProps {
@@ -18,6 +20,10 @@ const ActivitiesContext = createContext<ActivitiesContextType | undefined>(undef
 
 export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) => {
     const [activities, setActivities] = useState<ActivityType[]>([])
+    const [activitiesOfThisMonth, setActivitiesOfThisMonth] = useState<ActivityType[]>([])
+    const now = new Date()
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth()+1;
 
     useEffect(() => {
         const user = localStorage.getItem('user');
@@ -49,8 +55,24 @@ export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) 
         fetchAndSaveActivities();
     }, [])
 
+    useEffect(() => {
+        const res = activities.filter((activity) => {
+            const activityDate = new Date(activity.start_time);
+            return activityDate.getMonth() === currentMonth - 1; 
+        })
+        setActivitiesOfThisMonth(res);
+    }, [activities, currentMonth])
+
+    // const activitiesOfThisMonth = useMemo(() => {      
+    //     return activities.filter((activity) => {
+    //         const activityDate = new Date(activity.start_time);            
+            
+    //         return activityDate.getMonth() === currentMonth - 1;
+    //     })
+    // }, [activities, currentMonth])  
+
     return (
-        <ActivitiesContext.Provider value={{activities, setActivities}}>
+        <ActivitiesContext.Provider value={{activities, setActivities, activitiesOfThisMonth}}>
             {children}
         </ActivitiesContext.Provider>
     )

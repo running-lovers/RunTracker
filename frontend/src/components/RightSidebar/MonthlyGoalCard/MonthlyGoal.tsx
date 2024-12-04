@@ -13,25 +13,11 @@ import { useActivities } from '@/context/activitiesContext'
 import { calculateAverageSpeed, calculateTotalDistance } from '@/lib/goal/goals'
 
 export default function MonthlyGoal() {
-    const {goals} = useGoals();
-    const now = new Date()
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth()+1;
-    const{activities} = useActivities();
+    const {goalOfThisMonth} = useGoals();
+    const{activitiesOfThisMonth} = useActivities();
 
-    const activitiesOfThisMonth = useMemo(() => {      
-        return activities.filter((activity) => {
-            const activityDate = new Date(activity.start_time);            
-            
-            return activityDate.getMonth() === currentMonth - 1;
-        })
-    }, [activities, currentMonth])  
     console.log('Activity of this month:', activitiesOfThisMonth);
-    
-    const goalOfThisMonth = useMemo(() => {
-        const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
-        return goal;
-    }, [goals, currentMonth])
+
     console.log('goalOfThisMonth',goalOfThisMonth);
 
     const totalDistance = useMemo(() => {
