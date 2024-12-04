@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/userContext";
+import { useRouter } from "next/navigation";
 import { fetchAndFormatUsers, filterUsersByQuery, filterUsersByType, followUser, unfollowUser } from "@/lib/connections";
 import { ConnectionUser } from "@/types/connectionUserType";
 
 export default function FriendsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<'searchResults' | 'following' | 'followers'>('searchResults');
   const [users, setUsers] = useState<ConnectionUser[]>([]);
@@ -110,7 +112,10 @@ export default function FriendsPage() {
                 className="flex items-center justify-between p-4 bg-white rounded shadow hover:shadow-md transition-shadow duration-200"
               >
                 {/* User Info */}
-                <div className="flex items-center gap-4">
+                <div 
+                  className="flex items-center gap-4 cursor-pointer hover:opacity-80"
+                  onClick={() => router.push(`/friends/${user.id}`)}
+                >
                   <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
                     {user.name[0].toUpperCase()}
                   </div>
@@ -122,7 +127,10 @@ export default function FriendsPage() {
 
                 {/* Follow/Unfollow Button */}
                 <button
-                  onClick={() => handleFollowToggle(user)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFollowToggle(user);
+                  }}
                   className={`
                     px-4 py-2 rounded transition-all duration-200
                     ${user.isFollowing
