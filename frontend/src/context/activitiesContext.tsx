@@ -3,7 +3,6 @@
 import { ActivityType } from "@/types/activityType";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 import { getActivitiesFromDb, getActivitiesFromStrava, postActivities } from "@/lib/activity";
-import { errorMonitor } from "events";
 
 interface ActivitiesContextType {
     activities: ActivityType[],

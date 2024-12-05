@@ -1,7 +1,7 @@
 export interface ActivityType {
   id: number
   name: string
-  activity_type: string
+  sport_type: string
   start_time: string
   Distance?: number
   elapsed_time?: string
