@@ -1,6 +1,5 @@
 'use client'
-
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
     Card,
     CardContent,
@@ -9,12 +8,26 @@ import {
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { useGoals } from '@/context/goalsContext'
+import { getActivitiesFromDb } from '@/lib/activity'
+import { useActivities } from '@/context/activitiesContext'
 
 export default function MonthlyGoal() {
     const {goals} = useGoals();
     const now = new Date()
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth()+1;
+    const{activities} = useActivities();
+
+    const ActivitiesOfThisMonth = useMemo(() => {      
+        return activities.filter((activity) => {
+            const activityDate = new Date(activity.start_time);            
+            
+            return activityDate.getMonth() === currentMonth - 2;
+        })
+    }, [activities]) 
+    
+    console.log('Activity of this month:', ActivitiesOfThisMonth);
+    
     
     const goalOfThisMonth = goals.find(
         (g) => Number(g.year) === currentYear && Number(g.month) === currentMonth
