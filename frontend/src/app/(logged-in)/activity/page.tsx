@@ -5,47 +5,49 @@ import React, { useState } from 'react'
 import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
 import { useUser } from "@/context/userContext";
-
+import { useActivities } from '@/context/activitiesContext'
 
 export default function Activitypage() {
-    const [activities, setActivities] = useState<Activity[]>([
-        {
-            id: 1,
-            title: "Morning Run",
-            date: "16 October 2024",
-            time: "15:55",
-            Distance: 8.53,
-            Duration: "01:15:38",
-            Calories: 234,
-            user: "Yasuhito Komano",
-            status: "completed",
-            description: "A refreshing morning run through the local park."
-        },
-        {
-            id: 2,
-            title: "Evening Jog",
-            date: "11/12",
-            time: "11:00",
-            Distance: 5,
-            Duration: "00:30:00",
-            Calories: 150,
-            user: "Yasuhito Komano",
-            status: "planned",
-            description: "An easy jog to wind down after work."
-        },
-        {
-            id: 3,
-            title: "Afternoon Run",
-            date: "18 October 2024",
-            time: "14:30",
-            Distance: 7.2,
-            Duration: "00:47:22",
-            Calories: 210,
-            user: "Yasuhito Komano",
-            status: "completed",
-            description: "A challenging run on hilly terrain."
-        }
-    ])
+    // const [activities, setActivities] = useState<Activity[]>([
+    //     {
+    //         id: 1,
+    //         title: "Morning Run",
+    //         date: "16 October 2024",
+    //         time: "15:55",
+    //         Distance: 8.53,
+    //         Duration: "01:15:38",
+    //         Calories: 234,
+    //         user: "Yasuhito Komano",
+    //         status: "completed",
+    //         description: "A refreshing morning run through the local park."
+    //     },
+    //     {
+    //         id: 2,
+    //         title: "Evening Jog",
+    //         date: "11/12",
+    //         time: "11:00",
+    //         Distance: 5,
+    //         Duration: "00:30:00",
+    //         Calories: 150,
+    //         user: "Yasuhito Komano",
+    //         status: "planned",
+    //         description: "An easy jog to wind down after work."
+    //     },
+    //     {
+    //         id: 3,
+    //         title: "Afternoon Run",
+    //         date: "18 October 2024",
+    //         time: "14:30",
+    //         Distance: 7.2,
+    //         Duration: "00:47:22",
+    //         Calories: 210,
+    //         user: "Yasuhito Komano",
+    //         status: "completed",
+    //         description: "A challenging run on hilly terrain."
+    //     }
+    // ])
+    const { activities, setActivities } = useActivities();
+    console.log('Activity:', activities);
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -86,18 +88,28 @@ export default function Activitypage() {
                     </button>
                 </div>
                 <div className='flex flex-col mx-5 gap-y-3'>
-                    {activities.map((activity) => (
+                    {activities?.map((activity) => (
                         <ActivityCard
-                            key={activity.id} 
-                            activityStatus={activity.status} 
-                            username={activity.user} 
-                            title={activity.title}
-                            Date={activity.date} 
-                            Time={activity.time} 
-                            description={activity.description}
-                            distance={activity.Distance}
-                            duration={activity.Duration}
-                            calories={activity.Calories}
+                            // key={activity.id} 
+                            // activityStatus={activity.status || 'unknown'}
+                            // username={activity.user} 
+                            // title={activity.title}
+                            // Date={activity.date} 
+                            // Time={activity.time} 
+                            // description={activity.description}
+                            // distance={activity.Distance}
+                            // duration={activity.Duration}
+                            // calories={activity.Calories}
+                            key={activity.id}
+                            activityStatus={activity.type === 'Run' ? 'completed' : 'planned'}
+                            username={activity.athlete?.id.toString() || 'Unknown'}
+                            title={activity.name}
+                            Date={new Date(activity.start_date).toLocaleDateString()}
+                            Time={new Date(activity.start_date).toLocaleTimeString()}
+                            description={`Activity type: ${activity.type}`}
+                            distance={activity.distance / 1000}
+                            duration={`${Math.floor(activity.elapsed_time / 60)}m ${activity.elapsed_time % 60}s`}
+                            calories={activity.average_speed.toFixed(2)}
                             />
                     ))}
                 </div>
