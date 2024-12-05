@@ -1,18 +1,12 @@
 'use client'
-
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { useUser } from '@/context/userContext'
-import { getMonthlyGoals } from '@/lib/goal/goals';
-import { GoalsType } from '@/types/goalType'
 import { useGoals } from '@/context/goalsContext'
 import { getActivitiesFromDb } from '@/lib/activity'
 import { useActivities } from '@/context/activitiesContext'

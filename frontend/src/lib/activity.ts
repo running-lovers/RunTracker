@@ -1,4 +1,3 @@
-import { useUser } from "@/context/userContext"
 import { ActivityType } from "@/types/activityType";
 
 // type PostActivityParams = {

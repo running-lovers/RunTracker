@@ -1,8 +1,7 @@
 'use client'
 
 import { useUser } from '@/context/userContext';
-import { handleStravaCallback } from '@/lib/handleStravaCallback';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react'
 
 type Props = {

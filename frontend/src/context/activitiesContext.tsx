@@ -40,6 +40,7 @@ export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) 
                 console.log('activitiesFromDb:', activitiesFromDb);
                 setActivities(activitiesFromDb);
             } catch (error) {
+                console.log('error message:', error);
                 throw new Error('fail to get activities from strava')
             } finally{
                 onLoad?.()

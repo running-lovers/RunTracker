@@ -1,11 +1,9 @@
 'use client'
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
