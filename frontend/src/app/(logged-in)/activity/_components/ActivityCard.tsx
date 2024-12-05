@@ -6,21 +6,9 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useUser } from "@/context/userContext";
+import { ActivityCardProps } from './ActivityCardTypes';
 
-
-type ActivityCardProps = {
-    activityStatus: "planned" | "completed",
-    // username: string,
-    title: string,
-    Date: string,
-    Time: string,
-    description: string,
-    distance?: number,
-    duration?: string,
-    calories?: string
-}
-
-export default function ActivityCard({ activityStatus, title, Date, Time, description, distance, duration, calories 
+export default function ActivityCard({ activityStatus, title, Date, Time, description, distance, duration, AvgSpeed 
 }: ActivityCardProps) {
     const { user } = useUser();
     const username = user?.name || "Unknown User";
@@ -30,7 +18,10 @@ export default function ActivityCard({ activityStatus, title, Date, Time, descri
                 <CardHeader>
                     <div>
                     {username 
-                            ? username.split('').map(name => name[0]).join('') 
+                            ? username
+                                .split('')
+                                .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+                                .join('') 
                             : 'U'}
                     </div>
                     <div>
@@ -59,7 +50,7 @@ export default function ActivityCard({ activityStatus, title, Date, Time, descri
                         <div>
                             <div>Distance</div>
                             <div>
-                                <span>{distance}</span>
+                                <span>{distance} km.</span>
                             </div>
                         </div>
                         <div>
@@ -69,9 +60,9 @@ export default function ActivityCard({ activityStatus, title, Date, Time, descri
                             </div>
                         </div>
                         <div>
-                            <div>Calories</div>
+                            <div>Average Speed</div>
                             <div>
-                                <span>{calories}</span>
+                                <span>{AvgSpeed} m/s</span>
                             </div>
                         </div>
                     </div>
