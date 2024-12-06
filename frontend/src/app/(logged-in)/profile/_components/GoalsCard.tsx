@@ -108,8 +108,7 @@ export default function GoalsCard() {
 
     const averageSpeed =  useMemo(() => {
         return calculateAverageSpeed(activitiesOfEachMonth);
-    }, [activitiesOfEachMonth])
-    
+    }, [activitiesOfEachMonth])    
 
 
     return (
@@ -194,14 +193,14 @@ export default function GoalsCard() {
                             <span className='text-md font-medium'>Total Distance</span>
                             <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfEachMonth ? goalOfEachMonth.total_distance : ' -- '}km</span>
                         </div>
-                        <Progress value={70} className='h-2' />
+                        <Progress value={Math.min((totalDistance / (goalOfEachMonth?.total_distance || 1)) * 100, 100)} className='h-2' />
                     </div>
                     <div>
                         <div className='mb-2 flex items-center justify-between '>
                             <span className='text-md font-medium'>Average Pace</span>
                             <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfEachMonth ? goalOfEachMonth.average_speed : ' -- '}km/h</span>
                         </div>
-                        <Progress value={85} className='h-2' />
+                        <Progress value={Math.min((averageSpeed / (goalOfEachMonth?.average_speed || 1)) * 100, 100)} className='h-2' />
                     </div>
                 </CardContent>
             </Card>

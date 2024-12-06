@@ -28,6 +28,7 @@ export default function MonthlyGoal() {
         return calculateAverageSpeed(activitiesOfThisMonth);
     }, [activitiesOfThisMonth])
     
+    
     return (
         <Card className='bg-white mr-4 mt-5'>
             <CardHeader>
@@ -39,7 +40,9 @@ export default function MonthlyGoal() {
                         <span className='text-sm font-medium'>Total Distance</span>
                         <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth ? goalOfThisMonth.total_distance : ' -- '}km</span>
                     </div>
-                        <Progress value={70} className='h-2' />
+                        <Progress value={goalOfThisMonth && goalOfThisMonth.total_distance ? Math.min((totalDistance / goalOfThisMonth.total_distance) * 100, 100) : 0} 
+                                  className='h-2'
+                        />
                 </div>
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
