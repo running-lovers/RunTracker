@@ -70,7 +70,7 @@ export const updateGoal = async(req: Request, res: Response) => {
             where: {id: Number(goalId)},
             data: {
                 total_distance: total_distance,
-                average_pace: average_pace,
+                average_speed: average_pace,
                 calories_burned: calories_burned
             }
         });
