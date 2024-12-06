@@ -19,8 +19,8 @@ export const createAndUpdateGoal = async(req: Request, res: Response) => {
             newGoal = await prisma.goal.update({
                 where: {id: existingGoal.id},
                 data: {
-                    total_distance: total_distance,
-                    average_speed: average_speed,
+                    total_distance: Number(total_distance),
+                    average_speed: Number(average_speed),
                 }
             })
         }else {
@@ -29,8 +29,8 @@ export const createAndUpdateGoal = async(req: Request, res: Response) => {
                     user_id: userId,
                     year: year,
                     month: month,
-                    total_distance: total_distance,
-                    average_speed: average_speed
+                    total_distance: Number(total_distance),
+                    average_speed: Number(average_speed),
                 }
             })
         }
@@ -63,15 +63,14 @@ export const getGoals = async(req: Request, res: Response) => {
 
 export const updateGoal = async(req: Request, res: Response) => {
     const {goalId} = req.params
-    const {total_distance, average_pace, calories_burned} = req.body;
+    const {total_distance, average_speed } = req.body;
 
     try {
         const updatedGoal = await prisma.goal.update({
             where: {id: Number(goalId)},
             data: {
                 total_distance: total_distance,
-                average_speed: average_pace,
-                calories_burned: calories_burned
+                average_speed: average_speed,
             }
         });
 

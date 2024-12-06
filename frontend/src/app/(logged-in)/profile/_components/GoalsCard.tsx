@@ -24,10 +24,12 @@ import {
 import { Label } from '@/components/ui/label'
 import { useUser } from '@/context/userContext'
 
+const apiUrl= process.env.NEXT_PUBLIC_BACKEND_URL 
+
 export default function GoalsCard() {
     const { activitiesOfThisMonth } = useActivities();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const { goals } = useGoals();
+    const { goals, setGoals } = useGoals();
     const now = new Date()
     const currentYear = now.getFullYear();
     const currentMonth = (now.getMonth() + 1).toString() //12
@@ -35,6 +37,45 @@ export default function GoalsCard() {
     const [goalOfEachMonth, setGoalOfEachMonth] = useState<GoalsType>();
     const {user} = useUser();
     const userId = user?.id;
+    const [selectedYearAndMonth, setSelectedYearAndMonth] = useState<string>("");
+    const [newDistance, setNewDistance] = useState<string>("");
+    const [newAverageSpeed, setNewAverageSpeed] = useState<string>("");
+    
+    const handleSaveNewGoal = async() => {
+        try {
+            const [selectedYear, selectedMonth] = selectedYearAndMonth.split('-');
+            const body = JSON.stringify({
+                userId: userId,
+                year: selectedYear || currentYear,
+                month: selectedMonth || currentMonth,
+                total_distance: newDistance,
+                average_speed: newAverageSpeed
+            });
+
+            const res = await fetch(`${apiUrl}/api/goals`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: body
+            })
+
+            if(!res.ok) {
+                throw new Error('fail to save new goal')
+            }
+
+            const newGoal: GoalsType = await res.json();
+
+            setGoals((prevGoals: GoalsType[ ]) =>  [...prevGoals, newGoal])
+
+            setSelectedYearAndMonth("");
+            setNewDistance("");
+            setNewAverageSpeed("");
+            setIsEditModalOpen(false);
+        } catch (error) {
+            
+        }
+    }
 
     useEffect(() => {
         const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === Number(month))
@@ -79,32 +120,38 @@ export default function GoalsCard() {
                                 </DialogHeader>
                                 <div>
                                     <div className='grid grid-cols-4 items-center gap-4'>
-                                        <Label htmlFor='month'>Month</Label>
+                                        <Label htmlFor='yearMonth'>Month</Label>
                                         <input
-                                            id='month'
-                                            type="text"
+                                            id='yearMonth'
+                                            type="month"
+                                            value={selectedYearAndMonth}
                                             className='col-span-3'
+                                            onChange={(e) => setSelectedYearAndMonth(e.target.value)}
                                         />
                                     </div>
                                     <div className='grid grid-cols-4 items-center gap-4'>
                                         <Label htmlFor='distance' className='text-right'>Distance(km)</Label>
                                         <input
                                             id='distance'
-                                            type="number"
+                                            value={newDistance}
+                                            type="text"
                                             className='col-span-3'
+                                            onChange={(e) => setNewDistance(e.target.value)}
                                         />
                                     </div>
                                     <div className='grid grid-cols-4 items-center gap-4'>
                                         <Label htmlFor='speed' className='text-right'>Average Speed(km/h)</Label>
                                         <input
                                             id='speed'
-                                            type="number"
+                                            type="text"
+                                            value={newAverageSpeed}
                                             className='col-span-3'
+                                            onChange={(e) => setNewAverageSpeed(e.target.value)}
                                         />
                                     </div>
                                 </div>
                                 <DialogFooter>
-                                    <Button>Save change</Button>
+                                    <Button onClick={handleSaveNewGoal}>Save change</Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>

@@ -11,10 +11,9 @@ export default function LeftSidebar() {
 
     const { user, setUser } = useUser();
 
-    const handleLogout = async () => {
-        
+    const handleLogout = async () => {        
         if (!user?.strava_id) {
-            console.error('Strava ID is missing');
+            console.log('Strava ID is missing');
             return;
         }
         const res = await fetch('http://localhost:8080/api/strava/logout', {
@@ -24,6 +23,7 @@ export default function LeftSidebar() {
             },
             body: JSON.stringify({ strava_id: user?.strava_id })
         })
+        
         if (res.ok) {
             setUser(null); 
             localStorage.removeItem('user')
