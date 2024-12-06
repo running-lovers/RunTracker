@@ -44,7 +44,7 @@ export default function MonthlyGoal() {
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Average Pace</span>
-                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth ? goalOfThisMonth.average_pace : ' -- '}km/h</span>
+                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth ? goalOfThisMonth.average_speed : ' -- '}km/h</span>
                     </div>
                         <Progress value={85} className='h-2' />
                 </div>

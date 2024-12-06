@@ -84,16 +84,16 @@ export default function GoalsCard() {
 
 
     return (
-        <div className='mt-5'>
+        <div className='mt-5 mb-5'>
             <h1 className='text-3xl font-bold'>Monthly Goals</h1>
-            <Card className='flex flex-col space-y-5 px-5'>
+            <Card className='flex flex-col px-5'>
                 <CardHeader>
-                    <div className='flex mt-3 justify-between'>
+                    <div className='flex justify-between'>
                         <Select onValueChange={(value) => setMonth(value)}>
                             <SelectTrigger className="w-[120px]">
                                 <SelectValue placeholder="Month" />
                             </SelectTrigger>
-                            <SelectContent className="absolute top-full mt-1 max-h-[200px] overflow-auto">
+                            <SelectContent className="absolute top-full max-h-[140px] overflow-auto">
                                 <SelectItem value="1">January</SelectItem>
                                 <SelectItem value="2">February</SelectItem>
                                 <SelectItem value="3">March</SelectItem>
@@ -115,17 +115,17 @@ export default function GoalsCard() {
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
-                                <DialogHeader>
+                                <DialogHeader className='m-auto'>
                                     <DialogTitle>Set Goals</DialogTitle>
                                 </DialogHeader>
-                                <div>
+                                <div className='flex flex-col gap-3'>
                                     <div className='grid grid-cols-4 items-center gap-4'>
-                                        <Label htmlFor='yearMonth'>Month</Label>
+                                        <Label htmlFor='yearMonth' className='text-right'>Month</Label>
                                         <input
                                             id='yearMonth'
                                             type="month"
                                             value={selectedYearAndMonth}
-                                            className='col-span-3'
+                                            className='col-span-3 border border-gray-500 rounded-sm pl-1'
                                             onChange={(e) => setSelectedYearAndMonth(e.target.value)}
                                         />
                                     </div>
@@ -133,9 +133,10 @@ export default function GoalsCard() {
                                         <Label htmlFor='distance' className='text-right'>Distance(km)</Label>
                                         <input
                                             id='distance'
+                                            placeholder='0km'
                                             value={newDistance}
                                             type="text"
-                                            className='col-span-3'
+                                            className='col-span-3 border border-gray-500 rounded-sm pl-1'
                                             onChange={(e) => setNewDistance(e.target.value)}
                                         />
                                     </div>
@@ -143,15 +144,16 @@ export default function GoalsCard() {
                                         <Label htmlFor='speed' className='text-right'>Average Speed(km/h)</Label>
                                         <input
                                             id='speed'
+                                            placeholder='0km/h'
                                             type="text"
                                             value={newAverageSpeed}
-                                            className='col-span-3'
+                                            className='col-span-3 border border-gray-500 rounded-sm pl-1'
                                             onChange={(e) => setNewAverageSpeed(e.target.value)}
                                         />
                                     </div>
                                 </div>
                                 <DialogFooter>
-                                    <Button onClick={handleSaveNewGoal}>Save change</Button>
+                                    <Button onClick={handleSaveNewGoal} className='m-auto'>Save change</Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
@@ -168,7 +170,7 @@ export default function GoalsCard() {
                     <div>
                         <div className='mb-2 flex items-center justify-between '>
                             <span className='text-md font-medium'>Average Pace</span>
-                            <span className='text-sm text-muted-foreground'>5'30"/{goalOfEachMonth ? goalOfEachMonth.average_pace : ' -- '}km</span>
+                            <span className='text-sm text-muted-foreground'>5'30"/{goalOfEachMonth ? goalOfEachMonth.average_speed : ' -- '}km</span>
                         </div>
                         <Progress value={85} className='h-2' />
                     </div>
