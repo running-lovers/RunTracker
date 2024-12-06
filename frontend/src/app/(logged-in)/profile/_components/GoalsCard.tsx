@@ -44,12 +44,16 @@ export default function GoalsCard() {
     const handleSaveNewGoal = async() => {
         try {
             const [selectedYear, selectedMonth] = selectedYearAndMonth.split('-');
+            const goalOfSelectedMonth = (y: string, m: string) => {
+                const goal = goals.find((g) =>  Number(g.year) === Number(y) && Number(g.month) === Number(m))
+                return goal;
+            }
             const body = JSON.stringify({
                 userId: userId,
                 year: selectedYear || currentYear,
                 month: selectedMonth || currentMonth,
-                total_distance: newDistance,
-                average_speed: newAverageSpeed
+                total_distance: newDistance || goalOfSelectedMonth(selectedYear, selectedMonth)?.total_distance,
+                average_speed: newAverageSpeed || goalOfSelectedMonth(selectedYear, selectedMonth)?.average_speed
             });
 
             const res = await fetch(`${apiUrl}/api/goals`, {
@@ -66,7 +70,13 @@ export default function GoalsCard() {
 
             const newGoal: GoalsType = await res.json();
 
-            setGoals((prevGoals: GoalsType[ ]) =>  [...prevGoals, newGoal])
+            // setGoals((prevGoals: GoalsType[ ]) =>  [...prevGoals, newGoal])
+            setGoals((prevGoals: GoalsType[]) => {
+                const updatedGoals = prevGoals.filter(
+                    (g) => !(Number(g.year) === Number(newGoal.year) && Number(g.month) === Number(newGoal.month))
+                );
+                return [...updatedGoals, newGoal];
+            });
 
             setSelectedYearAndMonth("");
             setNewDistance("");
@@ -80,7 +90,7 @@ export default function GoalsCard() {
     useEffect(() => {
         const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === Number(month))
         setGoalOfEachMonth(goal);
-    }, [month])
+    }, [month, goals, currentYear])
 
 
     return (
