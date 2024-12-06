@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
     Card,
     CardContent,
@@ -23,11 +23,13 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from '@/components/ui/label'
 import { useUser } from '@/context/userContext'
+import { ActivityType } from '@/types/activityType'
+import { calculateAverageSpeed, calculateTotalDistance } from '@/lib/goal/goals'
 
 const apiUrl= process.env.NEXT_PUBLIC_BACKEND_URL 
 
 export default function GoalsCard() {
-    const { activitiesOfThisMonth } = useActivities();
+    const { activities } = useActivities();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { goals, setGoals } = useGoals();
     const now = new Date()
@@ -35,6 +37,7 @@ export default function GoalsCard() {
     const currentMonth = (now.getMonth() + 1).toString() //12
     const [month, setMonth] = useState<string>(currentMonth);
     const [goalOfEachMonth, setGoalOfEachMonth] = useState<GoalsType>();
+    const [activitiesOfEachMonth, setActivitiesOfEachMonth] = useState<ActivityType[]>([])
     const {user} = useUser();
     const userId = user?.id;
     const [selectedYearAndMonth, setSelectedYearAndMonth] = useState<string>("");
@@ -70,7 +73,6 @@ export default function GoalsCard() {
 
             const newGoal: GoalsType = await res.json();
 
-            // setGoals((prevGoals: GoalsType[ ]) =>  [...prevGoals, newGoal])
             setGoals((prevGoals: GoalsType[]) => {
                 const updatedGoals = prevGoals.filter(
                     (g) => !(Number(g.year) === Number(newGoal.year) && Number(g.month) === Number(newGoal.month))
@@ -90,7 +92,24 @@ export default function GoalsCard() {
     useEffect(() => {
         const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === Number(month))
         setGoalOfEachMonth(goal);
-    }, [month, goals, currentYear])
+        const res = activities.filter((activity) => {
+            const activityDate = new Date(activity.start_time);
+            return (activityDate.getMonth() + 1).toString() === month;
+        })
+        setActivitiesOfEachMonth(res);
+    }, [month, goals, currentYear])    
+
+    const totalDistance = useMemo(() => {
+        if(!activitiesOfEachMonth) {
+            return 0;
+        }
+        return calculateTotalDistance(activitiesOfEachMonth);
+    }, [activitiesOfEachMonth])
+
+    const averageSpeed =  useMemo(() => {
+        return calculateAverageSpeed(activitiesOfEachMonth);
+    }, [activitiesOfEachMonth])
+    
 
 
     return (
@@ -173,14 +192,14 @@ export default function GoalsCard() {
                     <div>
                         <div className='mb-2 flex items-center justify-between '>
                             <span className='text-md font-medium'>Total Distance</span>
-                            <span className='text-sm text-muted-foreground'>56.7/{goalOfEachMonth ? goalOfEachMonth.total_distance : ' -- '}km</span>
+                            <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfEachMonth ? goalOfEachMonth.total_distance : ' -- '}km</span>
                         </div>
                         <Progress value={70} className='h-2' />
                     </div>
                     <div>
                         <div className='mb-2 flex items-center justify-between '>
                             <span className='text-md font-medium'>Average Pace</span>
-                            <span className='text-sm text-muted-foreground'>5'30"/{goalOfEachMonth ? goalOfEachMonth.average_speed : ' -- '}km</span>
+                            <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfEachMonth ? goalOfEachMonth.average_speed : ' -- '}km/h</span>
                         </div>
                         <Progress value={85} className='h-2' />
                     </div>
