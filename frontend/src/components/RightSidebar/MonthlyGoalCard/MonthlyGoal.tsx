@@ -49,7 +49,7 @@ export default function MonthlyGoal() {
                         <span className='text-sm font-medium'>Average Pace</span>
                         <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth ? goalOfThisMonth.average_speed : ' -- '}km/h</span>
                     </div>
-                        <Progress value={85} className='h-2' />
+                        <Progress value={goalOfThisMonth && goalOfThisMonth.average_speed ? Math.min((averageSpeed / goalOfThisMonth.average_speed) * 100, 100) : 0} className='h-2' />
                 </div>
             </CardContent>
         </Card>
