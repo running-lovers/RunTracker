@@ -1,9 +1,9 @@
-import { Request, Response, Router } from "express";
-import { createNewGoal, deleteGoal, getGoals, updateGoal } from "../controllers/goalsController";
+import { Router } from "express";
+import {  createAndUpdateGoal, deleteGoal, getGoals, updateGoal } from "../controllers/goalsController";
 
 export const router = Router();
 
-router.post('/', createNewGoal);
+router.post('/', createAndUpdateGoal);
 router.get('/:userId', getGoals);
 router.put('/:goalId', updateGoal);
 router.delete('/:goalId', deleteGoal);

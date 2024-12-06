@@ -2,21 +2,39 @@ import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 import { error } from "console";
 
-export const createNewGoal = async(req: Request, res: Response) => {
-    const {userId, year, month, total_distance, average_pace, calories_burned} = req.body;
+export const createAndUpdateGoal = async(req: Request, res: Response) => {
+    const {userId, year, month, total_distance, average_speed } = req.body;
 
     try {
-        const newGoal = await prisma.goal.create({
-            data: {
+        const existingGoal = await prisma.goal.findFirst({
+            where: {
                 user_id: userId,
                 year: year,
                 month: month,
-                total_distance: total_distance,
-                average_pace: average_pace,
-                calories_burned: calories_burned
+                deleted_at: null
             }
-        })
+        });
 
+        let newGoal;
+        if(existingGoal) {
+            newGoal = await prisma.goal.update({
+                where: {id: existingGoal.id},
+                data: {
+                    total_distance: total_distance,
+                    average_pace: average_speed,
+                }
+            })
+        }else {
+            newGoal = await prisma.goal.create({
+                data: {
+                    user_id: userId,
+                    year: year,
+                    month: month,
+                    total_distance: total_distance,
+                    average_pace: average_speed
+                }
+            })
+        }
         res.json(newGoal);
     } catch (error) {
         console.error("Error creating goal:", error);
