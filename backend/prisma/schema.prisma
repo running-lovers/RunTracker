@@ -91,7 +91,7 @@ model Goal {
   year            String
   month           String
   total_distance  Float     @default(0)
-  average_pace    Float     @default(0)
+  average_speed    Float     @default(0)
   calories_burned Float     @default(0)
   current         Float?    @default(0)
   start_date      DateTime?

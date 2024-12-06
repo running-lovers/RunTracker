@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
-import { error } from "console";
 
 export const createAndUpdateGoal = async(req: Request, res: Response) => {
     const {userId, year, month, total_distance, average_speed } = req.body;
@@ -21,7 +20,7 @@ export const createAndUpdateGoal = async(req: Request, res: Response) => {
                 where: {id: existingGoal.id},
                 data: {
                     total_distance: total_distance,
-                    average_pace: average_speed,
+                    average_speed: average_speed,
                 }
             })
         }else {
@@ -31,7 +30,7 @@ export const createAndUpdateGoal = async(req: Request, res: Response) => {
                     year: year,
                     month: month,
                     total_distance: total_distance,
-                    average_pace: average_speed
+                    average_speed: average_speed
                 }
             })
         }
