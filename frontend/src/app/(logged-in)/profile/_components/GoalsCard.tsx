@@ -136,7 +136,7 @@ export default function GoalsCard() {
                                 <SelectItem value="12">December</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Dialog > 
+                        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}> 
                             <DialogTrigger asChild>
                                 <Button variant='ghost' size='icon'>
                                     <Edit className='w-4 h-4' />
