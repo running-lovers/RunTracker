@@ -148,17 +148,10 @@ model UserProfile {
   state             String?
   country           String?
   sex               String?
-  premium           Boolean?
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
   profile_medium    String?
   profile           String?
-  measurement_preference String?
-  ftp               Int?
-  weight            Float?
-  clubs             Json?     // Storing club data as JSON
-  bikes             Json?     // Storing bike data as JSON
-  shoes             Json?     // Storing shoe data as JSON
 
   // Relation to User
   user User @relation(fields: [user_id], references: [id])
