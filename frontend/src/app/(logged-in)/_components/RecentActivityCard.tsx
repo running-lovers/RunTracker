@@ -7,30 +7,24 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { useActivities } from "@/context/activitiesContext";
 import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, Plus, MapPin } from "lucide-react"
 import { FaRegUserCircle } from "react-icons/fa";
 
-type ActivityType = {
-    id: number,
-    icon: React.ReactNode
-    name: string,
-    startDate: string,
-    distance: number,
-    time: string,
-    calories: number,
-    mapImage: string
-}
 
-const activities: ActivityType[] = [
+
+const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
     { id: 2, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Victor Sarut", startDate: "15th October, 2024 at 10:13", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" }
 ]
+
+const { activities } = useActivities();
 
 export default function RecentActivityCard() {
     return (
         <>
         <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
-            {activities.map((activity) => (
+            {temporalyActivities.map((activity) => (
                 <Card  key={activity.id} className="space-y-6 mx-3 mt-2">
                     <CardContent>
                         <div>
