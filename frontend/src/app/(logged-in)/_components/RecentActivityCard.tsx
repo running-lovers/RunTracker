@@ -8,19 +8,22 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { useActivities } from "@/context/activitiesContext";
+import { ActivityType } from "@/types/activityType";
 import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, Plus, MapPin } from "lucide-react"
 import { FaRegUserCircle } from "react-icons/fa";
 
-
+type Props = {
+    allActivities: ActivityType[]
+  }
 
 const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
     { id: 2, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Victor Sarut", startDate: "15th October, 2024 at 10:13", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" }
 ]
 
-const { activities } = useActivities();
-
-export default function RecentActivityCard() {
+export default function RecentActivityCard({allActivities}: Props) {    
+    console.log('allAcitivities: ', allActivities);
+    
     return (
         <>
         <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>

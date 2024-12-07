@@ -42,6 +42,7 @@ export const postActivities = async(params: ActivityType[], userId: number) => {
     }
 }
 
+//get activities of specific user from db
 export const getActivitiesFromDb = async(userId: number) => {
     const res = await fetch(`${apiUrl}/api/activities/${userId}`, {
         headers: {
@@ -50,10 +51,26 @@ export const getActivitiesFromDb = async(userId: number) => {
     })
 
     if(!res.ok) {
-        throw new Error('fail to get activities data from database')
+        throw new Error('fail to get activities data from server')
     }
 
     const data = await res.json();    
 
     return data;
+}
+
+//get all activities from db
+export const getAllActivitiesFromDb = async() => {
+    const res = await fetch(`${apiUrl}/api/activities`, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+    if(!res.ok) {
+        throw new Error('fail to get Activities from Server')
+    }
+
+    const data = await res.json()
+    return data
 }
