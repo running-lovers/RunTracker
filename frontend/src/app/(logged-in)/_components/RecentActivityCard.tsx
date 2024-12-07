@@ -14,15 +14,18 @@ import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, P
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 
-// type UserProfileType = {
-//     name: string,
-//     photo: string
-// }
-
-type Props = {
-    allActivities: ActivityType[]
-    // userProfile: UserProfileType
+type UserType = {
+    country: string,
+    city: string,
+    firstname: string,
+    lastname: string,
+    id: number,
+    profile: string,
+    sex: string,
+    state: string
 }
+
+type MergedDataType = ActivityType & {user: UserType}
 
 const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
@@ -33,36 +36,45 @@ export default function RecentActivityCard() {
     const [allActivities, setAllActivities] = useState<ActivityType[]>([]) 
     const {user} = useUser();
     const [userProfileData, setUserProfileData] = useState();
+    const [mergedData, setMergedData] = useState<MergedDataType[]>([]);
            
 
     useEffect(() => {
         const fetchActivitiesAndUser = async () => {
-            const acitivities = await getAllActivitiesFromDb();
+            const acitivities: ActivityType[] = await getAllActivitiesFromDb();
             setAllActivities(acitivities)
 
-            const users = await getUserFromStrava(user!.accessToken);
-            setUserProfileData(users)
+            const userData = await getUserFromStrava(user!.accessToken);
+            setUserProfileData(userData)
+
+            const conbinedData = acitivities.map((activity) =>  (
+                {...activity, user:userData,}
+            ));
+
+            setMergedData(conbinedData);
         }
 
         fetchActivitiesAndUser();
     }, [])
 
-    console.log('allAcitivities: ', allActivities);
-    console.log('userProfileData:', userProfileData)
+    // console.log('allAcitivities: ', allActivities);
+    // console.log('userProfileData:', userProfileData);
+    console.log('mergedData: ', mergedData);
+    
 
     return (
         <>
             <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
-            {temporalyActivities.map((activity) => (
-                <Card key={activity.id} className="space-y-6 mx-3 mt-2">
+            {mergedData.map((data) => (
+                <Card key={data.id} className="space-y-6 mx-3 mt-2">
                     <CardContent>
                         <div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4 space-y-5">
-                                    <div>{activity.icon}</div>
+                                    <img src={data.user.profile} alt="" />
                                     <div>
-                                        <p className="font-semibold">{activity.name}</p>
-                                        <p className="text-sm text-muted-foreground">{activity.startDate}</p>
+                                        <p className="font-semibold">{data.user.firstname}{data.user.lastname}</p>
+                                        <p className="text-sm text-muted-foreground">{data.start_time}</p>
                                     </div>
                                 </div>
                                 <Button variant='ghost' size='sm'>
@@ -73,18 +85,18 @@ export default function RecentActivityCard() {
                             <div className="grid grid-cols-3 gap-4 text-sm mt-2">
                                 <div>
                                     <p className="text-muted-foreground">Distance</p>
-                                    <p className="font-medium">{activity.distance}</p>
+                                    <p className="font-medium">{data.Distance}</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Time</p>
-                                    <p className="font-medium">{activity.time}</p>
+                                    <p className="font-medium">{data.elapsed_time}</p>
                                 </div>
                                 <div>
-                                    <p className="text-muted-foreground">Calories</p>
-                                    <p className="font-medium">{activity.calories}</p>
+                                    <p className="text-muted-foreground">Average Speed</p>
+                                    <p className="font-medium">{data.Distance}</p>
                                 </div>
                                 <div>
-                                    <img src={activity.mapImage} alt="Running route" className="h-full w-full object-cover" />
+                                    <img src="#" alt="Running route" className="h-full w-full object-cover" />
                                 </div>
                             </div>
                         </div>
