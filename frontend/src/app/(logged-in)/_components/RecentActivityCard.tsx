@@ -1,34 +1,60 @@
+'use client'
+
 import { Button } from "@/components/ui/Button";
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
 } from "@/components/ui/card"
 import { useActivities } from "@/context/activitiesContext";
+import { useUser } from "@/context/userContext";
+import { getAllActivitiesFromDb } from "@/lib/activity";
+import { getUserFromStrava } from "@/lib/user";
 import { ActivityType } from "@/types/activityType";
 import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, Plus, MapPin } from "lucide-react"
+import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
+
+// type UserProfileType = {
+//     name: string,
+//     photo: string
+// }
 
 type Props = {
     allActivities: ActivityType[]
-  }
+    // userProfile: UserProfileType
+}
 
 const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
     { id: 2, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Victor Sarut", startDate: "15th October, 2024 at 10:13", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" }
 ]
 
-export default function RecentActivityCard({allActivities}: Props) {    
+export default function RecentActivityCard() {
+    const [allActivities, setAllActivities] = useState<ActivityType[]>([]) 
+    const {user} = useUser();
+    const [userProfileData, setUserProfileData] = useState();
+           
+
+    useEffect(() => {
+        const fetchActivitiesAndUser = async () => {
+            const acitivities = await getAllActivitiesFromDb();
+            setAllActivities(acitivities)
+
+            const users = await getUserFromStrava(user!.accessToken);
+            setUserProfileData(users)
+        }
+
+        fetchActivitiesAndUser();
+    }, [])
+
     console.log('allAcitivities: ', allActivities);
-    
+    console.log('userProfileData:', userProfileData)
+
     return (
         <>
-        <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
+            <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
             {temporalyActivities.map((activity) => (
-                <Card  key={activity.id} className="space-y-6 mx-3 mt-2">
+                <Card key={activity.id} className="space-y-6 mx-3 mt-2">
                     <CardContent>
                         <div>
                             <div className="flex items-center justify-between">
