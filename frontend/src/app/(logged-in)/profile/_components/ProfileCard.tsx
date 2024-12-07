@@ -2,12 +2,8 @@ import { Button } from "@/components/ui/Button"
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
 } from "@/components/ui/card"
-import { Edit, Ghost } from "lucide-react"
+import { Edit } from "lucide-react"
 import React from 'react'
 import { FaRegUserCircle } from "react-icons/fa"
 
