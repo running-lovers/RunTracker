@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useMemo } from 'react'
 import {
     Card,
@@ -8,8 +9,8 @@ import {
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { useGoals } from '@/context/goalsContext'
-import { getActivitiesFromDb } from '@/lib/activity'
 import { useActivities } from '@/context/activitiesContext'
+import { calculateAverageSpeed, calculateTotalDistance } from '@/lib/goal/goals'
 
 export default function MonthlyGoal() {
     const {goals} = useGoals();
@@ -18,20 +19,27 @@ export default function MonthlyGoal() {
     const currentMonth = now.getMonth()+1;
     const{activities} = useActivities();
 
-    const ActivitiesOfThisMonth = useMemo(() => {      
+    const activitiesOfThisMonth = useMemo(() => {      
         return activities.filter((activity) => {
             const activityDate = new Date(activity.start_time);            
             
-            return activityDate.getMonth() === currentMonth - 2;
+            return activityDate.getMonth() === currentMonth - 1;
         })
-    }, [activities]) 
+    }, [activities, currentMonth]) 
     
-    console.log('Activity of this month:', ActivitiesOfThisMonth);
+    console.log('Activity of this month:', activitiesOfThisMonth);
     
-    
-    const goalOfThisMonth = goals.find(
-        (g) => Number(g.year) === currentYear && Number(g.month) === currentMonth
-    )  
+    const goalOfThisMonth = useMemo(() => {
+        return  goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
+    }, [goals, currentMonth])
+
+    const totalDistance = useMemo(() => {
+        return calculateTotalDistance(activitiesOfThisMonth);
+    }, [activitiesOfThisMonth])
+
+    const averageSpeed = useMemo(() => {
+        return calculateAverageSpeed(activitiesOfThisMonth);
+    }, [activitiesOfThisMonth])
     
     return (
         <Card className='bg-white mr-4 mt-5'>
@@ -42,23 +50,16 @@ export default function MonthlyGoal() {
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Total Distance</span>
-                        <span className='text-sm text-muted-foreground'>56.7/{goalOfThisMonth?.total_distance}km</span>
+                        <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth?.total_distance}km</span>
                     </div>
                         <Progress value={70} className='h-2' />
                 </div>
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Average Pace</span>
-                        <span className='text-sm text-muted-foreground'>{goalOfThisMonth?.average_pace}km/h</span>
+                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth?.average_pace}km/h</span>
                     </div>
                         <Progress value={85} className='h-2' />
-                </div>
-                <div>
-                    <div className='mb-2 flex items-center justify-between '>
-                        <span className='text-sm font-medium'>Calories Burned</span>
-                        <span className='text-sm text-muted-foreground'>2200/{goalOfThisMonth?.calories_burned}kcal</span>
-                    </div>
-                        <Progress value={40} className='h-2' />
                 </div>
             </CardContent>
         </Card>
