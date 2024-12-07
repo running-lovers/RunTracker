@@ -19,8 +19,19 @@ export const postUserProfile = async(req: Request, res: Response) => {
     const {userId, firstname, lastname, city, state, country, sex, profile_medium, profile } = req.body;
 
     try {
-        const newProfile = await prisma.userProfile.create({
-           data: {
+        const newProfile = await prisma.userProfile.upsert({
+            where: {user_id: Number(userId)},
+            update: {
+                firstname,
+                lastname,
+                city,
+                state,
+                country,
+                sex,
+                profile_medium,
+                profile,
+            },
+           create: {
             user_id: Number(userId),
             firstname: firstname,
             lastname: lastname,
@@ -35,6 +46,19 @@ export const postUserProfile = async(req: Request, res: Response) => {
 
         res.json(newProfile);
     } catch (error) {
-        res.status(500).json({error: 'fail to post profile data'})
+        res.status(500).json({error: 'fail to upsert profile data'})
     }
 }
+
+// export const updateProfile = async(req: Request, res: Response) => {
+//     const userId = req.params;
+//     const { firstname, lastname, city, state, country, sex, profile_medium, profile } = req.body;
+
+//     try {
+//         const updatedProfile = await prisma.userProfile.update({
+//             where: {user_id: Number(userId)},
+//         })
+//     } catch (error) {
+        
+//     }
+// }
