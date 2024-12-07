@@ -16,10 +16,6 @@ export default function MonthlyGoal() {
     const {goalOfThisMonth} = useGoals();
     const{activitiesOfThisMonth} = useActivities();
 
-    console.log('Activity of this month:', activitiesOfThisMonth);
-
-    console.log('goalOfThisMonth',goalOfThisMonth);
-
     const totalDistance = useMemo(() => {
         return calculateTotalDistance(activitiesOfThisMonth);
     }, [activitiesOfThisMonth])
