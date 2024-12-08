@@ -7,6 +7,7 @@ import {router as messageRouter} from "./messageRouter"
 import {router as chatroomUserRouter} from "./chatroomUserRouter"
 import {router as connectionsRouter} from "./connectionsRouter"
 import {router as userProfileRouter} from "./userProfileRouter"
+import {router as dashboardRouter} from "./dashboardRouter"
 
 export const router = Router();
 
@@ -19,3 +20,4 @@ router.use('/messages', messageRouter)
 router.use('/chatroomUser', chatroomUserRouter)
 router.use('/connections', connectionsRouter)
 router.use('/userProfile', userProfileRouter)
+router.use('/dashboard', dashboardRouter)
