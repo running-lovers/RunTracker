@@ -74,3 +74,17 @@ export const getAllActivitiesFromDb = async() => {
     const data = await res.json()
     return data
 }
+
+export const getActivityCardData = async(id: number) => {
+    const res = await fetch(`${apiUrl}/api/dashboard/${id}`, {
+        headers: {
+            "Content-Type": "applicaiton/json"
+        }
+    })
+    if(!res.ok) {
+        throw new Error('fail to fetch acitivity card data')
+    }
+
+    const data = await res.json();
+    return data;
+} 

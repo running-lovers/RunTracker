@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card"
 import { useActivities } from "@/context/activitiesContext";
 import { useUser } from "@/context/userContext";
-import { getAllActivitiesFromDb } from "@/lib/activity";
+import { getActivityCardData, getAllActivitiesFromDb } from "@/lib/activity";
 import { getUserFromStrava } from "@/lib/user";
 import { ActivityType } from "@/types/activityType";
 import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, Plus, MapPin } from "lucide-react"
@@ -33,39 +33,30 @@ const temporalyActivities = [
 ]
 
 export default function RecentActivityCard() {
-    const [allActivities, setAllActivities] = useState<ActivityType[]>([]) 
+    const [activityCards, setActivityCards] = useState<MergedDataType[]>([]) 
     const {user} = useUser();
-    const [userProfileData, setUserProfileData] = useState();
-    const [mergedData, setMergedData] = useState<MergedDataType[]>([]);
-           
+    const userId = user?.id;
 
     useEffect(() => {
-        const fetchActivitiesAndUser = async () => {
-            const acitivities: ActivityType[] = await getAllActivitiesFromDb();
-            setAllActivities(acitivities)
-
-            const userData = await getUserFromStrava(user!.accessToken);
-            setUserProfileData(userData)
-
-            const conbinedData = acitivities.map((activity) =>  (
-                {...activity, user:userData,}
-            ));
-
-            setMergedData(conbinedData);
+        if(!userId) {
+            throw new Error("userId is undefined")
+        }
+        const activityCard = async() => {
+            const cardData = await getActivityCardData(userId);
+            setActivityCards(cardData);
         }
 
-        fetchActivitiesAndUser();
+        activityCard()
     }, [])
-
-    // console.log('allAcitivities: ', allActivities);
-    // console.log('userProfileData:', userProfileData);
-    console.log('mergedData: ', mergedData);
+           
+    console.log('acticityCards: ', activityCards);
+    
     
 
     return (
         <>
             <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
-            {mergedData.map((data) => (
+            {activityCards.map((data) => (
                 <Card key={data.id} className="space-y-6 mx-3 mt-2">
                     <CardContent>
                         <div>
