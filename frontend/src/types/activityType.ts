@@ -13,6 +13,7 @@ export interface ActivityType {
 }
 
 export interface ActivityCardType {
+  id: number
   activity_type: string
   average_speed: number
   duration: number
