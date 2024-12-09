@@ -10,7 +10,8 @@ import { useUser } from "@/context/userContext";
 import { getActivityCardData, getAllActivitiesFromDb } from "@/lib/activity";
 import { getUserFromStrava } from "@/lib/user";
 import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
-import { ActivityType } from "@/types/activityType";
+import { ActivityCardType } from "@/types/activityType";
+import { UserProfileType } from "@/types/useProfileType";
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -26,7 +27,7 @@ type UserType = {
     state: string
 }
 
-type MergedDataType = ActivityType & {user: UserType}
+type MergedDataType = ActivityCardType & {user: UserType & { userProfile: UserProfileType}}
 
 const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
@@ -71,7 +72,7 @@ export default function RecentActivityCard() {
                         <div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4 space-y-5">
-                                    <img src={data.user.profile} alt="" />
+                                    <img src={"#"} alt="#" />
                                     <div>
                                         <p className="font-semibold">{data.user.firstname}{data.user.lastname}</p>
                                         <p className="text-sm text-muted-foreground">{data.start_time}</p>
@@ -85,15 +86,15 @@ export default function RecentActivityCard() {
                             <div className="grid grid-cols-3 gap-4 text-sm mt-2">
                                 <div>
                                     <p className="text-muted-foreground">Distance</p>
-                                    <p className="font-medium">{data.Distance}</p>
+                                    <p className="font-medium">{data.distance}</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Time</p>
-                                    <p className="font-medium">{data.elapsed_time}</p>
+                                    <p className="font-medium">{data.duration}</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Average Speed</p>
-                                    <p className="font-medium">{data.Distance}</p>
+                                    <p className="font-medium">{data.average_speed}</p>
                                 </div>
                                 <div>
                                     <img src="#" alt="Running route" className="h-full w-full object-cover" />
