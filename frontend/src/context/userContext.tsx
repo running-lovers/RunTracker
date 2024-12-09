@@ -3,11 +3,8 @@
 
 import { handleStravaCallback } from '@/lib/handleStravaCallback';
 import { UserType } from '@/model/userModel';
-import { User } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
-import { useClientData } from './clientDataContext';
-
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 interface UserContextType {
     user: UserType | null
     setUser: React.Dispatch<React.SetStateAction<UserType | null>>

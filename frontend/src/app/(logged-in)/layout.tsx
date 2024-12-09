@@ -5,18 +5,16 @@ import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import RightSidebar from '@/components/RightSidebar/RightSidebar';
 import { ActivitiesProvider } from '@/context/activitiesContext';
 import { GoalsProvider } from '@/context/goalsContext';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export default function Mainlayout({
   children,
-  modal
 }: Readonly<{
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-
   const [activitiesLoaded, setActivitiesLoaded] = useState(false)
   const [goalsLoaded, setGoalsLoaded] = useState(false)
 
