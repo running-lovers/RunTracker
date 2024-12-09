@@ -9,6 +9,7 @@ import { useActivities } from "@/context/activitiesContext";
 import { useUser } from "@/context/userContext";
 import { getActivityCardData, getAllActivitiesFromDb } from "@/lib/activity";
 import { getUserFromStrava } from "@/lib/user";
+import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
 import { ActivityType } from "@/types/activityType";
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
@@ -41,13 +42,21 @@ export default function RecentActivityCard() {
         if(!userId) {
             throw new Error("userId is undefined")
         }
+        
+        const getAndPostProfileData = async() => {
+            const data = await fetchUserProfileFromStrava(user.accessToken);
+            const post = await postUserProfile(userId, data);
+            return post
+        }
+        getAndPostProfileData();
+
         const activityCard = async() => {
             const cardData = await getActivityCardData(userId);
             setActivityCards(cardData);
         }
 
         activityCard()
-    }, [])
+    }, [user])
            
     console.log('acticityCards: ', activityCards);
     

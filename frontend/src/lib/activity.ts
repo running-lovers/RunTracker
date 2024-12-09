@@ -1,14 +1,5 @@
 import { ActivityType } from "@/types/activityType";
 
-// type PostActivityParams = {
-//     userId: number;
-//     activityType: string;
-//     distance: number;
-//     duration: number; 
-//     description?: string;
-//     time: Date; 
-//   };
-
 const apiUrl= process.env.NEXT_PUBLIC_BACKEND_URL
 
 export const getActivitiesFromStrava = async(access_token: string) => {
