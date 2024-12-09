@@ -90,8 +90,11 @@ export default function GoalsCard() {
     }
 
     useEffect(() => {
+        //get each goal
         const goal = goals.find((g) => Number(g.year) === currentYear && Number(g.month) === Number(month))
         setGoalOfEachMonth(goal);
+
+        //get each activity
         const res = activities.filter((activity) => {
             const activityDate = new Date(activity.start_time);
             return (activityDate.getMonth() + 1).toString() === month;
@@ -108,7 +111,8 @@ export default function GoalsCard() {
 
     const averageSpeed =  useMemo(() => {
         return calculateAverageSpeed(activitiesOfEachMonth);
-    }, [activitiesOfEachMonth])    
+    }, [activitiesOfEachMonth])
+    
 
 
     return (
