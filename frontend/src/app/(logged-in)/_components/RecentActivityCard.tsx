@@ -10,7 +10,7 @@ import { useUser } from "@/context/userContext";
 import { getActivityCardData, getAllActivitiesFromDb } from "@/lib/activity";
 import { getUserFromStrava } from "@/lib/user";
 import { ActivityType } from "@/types/activityType";
-import { Activity, BarChart2, Calendar, ChevronDown, MessageCircle, Map, User, Plus, MapPin } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 
