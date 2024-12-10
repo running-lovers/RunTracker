@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
-import { log } from "console";
 
 export const getRecentActivities = async(req: Request, res: Response) => {
     const {userId} = req.params;
