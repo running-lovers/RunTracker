@@ -1,6 +1,6 @@
 'use client'
 
-import { Activity } from '@/types/activityType'
+import { ActivityType } from '@/types/activityType'
 import React, { useState } from 'react'
 import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
@@ -13,14 +13,14 @@ export default function Activitypage() {
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [newActivity, setNewActivity] = useState<Activity>({
+    const [newActivity, setNewActivity] = useState<ActivityType>({
         id: 0,
-        title: '',
-        date: '',
-        time: '',
+        name: '',
+        activity_type: '',
+        start_time: '',
         Distance: 0,
-        Duration: '',
-        Calories: 0,
+        average_speed: 0,
+        elapsed_time: '',
         user: user?.name || "Unknown",
         status: 'planned',
         description: ''
