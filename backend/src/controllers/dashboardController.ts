@@ -20,11 +20,9 @@ export const getRecentActivities = async(req: Request, res: Response) => {
             res.status(404).json({error: 'User is not found'})
             return;
         }
-        console.log('user: ',user);
         
         //get the IDs of user and followingUser
         const userIds: number[] = [Number(userId), ...user!.connections.map(f => f.following_user_id)]
-        console.log('userIds: ', userIds);
         
 
         const activities = await prisma.activity.findMany({

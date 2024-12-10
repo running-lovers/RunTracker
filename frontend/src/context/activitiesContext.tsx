@@ -39,7 +39,7 @@ export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) 
                 console.log('activitiesfromstrava:', activities);
                 const RunActivities = activities.filter(activity => activity.sport_type === "Run");
                 
-                await postActivities(RunActivities, userId);
+                await postActivities(RunActivities, userId, accessToken);
 
                 const activitiesFromDb = await getActivitiesFromDb(userId);
                 console.log('activitiesFromDb:', activitiesFromDb);

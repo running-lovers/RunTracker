@@ -15,10 +15,11 @@ export const getActivitiesFromStrava = async(access_token: string) => {
     return activitiesData;
 }
 
-export const postActivities = async(params: ActivityType[], userId: number) => {
+export const postActivities = async(params: ActivityType[], userId: number, access_token: string) => {
     const body = {
         userId,
         activities: params,
+        access_token: access_token
     }
     const res = await fetch(`${apiUrl}/api/activities/save`, {
         method: 'POST',
