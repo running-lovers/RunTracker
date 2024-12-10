@@ -17,13 +17,17 @@ export default function Activitypage() {
         id: 0,
         name: '',
         activity_type: '',
+        start_date: '',
         start_time: '',
-        Distance: 0,
+        distance: 0,
         average_speed: 0,
         elapsed_time: '',
         user: user?.name || "Unknown",
         status: 'planned',
-        description: ''
+        description: '',
+        date:'',
+        time:'',
+        sport_type: "Run",
     })
 
     const parseDuration = (duration: string): number => {
@@ -35,16 +39,17 @@ export default function Activitypage() {
     const handleSaveActivity = () => {
         const formattedActivity = {
             id: activities.length + 1,
-            title: newActivity.title || 'Untitled Activity',
+            name: newActivity.name || 'Untitled Activity',
+            activity_type: newActivity.activity_type || 'Unknown',
             start_date: `${newActivity.date || '2024-01-01'}T${newActivity.time || '00:00'}`,
-            distance: (newActivity.Distance || 0) * 1000,
-            elapsed_time: parseDuration(newActivity.Duration || '00:00:00'),
+            distance: (newActivity.distance || 0) * 1000,
+            elapsed_time: parseDuration(newActivity.elapsed_time || '00:00:00'),
             average_speed:
-                newActivity.Distance && newActivity.Duration
-                    ? (newActivity.Distance / (parseDuration(newActivity.Duration) / 3600))
+                newActivity.distance && newActivity.elapsed_time
+                    ? (newActivity.distance / (parseDuration(newActivity.elapsed_time) / 3600))
                     : 0,
-            athlete: { id: user?.id || 0 },
-            type: newActivity.status || 'Run',
+            user: user?.name || "Unknown",
+            status: newActivity.status || 'planned',
             description: newActivity.description || '',
         };
 
@@ -56,7 +61,7 @@ export default function Activitypage() {
         <div className='flex-1 flex flex-col'>
             <div className='flex-1'>
                 <div className='max-w-6xl mx-auto p-6'>
-                    <Header />
+                    {/* <Header /> */}
                 </div>
                 <div className='flex justify-start mx-5 mb-3'>
                     <button
@@ -70,7 +75,7 @@ export default function Activitypage() {
                     {activities?.map((activity) => (
                         <ActivityCard
                             key={activity.id}
-                            activityStatus={activity.type === 'Run' ? 'completed' : 'planned'}
+                            activityStatus={activity.sport_type === 'Run' ? 'completed' : 'planned'}
                             username={activity.athlete?.id.toString() || 'Unknown'}
                             title={activity.name}
                             Date={new Date(activity.start_date).toLocaleDateString()}
@@ -93,28 +98,26 @@ export default function Activitypage() {
                 <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
                     <div className='bg-white p-6 rounded w-[30%] h-[70%] overflow-y-auto'>
                         <h2 className='text-xl font-bold mb-4'>Add New Activity</h2>
-                        <p className='font-semibold'>Activity</p>
+                        <p className='font-semibold'>Title</p>
                         <div className='flex flex-col gap-3'>
-                            <select
+                            <input
+                                type="text"
+                                placeholder="title"
                                 className="border p-2 rounded"
-                                value={newActivity.title}
+                                value={newActivity.name}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, title: e.target.value })
+                                    setNewActivity({ ...newActivity, name: e.target.value })
                                 }
-                            >
-                                <option value="">Select activity type</option>
-                                <option value="Morning Run">Morning Run</option>
-                                <option value="Evening Jog">Evening Jog</option>
-                                <option value="Afternoon Run">Afternoon Run</option>
-                            </select>
+                            />
+
                             <p className='font-semibold'>Distance (km)</p>
                             <input
                                 type="text"
                                 placeholder="Distance (km)"
                                 className="border p-2 rounded"
-                                value={newActivity.Distance}
+                                value={newActivity.distance}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, Distance: parseFloat(e.target.value) })
+                                    setNewActivity({ ...newActivity, distance: parseFloat(e.target.value) })
                                 }
                             />
                             <p className='font-semibold'>Duration</p>
@@ -122,9 +125,9 @@ export default function Activitypage() {
                                 type="text"
                                 placeholder="Duration (HH:MM:SS)"
                                 className="border p-2 rounded"
-                                value={newActivity.Duration}
+                                value={newActivity.elapsed_time}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, Duration: e.target.value })
+                                    setNewActivity({ ...newActivity, elapsed_time: e.target.value })
                                 }
                             />
                             <p className='font-semibold'>Date</p>
