@@ -3,9 +3,9 @@ export interface ActivityType {
   name: string
   activity_type: string
   start_date: string
-  start_time: string
+  start_time?: string
   distance?: number
-  elapsed_time?: string
+  elapsed_time: number
   average_speed: number
   user: string
   status: "planned" | "completed"

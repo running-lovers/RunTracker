@@ -21,7 +21,7 @@ export default function Activitypage() {
         start_time: '',
         distance: 0,
         average_speed: 0,
-        elapsed_time: '',
+        elapsed_time: 0,
         user: user?.name || "Unknown",
         status: 'planned',
         description: '',
@@ -34,7 +34,7 @@ export default function Activitypage() {
         const [hours, minutes, seconds] = duration.split(':').map(Number);
         return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
     };
-
+    
 
     const handleSaveActivity = () => {
         const formattedActivity = {
@@ -76,7 +76,7 @@ export default function Activitypage() {
                         <ActivityCard
                             key={activity.id}
                             activityStatus={activity.sport_type === 'Run' ? 'completed' : 'planned'}
-                            username={activity.athlete?.id.toString() || 'Unknown'}
+                            // username={activity.athlete?.id.toString() || 'Unknown'}
                             title={activity.name}
                             Date={new Date(activity.start_date).toLocaleDateString()}
                             Time={new Date(activity.start_date).toLocaleTimeString()}
