@@ -21,7 +21,6 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
             where: {user_id: Number(userId)},
             include: {route: true},
         });
-        console.log('activities:', activities);
         
         res.json(activities)
     } catch (error) {
@@ -54,6 +53,7 @@ export const saveNewActivity = async(req: Request, res: Response) => {
             data: newActivities.map((activity) => ({
                 activity_type: activity.sport_type,
                 user_id: userId,
+                name: activity.name,
                 distance: activity.distance,
                 average_speed: activity.average_speed,
                 duration: activity.moving_time,

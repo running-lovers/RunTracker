@@ -13,25 +13,12 @@ import { useActivities } from '@/context/activitiesContext'
 import { calculateAverageSpeed, calculateTotalDistance } from '@/lib/goal/goals'
 
 export default function MonthlyGoal() {
-    const {goals} = useGoals();
-    const now = new Date()
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth()+1;
-    const{activities} = useActivities();
+    const {goalOfThisMonth} = useGoals();
+    const{activitiesOfThisMonth} = useActivities();
 
-    const activitiesOfThisMonth = useMemo(() => {      
-        return activities.filter((activity) => {
-            const activityDate = new Date(activity.start_time);            
-            
-            return activityDate.getMonth() === currentMonth - 1;
-        })
-    }, [activities, currentMonth]) 
-    
     console.log('Activity of this month:', activitiesOfThisMonth);
-    
-    const goalOfThisMonth = useMemo(() => {
-        return  goals.find((g) => Number(g.year) === currentYear && Number(g.month) === currentMonth)  
-    }, [goals, currentMonth])
+
+    console.log('goalOfThisMonth',goalOfThisMonth);
 
     const totalDistance = useMemo(() => {
         return calculateTotalDistance(activitiesOfThisMonth);
@@ -40,6 +27,7 @@ export default function MonthlyGoal() {
     const averageSpeed = useMemo(() => {
         return calculateAverageSpeed(activitiesOfThisMonth);
     }, [activitiesOfThisMonth])
+    
     
     return (
         <Card className='bg-white mr-4 mt-5'>
@@ -50,16 +38,18 @@ export default function MonthlyGoal() {
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Total Distance</span>
-                        <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth?.total_distance}km</span>
+                        <span className='text-sm text-muted-foreground'>{totalDistance}/{goalOfThisMonth ? goalOfThisMonth.total_distance : ' -- '}km</span>
                     </div>
-                        <Progress value={70} className='h-2' />
+                        <Progress value={Math.min((totalDistance / (goalOfThisMonth?.total_distance || 1)) * 100, 100)} 
+                                  className='h-2'
+                        />
                 </div>
                 <div>
                     <div className='mb-2 flex items-center justify-between '>
                         <span className='text-sm font-medium'>Average Pace</span>
-                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth?.average_pace}km/h</span>
+                        <span className='text-sm text-muted-foreground'>{averageSpeed}/{goalOfThisMonth ? goalOfThisMonth.average_speed : ' -- '}km/h</span>
                     </div>
-                        <Progress value={85} className='h-2' />
+                        <Progress value={Math.min((averageSpeed / (goalOfThisMonth?.average_speed || 1)) * 100, 100)} className='h-2' />
                 </div>
             </CardContent>
         </Card>

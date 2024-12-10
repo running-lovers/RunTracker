@@ -30,7 +30,7 @@ model User {
   activities   Activity[]
   goals        Goal[]
   chatRooms    ChatRoomUser[]
-  sentMessages Message[]       @relation("SentMessages")
+  sentMessages Message[]      @relation("SentMessages")
 }
 
 model Connection {
@@ -66,6 +66,7 @@ model Activity {
   user_id            Int
   route_id           Int?
   activity_type      String?
+  name               String?
   distance           Float
   duration           Int
   average_speed      Float?
@@ -90,7 +91,7 @@ model Goal {
   year            String
   month           String
   total_distance  Float     @default(0)
-  average_pace    Float     @default(0)
+  average_speed    Float     @default(0)
   calories_burned Float     @default(0)
   current         Float?    @default(0)
   start_date      DateTime?
@@ -109,8 +110,8 @@ model Message {
   chatRoomId Int
 
   // Relationships
-  sender      User          @relation("SentMessages", fields: [senderId], references: [id])
-  chatRoom    ChatRoom      @relation(fields: [chatRoomId], references: [id])
+  sender   User     @relation("SentMessages", fields: [senderId], references: [id])
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
 }
 
 model ChatRoom {
