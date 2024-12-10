@@ -5,10 +5,8 @@ import {
     Card,
     CardContent,
 } from "@/components/ui/card"
-import { useActivities } from "@/context/activitiesContext";
 import { useUser } from "@/context/userContext";
-import { getActivityCardData, getAllActivitiesFromDb } from "@/lib/activity";
-import { getUserFromStrava } from "@/lib/user";
+import { getActivityCardData } from "@/lib/activity";
 import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
 import { ActivityCardType } from "@/types/activityType";
 import { UserProfileType } from "@/types/useProfileType";
