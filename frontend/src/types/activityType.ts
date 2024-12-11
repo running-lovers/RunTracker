@@ -3,7 +3,7 @@ export interface ActivityType {
   name: string
   sport_type: string
   start_time: string
-  Distance?: number
+  distance?: number
   elapsed_time?: string
   average_speed: number
   user: string
@@ -19,5 +19,5 @@ export interface ActivityCardType {
   duration: number
   distance: number
   start_time: string
-  route_data: RouteType
+  route_data: {id: string, polyline: string, resouce_state: number, summary_polyline: string}
 }

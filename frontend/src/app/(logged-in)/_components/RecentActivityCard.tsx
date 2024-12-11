@@ -10,9 +10,11 @@ import { getActivityCardData } from "@/lib/activity";
 import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
 import { ActivityCardType } from "@/types/activityType";
 import { UserProfileType } from "@/types/useProfileType";
+import polyline from "@mapbox/polyline";
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
+import { MapContainer, Polyline, TileLayer } from "react-leaflet"
 
 type UserType = {
     country: string,
@@ -25,7 +27,7 @@ type UserType = {
     state: string
 }
 
-type MergedDataType = ActivityCardType & {user: UserType & { userProfile: UserProfileType}}
+type MergedDataType = ActivityCardType & { user: UserType & { userProfile: UserProfileType } }
 
 const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
@@ -33,33 +35,33 @@ const temporalyActivities = [
 ]
 
 export default function RecentActivityCard() {
-    const [activityCards, setActivityCards] = useState<MergedDataType[]>([]) 
-    const {user} = useUser();
+    const [activityCards, setActivityCards] = useState<MergedDataType[]>([])
+    const { user } = useUser();
     const userId = user?.id;
 
     useEffect(() => {
-        if(!userId) {
+        if (!userId) {
             throw new Error("userId is undefined")
         }
-        
-        const getAndPostProfileData = async() => {
+
+        const getAndPostProfileData = async () => {
             const data = await fetchUserProfileFromStrava(user.accessToken);
             const post = await postUserProfile(userId, data);
             return post
         }
         getAndPostProfileData();
 
-        const activityCard = async() => {
+        const activityCard = async () => {
             const cardData = await getActivityCardData(userId);
             setActivityCards(cardData);
         }
 
         activityCard()
     }, [user])
-           
+
     console.log('acticityCards: ', activityCards);
-    
-    
+
+
 
     return (
         <>
@@ -72,7 +74,7 @@ export default function RecentActivityCard() {
                                 <div className="flex items-center space-x-4 space-y-5">
                                     <img src={"#"} alt="#" />
                                     <div>
-                                        <p className="font-semibold">{data.user.firstname}{data.user.lastname}</p>
+                                        <p className="font-semibold">{data.user.userProfile.firstname}{data.user.userProfile.lastname}</p>
                                         <p className="text-sm text-muted-foreground">{data.start_time}</p>
                                     </div>
                                 </div>
@@ -95,7 +97,12 @@ export default function RecentActivityCard() {
                                     <p className="font-medium">{data.average_speed}</p>
                                 </div>
                                 <div>
-                                    <img src="#" alt="Running route" className="h-full w-full object-cover" />
+                                    <MapContainer>
+                                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                                        {data.route_data && data.route_data.polyline ? (
+                                           <Polyline positions={polyline.decode(data.route_data.polyline)} color="blue"/>
+                                        ) : ( null )}
+                                    </MapContainer>
                                 </div>
                             </div>
                         </div>
