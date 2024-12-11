@@ -33,7 +33,7 @@ const temporalyActivities = [
     { id: 2, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Victor Sarut", startDate: "15th October, 2024 at 10:13", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" }
 ]
 
-export default function RecentActivityCard() {
+export default function Dashboard() {
     const [activityCards, setActivityCards] = useState<MergedDataType[]>([])
     const { user } = useUser();
     const userId = user?.id;
