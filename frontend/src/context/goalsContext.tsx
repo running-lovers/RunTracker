@@ -33,7 +33,6 @@ export const GoalsProvider = ({ children, onLoad }: GoalsProviderProps) => {
         const fetchGoals = async () => {
             try {
                 const goals = await getMonthlyGoals(userId);
-                console.log('goalsfromDB:', goals);
                 
                 setGoals(goals)
             } catch (error) {

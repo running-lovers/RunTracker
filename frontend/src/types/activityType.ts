@@ -11,3 +11,13 @@ export interface ActivityType {
   description: string
   route?: RouteType
 }
+
+export interface ActivityCardType {
+  id: number
+  activity_type: string
+  average_speed: number
+  duration: number
+  distance: number
+  start_time: string
+  route_data: RouteType
+}

@@ -7,7 +7,7 @@ import { getActivitiesFromDb, getActivitiesFromStrava, postActivities } from "@/
 interface ActivitiesContextType {
     activities: ActivityType[],
     setActivities: Dispatch<SetStateAction<ActivityType[]>>,
-    activitiesOfThisMonth: ActivityType[]
+    activitiesOfCurrentMonth: ActivityType[]
 }
 
 interface ActivitiesProviderProps {
@@ -19,7 +19,7 @@ const ActivitiesContext = createContext<ActivitiesContextType | undefined>(undef
 
 export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) => {
     const [activities, setActivities] = useState<ActivityType[]>([])
-    const [activitiesOfThisMonth, setActivitiesOfThisMonth] = useState<ActivityType[]>([])
+    const [activitiesOfCurrentMonth, setActivitiesOfCurrentMonth] = useState<ActivityType[]>([])
     const now = new Date()
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth()+1;
@@ -60,19 +60,11 @@ export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) 
             const activityDate = new Date(activity.start_time);
             return activityDate.getMonth() === currentMonth - 1; 
         })
-        setActivitiesOfThisMonth(res);
+        setActivitiesOfCurrentMonth(res);
     }, [activities, currentMonth])
 
-    // const activitiesOfThisMonth = useMemo(() => {      
-    //     return activities.filter((activity) => {
-    //         const activityDate = new Date(activity.start_time);            
-            
-    //         return activityDate.getMonth() === currentMonth - 1;
-    //     })
-    // }, [activities, currentMonth])  
-
     return (
-        <ActivitiesContext.Provider value={{activities, setActivities, activitiesOfThisMonth}}>
+        <ActivitiesContext.Provider value={{activities, setActivities, activitiesOfCurrentMonth}}>
             {children}
         </ActivitiesContext.Provider>
     )

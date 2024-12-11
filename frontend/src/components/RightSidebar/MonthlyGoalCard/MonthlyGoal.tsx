@@ -14,19 +14,15 @@ import { calculateAverageSpeed, calculateTotalDistance } from '@/lib/goal/goals'
 
 export default function MonthlyGoal() {
     const {goalOfThisMonth} = useGoals();
-    const{activitiesOfThisMonth} = useActivities();
-
-    console.log('Activity of this month:', activitiesOfThisMonth);
-
-    console.log('goalOfThisMonth',goalOfThisMonth);
+    const{activitiesOfCurrentMonth} = useActivities();
 
     const totalDistance = useMemo(() => {
-        return calculateTotalDistance(activitiesOfThisMonth);
-    }, [activitiesOfThisMonth])
+        return calculateTotalDistance(activitiesOfCurrentMonth);
+    }, [activitiesOfCurrentMonth])
 
     const averageSpeed = useMemo(() => {
-        return calculateAverageSpeed(activitiesOfThisMonth);
-    }, [activitiesOfThisMonth])
+        return calculateAverageSpeed(activitiesOfCurrentMonth);
+    }, [activitiesOfCurrentMonth])
     
     
     return (

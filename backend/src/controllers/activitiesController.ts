@@ -4,7 +4,9 @@ import prisma from "../../lib/prisma";
 //Get all activities
 export const getActivities = async (req: Request, res: Response) => {
     try {
-        const activities = await prisma.activity.findMany();
+        const activities = await prisma.activity.findMany({
+            where: {activity_type: "Run"}
+        });
         res.json(activities);
     }catch (error) {
         res.status(500).json({ error: 'Failed to fetch activities' });
