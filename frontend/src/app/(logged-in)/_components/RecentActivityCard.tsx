@@ -15,6 +15,7 @@ import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 import { MapContainer, Polyline, TileLayer } from "react-leaflet"
+import RouteMap from "./RouteMap";
 
 type UserType = {
     country: string,
@@ -83,7 +84,7 @@ export default function RecentActivityCard() {
                                     <ChevronDown className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>
-                            <div className="grid grid-cols-3 gap-4 text-sm mt-2">
+                            <div className="flex justify-evenly text-sm mt-2">
                                 <div>
                                     <p className="text-muted-foreground">Distance</p>
                                     <p className="font-medium">{data.distance}</p>
@@ -96,14 +97,9 @@ export default function RecentActivityCard() {
                                     <p className="text-muted-foreground">Average Speed</p>
                                     <p className="font-medium">{data.average_speed}</p>
                                 </div>
-                                <div>
-                                    <MapContainer>
-                                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                                        {data.route_data && data.route_data.polyline ? (
-                                           <Polyline positions={polyline.decode(data.route_data.polyline)} color="blue"/>
-                                        ) : ( null )}
-                                    </MapContainer>
-                                </div>
+                            </div>
+                            <div className="w-full mt-3">
+                                {data.route_data ? <RouteMap encodedPolyline={data.route_data.polyline} /> : <div>no map</div>}
                             </div>
                         </div>
                     </CardContent>
