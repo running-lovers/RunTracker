@@ -10,11 +10,9 @@ import { getActivityCardData } from "@/lib/activity";
 import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
 import { ActivityCardType } from "@/types/activityType";
 import { UserProfileType } from "@/types/useProfileType";
-import polyline from "@mapbox/polyline";
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
-import { MapContainer, Polyline, TileLayer } from "react-leaflet"
 import RouteMap from "./RouteMap";
 
 type UserType = {
@@ -99,7 +97,7 @@ export default function RecentActivityCard() {
                                 </div>
                             </div>
                             <div className="w-full mt-3">
-                                {data.route_data ? <RouteMap encodedPolyline={data.route_data.polyline} /> : <div>no map</div>}
+                                {data.route_data ? <RouteMap encodedPolyline={data.route_data.summary_polyline} /> : <div>no map</div>}
                             </div>
                         </div>
                     </CardContent>

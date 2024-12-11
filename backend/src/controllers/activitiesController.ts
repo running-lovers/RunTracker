@@ -32,11 +32,11 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
 
 //save new activities from strava
 export const saveNewActivity = async(req: Request, res: Response) => {
-    const {userId, activities, access_token}= req.body as {userId: number , activities: any[], access_token: string}
+    const {userId, activities}= req.body as {userId: number , activities: any[], access_token: string}
     if(!userId || !activities) {
         throw new Error('userId and activities are required')
     }    
-
+    
     try {
         const existingActivities = await prisma.activity.findMany({
             where: {
@@ -49,35 +49,9 @@ export const saveNewActivity = async(req: Request, res: Response) => {
         const existingActivityIds = new Set(existingActivities.map((activity) => activity.strava_activity_id))        
         
         const newActivities = activities.filter((activity) => !existingActivityIds.has(String(activity.id)))
-        
-        const newActivitiesWithRouteData = await Promise.all(
-            newActivities.map(async(activity) => {
-                try {
-                    const response = await fetch(`https://www.strava.com/api/v3/activities/${activity.id}`, {
-                        method: 'GET',
-                        headers: {
-                            Authorization: `Bearer ${access_token}`
-                        },
-                    });
-                    if(!response.ok) {
-                        throw new Error('fail to get activity route data')
-                    }
-
-                    const stravaData = await response.json();
-                    const {map} = stravaData;
-
-                    return {
-                        ...activity,
-                        route_data: map,
-                    };
-                } catch (error) {
-                    console.log('fail to get route data:',error)
-                }
-            })
-        )
 
         const savedActivities = await prisma.activity.createMany({
-            data: newActivitiesWithRouteData.map((activity) => ({
+            data: newActivities.map((activity) => ({
                 activity_type: activity.sport_type,
                 user_id: userId,
                 name: activity.name,
@@ -86,7 +60,7 @@ export const saveNewActivity = async(req: Request, res: Response) => {
                 duration: activity.moving_time,
                 start_time: activity.start_date,
                 strava_activity_id: String(activity.id),
-                route_data: activity.route_data,
+                route_data: activity.map,
             }))
         })
 
