@@ -1,17 +1,22 @@
 export interface ActivityType {
   id: number
   name: string
-  activity_type: string
+  sport_type: string
   start_date: string
-  start_time?: string
   distance?: number
-  elapsed_time: number
-  average_speed: number
+  elapsed_time?: number
+  average_speed?: number
   user: string
   status: "planned" | "completed"
   description: string
   route?: RouteType
-  date?: string;
-  time?: string;
-  sport_type?: string;
+}
+
+export interface NewActivityType {
+  name: string,
+  sport_type: string
+  start_date: string,
+  distance: number,
+  elapsed_time: number,
+  description: string
 }

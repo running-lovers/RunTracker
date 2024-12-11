@@ -1,59 +1,79 @@
 'use client'
 
-import { ActivityType } from '@/types/activityType'
+import { ActivityType, NewActivityType } from '@/types/activityType'
 import React, { useState } from 'react'
 import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
 import { useUser } from "@/context/userContext";
 import { useActivities } from '@/context/activitiesContext'
+import { getActivitiesFromStrava, postActivities } from '@/lib/activity'
 
 export default function Activitypage() {
     const { activities, setActivities } = useActivities();
     const { user } = useUser();
+    const access_token= user?.accessToken
+    const userId = user?.id
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [newActivity, setNewActivity] = useState<ActivityType>({
-        id: 0,
-        name: '',
-        activity_type: '',
-        start_date: '',
-        start_time: '',
-        distance: 0,
-        average_speed: 0,
-        elapsed_time: 0,
-        user: user?.name || "Unknown",
-        status: 'planned',
-        description: '',
-        date:'',
-        time:'',
+    const [newActivity, setNewActivity] = useState<NewActivityType>({
+        name: "",
         sport_type: "Run",
+        start_date: "",
+        distance: 0,
+        elapsed_time: 0,
+        description: ""
     })
 
     const parseDuration = (duration: string): number => {
         const [hours, minutes, seconds] = duration.split(':').map(Number);
         return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
     };
-    
 
-    const handleSaveActivity = () => {
-        const formattedActivity = {
-            id: activities.length + 1,
+
+    const handleSaveActivity = async () => {        
+        const formattedActivity: NewActivityType = {
             name: newActivity.name || 'Untitled Activity',
-            activity_type: newActivity.activity_type || 'Unknown',
-            start_date: `${newActivity.date || '2024-01-01'}T${newActivity.time || '00:00'}`,
-            distance: (newActivity.distance || 0) * 1000,
-            elapsed_time: parseDuration(newActivity.elapsed_time || '00:00:00'),
-            average_speed:
-                newActivity.distance && newActivity.elapsed_time
-                    ? (newActivity.distance / (parseDuration(newActivity.elapsed_time) / 3600))
-                    : 0,
-            user: user?.name || "Unknown",
-            status: newActivity.status || 'planned',
+            sport_type: "Run",
+            start_date: newActivity.start_date,
+            distance: (newActivity.distance || 0) ,
+            elapsed_time: newActivity.elapsed_time,
             description: newActivity.description || '',
         };
 
-        setActivities([...activities, formattedActivity]);
+        const postNewActivityToStrava = async () => {
+            const res = await fetch("https://www.strava.com/api/v3/activities", {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formattedActivity.name,
+                    type: formattedActivity.sport_type,
+                    start_date: formattedActivity.start_date,
+                    distance: formattedActivity.distance,
+                    elapsed_time: formattedActivity.elapsed_time,
+                    description: formattedActivity.description
+                })
+            })
+
+            if(!res.ok) {
+                throw new Error('fail to post new activity to strava')
+            }
+
+            const data = await res.json();
+            return data
+        }
+
+        const postedData = await postNewActivityToStrava()
+
+        const data = await getActivitiesFromStrava(access_token!);
+        const newData = await postActivities(data, userId!); 
+        const newActivityFromStrava = await getActivitiesFromStrava(access_token!);
+        
+
+        setActivities(newActivityFromStrava)
         setIsModalOpen(false);
     };
 
@@ -81,14 +101,14 @@ export default function Activitypage() {
                             Date={new Date(activity.start_date).toLocaleDateString()}
                             Time={new Date(activity.start_date).toLocaleTimeString()}
                             description={`Description: ${activity.description ?? 'none'}`}
-                            distance={activity.distance ? (activity.distance / 1000).toFixed(2) : '0.00'}
-                            duration={`${Math.floor(activity.elapsed_time / 60)}m ${activity.elapsed_time % 60}s`}
+                            distance={activity.distance ? (activity.distance / 1000) : 0}
+                            duration={`${Math.floor(activity.elapsed_time! / 60)}m ${activity.elapsed_time! % 60}s`}
                             AvgSpeed={
                                 activity.average_speed !== undefined
                                     ? activity.average_speed.toFixed(2)
                                     : '0.00'
                             }
-                            />
+                        />
                     ))}
                 </div>
             </div>
@@ -110,43 +130,50 @@ export default function Activitypage() {
                                 }
                             />
 
-                            <p className='font-semibold'>Distance (km)</p>
+                            <p className='font-semibold'>Distance (m)</p>
                             <input
-                                type="text"
-                                placeholder="Distance (km)"
+                                type="number"
+                                placeholder="Distance (m)"
                                 className="border p-2 rounded"
                                 value={newActivity.distance}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, distance: parseFloat(e.target.value) })
+                                    setNewActivity({
+                                        ...newActivity,
+                                        distance: e.target.value === "" ? 0 : parseFloat(e.target.value),
+                                    })
                                 }
                             />
                             <p className='font-semibold'>Duration</p>
                             <input
-                                type="text"
+                                type="number"
                                 placeholder="Duration (HH:MM:SS)"
                                 className="border p-2 rounded"
                                 value={newActivity.elapsed_time}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, elapsed_time: e.target.value })
+                                    setNewActivity({ ...newActivity, elapsed_time: Number(e.target.value) })
                                 }
                             />
                             <p className='font-semibold'>Date</p>
                             <input
                                 type="date"
                                 className="border p-2 rounded"
-                                value={newActivity.date}
-                                onChange={(e) =>
-                                    setNewActivity({ ...newActivity, date: e.target.value })
-                                }
+                                value={newActivity.start_date ? newActivity.start_date.split("T")[0] : ""}
+                                onChange={(e) => {
+                                    const date = e.target.value;
+                                    const time = newActivity.start_date.split("T")[1] || "00:00:00";
+                                    setNewActivity({ ...newActivity, start_date: `${date}T${time}` });
+                                }}
                             />
                             <p className='font-semibold'>Start Time</p>
                             <input
                                 type="time"
                                 className="border p-2 rounded"
-                                value={newActivity.time}
-                                onChange={(e) =>
-                                    setNewActivity({ ...newActivity, time: e.target.value })
-                                }
+                                value={newActivity.start_date ? newActivity.start_date.split("T")[1]?.slice(0, 5) : ""}
+                                onChange={(e) => {
+                                    const time = e.target.value;
+                                    const date = newActivity.start_date.split("T")[0] || "1970-01-01";
+                                    setNewActivity({ ...newActivity, start_date: `${date}T${time}:00` });
+                                }}
                             />
                             <p className='font-semibold'>Description</p>
                             <textarea
