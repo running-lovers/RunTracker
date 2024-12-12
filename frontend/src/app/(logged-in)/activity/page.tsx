@@ -31,7 +31,10 @@ export default function Activitypage() {
     };
 
 
-    const handleSaveActivity = async () => {        
+    const handleSaveActivity = async () => {
+        const currentDate = new Date();
+        const activityDate = new Date(newActivity.start_date);
+        
         const formattedActivity: NewActivityType = {
             name: newActivity.name || 'Untitled Activity',
             sport_type: "Run",
@@ -41,11 +44,10 @@ export default function Activitypage() {
             description: newActivity.description || '',
         };
 
-        const postNewActivityToStrava = async () => {
-            const res = await fetch("https://www.strava.com/api/v3/activities", {
+        if (activityDate > currentDate){
+            const res = await fetch("/api/activities/save", {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${access_token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
@@ -55,26 +57,54 @@ export default function Activitypage() {
                     distance: formattedActivity.distance,
                     elapsed_time: formattedActivity.elapsed_time,
                     description: formattedActivity.description
-                })
-            })
+                }),
+            });
 
-            if(!res.ok) {
-                throw new Error('fail to post new activity to strava')
+            if(!res.ok){
+                throw new Error('Failed to save future activity to database');
             }
 
-            const data = await res.json();
-            return data
+            const newActivityFromDB = await res.json();
+            
+            setActivities((prev) => [...prev, newActivityFromDB]);
+            setIsModalOpen(false);
+
+        }else{
+            const postNewActivityToStrava = async () => {
+                const res = await fetch("https://www.strava.com/api/v3/activities", {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: formattedActivity.name,
+                        type: formattedActivity.sport_type,
+                        start_date: formattedActivity.start_date,
+                        distance: formattedActivity.distance,
+                        elapsed_time: formattedActivity.elapsed_time,
+                        description: formattedActivity.description
+                    })
+                })
+    
+                if(!res.ok) {
+                    throw new Error('fail to post new activity to strava')
+                }
+    
+                const data = await res.json();
+                return data
+            }
+    
+            const postedData = await postNewActivityToStrava()
+    
+            const data = await getActivitiesFromStrava(access_token!);
+            const newData = await postActivities(data, userId!); 
+            const newActivityFromStrava = await getActivitiesFromStrava(access_token!);
+            
+    
+            setActivities(newActivityFromStrava)
+            setIsModalOpen(false);
         }
-
-        const postedData = await postNewActivityToStrava()
-
-        const data = await getActivitiesFromStrava(access_token!);
-        const newData = await postActivities(data, userId!); 
-        const newActivityFromStrava = await getActivitiesFromStrava(access_token!);
-        
-
-        setActivities(newActivityFromStrava)
-        setIsModalOpen(false);
     };
 
     return (
