@@ -37,6 +37,7 @@ export default function Dashboard() {
     const [activityCards, setActivityCards] = useState<MergedDataType[]>([])
     const { user } = useUser();
     const userId = user?.id;
+    const DEFAULT_IMAGE_URL = "avatar/athlete/large.png";
 
     useEffect(() => {
         if (!userId) {
@@ -71,7 +72,11 @@ export default function Dashboard() {
                         <div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4 space-y-5">
-                                    <img src={"#"} alt="#" />
+                                    { data.user.userProfile.profile !== DEFAULT_IMAGE_URL ? (
+                                        <img src={data.user.userProfile.profile} alt='User Profile' className="w-[30px] h-[30px] rounded-full" />
+                                    ) : (
+                                        <FaRegUserCircle className="w-[30px] h-[30px]"/>
+                                    )}
                                     <div>
                                         <p className="font-semibold">{data.user.userProfile.firstname}{data.user.userProfile.lastname}</p>
                                         <p className="text-sm text-muted-foreground">{data.start_time}</p>
