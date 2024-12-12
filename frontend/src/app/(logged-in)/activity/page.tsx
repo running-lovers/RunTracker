@@ -45,18 +45,14 @@ export default function Activitypage() {
         };
 
         if (activityDate > currentDate){
-            const res = await fetch("/api/activities/save", {
+            const res = await fetch("http://localhost:8080/api/activities/save", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    name: formattedActivity.name,
-                    type: formattedActivity.sport_type,
-                    start_date: formattedActivity.start_date,
-                    distance: formattedActivity.distance,
-                    elapsed_time: formattedActivity.elapsed_time,
-                    description: formattedActivity.description
+                    userId,
+                    activities: [formattedActivity],
                 }),
             });
 

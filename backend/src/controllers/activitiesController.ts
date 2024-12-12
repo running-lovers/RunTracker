@@ -54,9 +54,9 @@ export const saveNewActivity = async(req: Request, res: Response) => {
                 activity_type: activity.sport_type,
                 user_id: userId,
                 distance: activity.distance,
-                duration: activity.moving_time,
-                start_time: activity.start_date,
-                strava_activity_id: String(activity.id),
+                duration: activity.elapsed_time,
+                start_time: new Date(activity.start_date).toISOString(),
+                strava_activity_id: activity.id ? String(activity.id) : undefined,
             }))
         })
 
