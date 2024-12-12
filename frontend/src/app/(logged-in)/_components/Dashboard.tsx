@@ -59,6 +59,12 @@ export default function Dashboard() {
         activityCard()
     }, [user])
 
+    const convertDurationTime = (seconds: number) => {
+        const hours = Math.floor(seconds/3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${hours}h${minutes}min`
+    }
+
     console.log('acticityCards: ', activityCards);
 
 
@@ -90,15 +96,15 @@ export default function Dashboard() {
                             <div className="flex justify-evenly text-sm mt-2">
                                 <div>
                                     <p className="text-muted-foreground">Distance</p>
-                                    <p className="font-medium">{data.distance}</p>
+                                    <p className="font-medium">{((data.distance) / 1000).toFixed(2)}km</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Time</p>
-                                    <p className="font-medium">{data.duration}</p>
+                                    <p className="font-medium">{convertDurationTime(data.duration)}</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Average Speed</p>
-                                    <p className="font-medium">{data.average_speed}</p>
+                                    <p className="font-medium">{data.average_speed ? (data.average_speed).toFixed(2) : "--"}km/h</p>
                                 </div>
                             </div>
                             <div className="w-full mt-3">
