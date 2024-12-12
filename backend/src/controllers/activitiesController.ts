@@ -89,7 +89,7 @@ export const createActivity = async(req: Request, res: Response) => {
             user_id: Number(userId),
             activity_type: activityType || null,
             distance: distance || 0,
-            average_speed: activityType || 0,
+            average_speed: average_speed || 0,
             duration: duration || 0,
             start_time: new Date(startTime),
             description: description || null
