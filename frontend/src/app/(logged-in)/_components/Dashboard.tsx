@@ -79,7 +79,7 @@ export default function Dashboard() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4 space-y-5">
                                     { data.user.userProfile.profile !== DEFAULT_IMAGE_URL ? (
-                                        <img src={data.user.userProfile.profile} alt='User Profile' className="w-[30px] h-[30px] rounded-full" />
+                                        <img src={data.user.userProfile.profile} alt='User Profile' className="w-[30px] h-[30px] rounded-full" referrerPolicy="no-referrer" />
                                     ) : (
                                         <FaRegUserCircle className="w-[30px] h-[30px]"/>
                                     )}
@@ -88,10 +88,6 @@ export default function Dashboard() {
                                         <p className="text-sm text-muted-foreground">{data.start_time}</p>
                                     </div>
                                 </div>
-                                <Button variant='ghost' size='sm'>
-                                    Follow
-                                    <ChevronDown className="ml-2 h-4 w-4" />
-                                </Button>
                             </div>
                             <div className="flex justify-evenly text-sm mt-2">
                                 <div>
@@ -108,7 +104,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className="w-full mt-3">
-                                {data.route_data ? <RouteMap encodedPolyline={data.route_data.summary_polyline} /> : <div>no map</div>}
+                                {data.route_data && data.route_data.summary_polyline !== "" ? <RouteMap encodedPolyline={data.route_data.summary_polyline} /> : <div>no map data</div>}
                             </div>
                         </div>
                     </CardContent>
