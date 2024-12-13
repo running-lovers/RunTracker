@@ -47,7 +47,8 @@ export default function Activitypage() {
 
         const fetchAndSetData = async () => {
             const data = await firstFetchDataFromDataBase();
-            setActivityHistoryAndPlan(data); // Ensure data matches activityHistoryAndPlanType[]
+            const sortedData = data.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+            setActivityHistoryAndPlan(sortedData);
         };
 
         fetchAndSetData();
