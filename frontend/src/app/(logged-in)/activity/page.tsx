@@ -47,7 +47,8 @@ export default function Activitypage() {
 
         const fetchAndSetData = async () => {
             const data = await firstFetchDataFromDataBase();
-            setActivityHistoryAndPlan(data); // Ensure data matches activityHistoryAndPlanType[]
+            const sortedData = data.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+            setActivityHistoryAndPlan(sortedData);
         };
 
         fetchAndSetData();
@@ -154,7 +155,11 @@ export default function Activitypage() {
                     {activityHistoryAndPlan?.map((activity, index) => (
                         <ActivityCard
                             key={activity.id || index}
-                            activityStatus={activity.activity_type === 'Run' ? 'completed' : 'planned'}
+                            activityStatus={
+                                new Date(activity.start_time) <= new Date()
+                                    ? 'completed'
+                                    : 'planned'
+                            }
                             // username={activity.athlete?.id.toString() || 'Unknown'}
                             title={activity.name}
                             Date={new Date(activity.start_time).toLocaleDateString()}
@@ -191,7 +196,7 @@ export default function Activitypage() {
 
                             <p className='font-semibold'>Distance (m)</p>
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Distance (m)"
                                 className="border p-2 rounded"
                                 value={newActivity.distance}
@@ -204,7 +209,7 @@ export default function Activitypage() {
                             />
                             <p className='font-semibold'>Duration</p>
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Duration (HH:MM:SS)"
                                 className="border p-2 rounded"
                                 value={newActivity.elapsed_time}
