@@ -1,18 +1,57 @@
 'use client'
 
 import { ActivityType, NewActivityType } from '@/types/activityType'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
 import { useUser } from "@/context/userContext";
 import { useActivities } from '@/context/activitiesContext'
 import { getActivitiesFromStrava, postActivities } from '@/lib/activity'
 
+type activityHistoryAndPlanType = {
+    id: number,
+    user_id: number,
+    activity_type: string,
+    name: string,
+    distance: number,
+    duration: number,
+    average_speed?: number,
+    start_time: string,
+    description: string
+}
+
 export default function Activitypage() {
-    const { activities, setActivities } = useActivities();
+    const {activities, setActivities} = useActivities()
+    const [activityHistoryAndPlan, setActivityHistoryAndPlan] = useState<activityHistoryAndPlanType[]>([])
     const { user } = useUser();
     const access_token= user?.accessToken
     const userId = user?.id
+
+
+    useEffect(() => {
+        const firstFetchDataFromDataBase = async () => {
+            const response = await fetch(`http://localhost:8080/api/activities/${userId}`,{
+                headers : {
+                    "Content-Type" : "application/json"
+                }
+            })
+
+            if(!response.ok) {
+                throw new Error("fail to fetch activities data from database")
+            }
+            const data: activityHistoryAndPlanType[] = await response.json()
+            const Runactivities = data.filter(activity => activity.activity_type === "Run")
+
+            return Runactivities
+        }
+
+        const fetchAndSetData = async () => {
+            const data = await firstFetchDataFromDataBase();
+            setActivityHistoryAndPlan(data); // Ensure data matches activityHistoryAndPlanType[]
+        };
+
+        fetchAndSetData();
+    }, [])
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -31,9 +70,7 @@ export default function Activitypage() {
     };
 
 
-    const handleSaveActivity = async () => {
-        const currentDate = new Date();
-        const activityDate = new Date(newActivity.start_date);
+    const handleSaveActivity = async () => { 
         
         const formattedActivity: NewActivityType = {
             name: newActivity.name || 'Untitled Activity',
@@ -44,64 +81,60 @@ export default function Activitypage() {
             description: newActivity.description || '',
         };
 
-        if (activityDate > currentDate){
-            const res = await fetch("http://localhost:8080/api/activities/save", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId,
-                    activities: [formattedActivity],
-                }),
-            });
 
-            if(!res.ok){
-                throw new Error('Failed to save future activity to database');
-            }
+    const postNewActivityToDb = async () => {
+        const res = await fetch("http://localhost:8080/api/activities", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: userId,
+                name: formattedActivity.name,
+                sport_type: formattedActivity.sport_type,
+                start_date: formattedActivity.start_date,
+                distance: formattedActivity.distance,
+                elapsed_time: formattedActivity.elapsed_time,
+                description: formattedActivity.description
+            })
+        })
 
-            const newActivityFromDB = await res.json();
-            
-            setActivities((prev) => [...prev, newActivityFromDB]);
-            setIsModalOpen(false);
-
-        }else{
-            const postNewActivityToStrava = async () => {
-                const res = await fetch("https://www.strava.com/api/v3/activities", {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: formattedActivity.name,
-                        type: formattedActivity.sport_type,
-                        start_date: formattedActivity.start_date,
-                        distance: formattedActivity.distance,
-                        elapsed_time: formattedActivity.elapsed_time,
-                        description: formattedActivity.description
-                    })
-                })
-    
-                if(!res.ok) {
-                    throw new Error('fail to post new activity to strava')
-                }
-    
-                const data = await res.json();
-                return data
-            }
-    
-            const postedData = await postNewActivityToStrava()
-    
-            const data = await getActivitiesFromStrava(access_token!);
-            const newData = await postActivities(data, userId!); 
-            const newActivityFromStrava = await getActivitiesFromStrava(access_token!);
-            
-    
-            setActivities(newActivityFromStrava)
-            setIsModalOpen(false);
+        if(!res.ok) {
+            throw new Error('fail to post new activity to database')
         }
-    };
+
+        const data = await res.json();
+        console.log("data;", data);
+        
+        return data
+    }
+
+    const postedData = await postNewActivityToDb()
+    
+    const fetchUpdatedActivityFromDb = async() => {
+        if(!userId) {
+            throw new Error('userId is required')
+        }
+        const res = await fetch(`http://localhost:8080/api/activities/${userId}`,{
+            headers: {
+                "Content-Type" : "application/json"
+            }
+        })
+
+        const data = await res.json();
+        console.log("datafromDB: ", data)
+        return data;
+    }
+
+    const updatedActivitiesFromDb = await fetchUpdatedActivityFromDb()
+    
+
+    setActivityHistoryAndPlan(updatedActivitiesFromDb);
+    setIsModalOpen(false);
+}
+
+    console.log("activitiesinActivitypage;", activityHistoryAndPlan);
+    
 
     return (
         <div className='flex-1 flex flex-col'>
@@ -118,19 +151,19 @@ export default function Activitypage() {
                     </button>
                 </div>
                 <div className='flex flex-col mx-5 gap-y-3'>
-                    {activities?.map((activity) => (
+                    {activityHistoryAndPlan?.map((activity, index) => (
                         <ActivityCard
-                            key={activity.id}
-                            activityStatus={activity.sport_type === 'Run' ? 'completed' : 'planned'}
+                            key={activity.id || index}
+                            activityStatus={activity.activity_type === 'Run' ? 'completed' : 'planned'}
                             // username={activity.athlete?.id.toString() || 'Unknown'}
                             title={activity.name}
-                            Date={new Date(activity.start_date).toLocaleDateString()}
-                            Time={new Date(activity.start_date).toLocaleTimeString()}
+                            Date={new Date(activity.start_time).toLocaleDateString()}
+                            Time={new Date(activity.start_time).toLocaleTimeString()}
                             description={`Description: ${activity.description ?? 'none'}`}
                             distance={activity.distance ? (activity.distance / 1000) : 0}
-                            duration={`${Math.floor(activity.elapsed_time! / 60)}m ${activity.elapsed_time! % 60}s`}
+                            duration={`${Math.floor(activity.duration! / 60)}m ${activity.duration! % 60}s`}
                             AvgSpeed={
-                                activity.average_speed !== undefined
+                                typeof activity.average_speed === 'number'
                                     ? activity.average_speed.toFixed(2)
                                     : '0.00'
                             }
