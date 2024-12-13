@@ -154,7 +154,11 @@ export default function Activitypage() {
                     {activityHistoryAndPlan?.map((activity, index) => (
                         <ActivityCard
                             key={activity.id || index}
-                            activityStatus={activity.activity_type === 'Run' ? 'completed' : 'planned'}
+                            activityStatus={
+                                new Date(activity.start_time) <= new Date()
+                                    ? 'completed'
+                                    : 'planned'
+                            }
                             // username={activity.athlete?.id.toString() || 'Unknown'}
                             title={activity.name}
                             Date={new Date(activity.start_time).toLocaleDateString()}
