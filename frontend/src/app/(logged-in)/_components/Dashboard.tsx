@@ -8,7 +8,7 @@ import {
 import { useUser } from "@/context/userContext";
 import { getActivityCardData } from "@/lib/activity";
 import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
-import { ActivityCardType } from "@/types/activityType";
+import { ActivityCardType, ActivityType } from "@/types/activityType";
 import { UserProfileType } from "@/types/useProfileType";
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
@@ -52,8 +52,13 @@ export default function Dashboard() {
         getAndPostProfileData();
 
         const activityCard = async () => {
-            const cardData = await getActivityCardData(userId);
-            setActivityCards(cardData);
+            const cardData: MergedDataType[] = await getActivityCardData(userId);
+
+            const addAverageSpeed = cardData.map((data) => ({
+                ...data,
+                average_speed: data.distance && data.duration ? (data.distance / data.duration) * 3.6 : 0,
+            }))
+            setActivityCards(addAverageSpeed);
         }
 
         activityCard()
