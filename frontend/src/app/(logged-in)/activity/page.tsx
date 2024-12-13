@@ -163,8 +163,8 @@ export default function Activitypage() {
                             distance={activity.distance ? (activity.distance / 1000) : 0}
                             duration={`${Math.floor(activity.duration! / 60)}m ${activity.duration! % 60}s`}
                             AvgSpeed={
-                                typeof activity.average_speed === 'number'
-                                    ? activity.average_speed.toFixed(2)
+                                activity.distance && activity.duration
+                                    ? (activity.distance / activity.duration).toFixed(2)
                                     : '0.00'
                             }
                         />
