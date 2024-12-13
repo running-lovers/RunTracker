@@ -5,7 +5,9 @@ import ProtectedRoute from '@/components/ProtectedRoute/ProtectedRoute';
 import RightSidebar from '@/components/RightSidebar/RightSidebar';
 import { ActivitiesProvider } from '@/context/activitiesContext';
 import { GoalsProvider } from '@/context/goalsContext';
-import React from 'react'
+import React, { useState } from 'react'
+
+const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export default function Mainlayout({
   children,
@@ -13,14 +15,17 @@ export default function Mainlayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
+  const [activitiesLoaded, setActivitiesLoaded] = useState(false)
+  const [goalsLoaded, setGoalsLoaded] = useState(false)
+
   return (
     <ProtectedRoute>
-      <ActivitiesProvider>
-        <GoalsProvider>
+      <ActivitiesProvider onLoad={() => setActivitiesLoaded(true)}>
+        <GoalsProvider onLoad={() => setGoalsLoaded(true)}>
           <div className='flex flex-1'>
             <LeftSidebar />
             <main className='flex-grow h-screen overflow-y-auto'>{children}</main>
-            <RightSidebar />
+            {activitiesLoaded && goalsLoaded && <RightSidebar />}
           </div>
         </GoalsProvider>
       </ActivitiesProvider>

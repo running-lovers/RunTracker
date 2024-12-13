@@ -4,7 +4,9 @@ import prisma from "../../lib/prisma";
 //Get all activities
 export const getActivities = async (req: Request, res: Response) => {
     try {
-        const activities = await prisma.activity.findMany();
+        const activities = await prisma.activity.findMany({
+            where: {activity_type: "Run"}
+        });
         res.json(activities);
     }catch (error) {
         res.status(500).json({ error: 'Failed to fetch activities' });
@@ -21,7 +23,7 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
             where: {user_id: Number(userId)},
             include: {route: true},
         });
-
+        
         res.json(activities)
     } catch (error) {
         res.status(500).json({error: 'fail to get user activity data'})
@@ -30,11 +32,11 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
 
 //save new activities from strava
 export const saveNewActivity = async(req: Request, res: Response) => {
-    const {userId, activities }= req.body as {userId: number , activities: any[]}
+    const {userId, activities}= req.body as {userId: number , activities: any[], access_token: string}
     if(!userId || !activities) {
         throw new Error('userId and activities are required')
     }    
-
+    
     try {
         const existingActivities = await prisma.activity.findMany({
             where: {
@@ -47,16 +49,18 @@ export const saveNewActivity = async(req: Request, res: Response) => {
         const existingActivityIds = new Set(existingActivities.map((activity) => activity.strava_activity_id))        
         
         const newActivities = activities.filter((activity) => !existingActivityIds.has(String(activity.id)))
-        
 
         const savedActivities = await prisma.activity.createMany({
             data: newActivities.map((activity) => ({
                 activity_type: activity.sport_type,
                 user_id: userId,
+                name: activity.name,
                 distance: activity.distance,
                 duration: activity.elapsed_time,
-                start_time: new Date(activity.start_date).toISOString(),
-                strava_activity_id: activity.id ? String(activity.id) : undefined,
+                average_speed: activity.average_speed,
+                start_time: activity.start_date,
+                strava_activity_id: String(activity.id),
+                route_data: activity.map,
             }))
         })
 

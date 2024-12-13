@@ -4,6 +4,6 @@ export interface GoalsType {
     year: string,
     month: string,
     total_distance: number,
-    average_pace: number,
+    average_speed: number,
     calories_burned: number
 }

@@ -14,8 +14,7 @@ import { useClientData } from "@/context/clientDataContext";
 const HomePage: React.FC = () => {
   const {clientId, setClientId, clientSecret, setClientSecret} = useClientData();
 
-  const handleLogin = async () => {
-
+  const handleLogin = async () => {    
     try {
       const res = await fetch('http://localhost:8080/api/strava/auth', {
         method: 'POST',

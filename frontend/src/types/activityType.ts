@@ -12,6 +12,7 @@ export interface ActivityType {
   route?: RouteType
 }
 
+
 export interface NewActivityType {
   name: string,
   sport_type: string
@@ -19,4 +20,14 @@ export interface NewActivityType {
   distance: number,
   elapsed_time: number,
   description: string
+}
+
+export interface ActivityCardType {
+  id: number
+  activity_type: string
+  average_speed: number
+  duration: number
+  distance: number
+  start_time: string
+  route_data: {id: string, polyline: string, resouce_state: number, summary_polyline: string}
 }
