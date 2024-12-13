@@ -195,7 +195,7 @@ export default function Activitypage() {
 
                             <p className='font-semibold'>Distance (m)</p>
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Distance (m)"
                                 className="border p-2 rounded"
                                 value={newActivity.distance}
@@ -208,7 +208,7 @@ export default function Activitypage() {
                             />
                             <p className='font-semibold'>Duration</p>
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Duration (HH:MM:SS)"
                                 className="border p-2 rounded"
                                 value={newActivity.elapsed_time}
