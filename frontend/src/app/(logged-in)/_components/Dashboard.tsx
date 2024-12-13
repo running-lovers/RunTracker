@@ -37,6 +37,7 @@ export default function Dashboard() {
     const [activityCards, setActivityCards] = useState<MergedDataType[]>([])
     const { user } = useUser();
     const userId = user?.id;
+    const DEFAULT_IMAGE_URL = "avatar/athlete/large.png";
 
     useEffect(() => {
         if (!userId) {
@@ -58,6 +59,12 @@ export default function Dashboard() {
         activityCard()
     }, [user])
 
+    const convertDurationTime = (seconds: number) => {
+        const hours = Math.floor(seconds/3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${hours}h${minutes}min`
+    }
+
     console.log('acticityCards: ', activityCards);
 
 
@@ -71,33 +78,33 @@ export default function Dashboard() {
                         <div>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4 space-y-5">
-                                    <img src={"#"} alt="#" />
+                                    { data.user.userProfile.profile !== DEFAULT_IMAGE_URL ? (
+                                        <img src={data.user.userProfile.profile} alt='User Profile' className="w-[30px] h-[30px] rounded-full" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        <FaRegUserCircle className="w-[30px] h-[30px]"/>
+                                    )}
                                     <div>
                                         <p className="font-semibold">{data.user.userProfile.firstname}{data.user.userProfile.lastname}</p>
                                         <p className="text-sm text-muted-foreground">{data.start_time}</p>
                                     </div>
                                 </div>
-                                <Button variant='ghost' size='sm'>
-                                    Follow
-                                    <ChevronDown className="ml-2 h-4 w-4" />
-                                </Button>
                             </div>
                             <div className="flex justify-evenly text-sm mt-2">
                                 <div>
                                     <p className="text-muted-foreground">Distance</p>
-                                    <p className="font-medium">{data.distance}</p>
+                                    <p className="font-medium">{((data.distance) / 1000).toFixed(2)}km</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Time</p>
-                                    <p className="font-medium">{data.duration}</p>
+                                    <p className="font-medium">{convertDurationTime(data.duration)}</p>
                                 </div>
                                 <div>
                                     <p className="text-muted-foreground">Average Speed</p>
-                                    <p className="font-medium">{data.average_speed}</p>
+                                    <p className="font-medium">{data.average_speed ? (data.average_speed).toFixed(2) : "--"}km/h</p>
                                 </div>
                             </div>
                             <div className="w-full mt-3">
-                                {data.route_data ? <RouteMap encodedPolyline={data.route_data.summary_polyline} /> : <div>no map</div>}
+                                {data.route_data && data.route_data.summary_polyline !== "" ? <RouteMap encodedPolyline={data.route_data.summary_polyline} /> : <div>no map data</div>}
                             </div>
                         </div>
                     </CardContent>
