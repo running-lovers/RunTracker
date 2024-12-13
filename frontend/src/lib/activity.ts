@@ -31,6 +31,8 @@ export const postActivities = async(params: ActivityType[], userId: number) => {
     if(!res) {
         throw new Error('fail to post activities')
     }
+    const data = await res.json();
+    return data
 }
 
 //get activities of specific user from db

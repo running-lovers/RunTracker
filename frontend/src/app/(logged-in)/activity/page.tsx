@@ -1,81 +1,146 @@
 'use client'
 
-import { Activity } from '@/types/activityType'
-import React, { useState } from 'react'
+import { ActivityType, NewActivityType } from '@/types/activityType'
+import React, { useEffect, useState } from 'react'
 import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
 import { useUser } from "@/context/userContext";
+import { useActivities } from '@/context/activitiesContext'
+import { getActivitiesFromStrava, postActivities } from '@/lib/activity'
 
+type activityHistoryAndPlanType = {
+    id: number,
+    user_id: number,
+    activity_type: string,
+    name: string,
+    distance: number,
+    duration: number,
+    average_speed?: number,
+    start_time: string,
+    description: string
+}
 
 export default function Activitypage() {
-    const [activities, setActivities] = useState<Activity[]>([
-        {
-            id: 1,
-            title: "Morning Run",
-            date: "16 October 2024",
-            time: "15:55",
-            Distance: 8.53,
-            Duration: "01:15:38",
-            Calories: 234,
-            user: "Yasuhito Komano",
-            status: "completed",
-            description: "A refreshing morning run through the local park."
-        },
-        {
-            id: 2,
-            title: "Evening Jog",
-            date: "11/12",
-            time: "11:00",
-            Distance: 5,
-            Duration: "00:30:00",
-            Calories: 150,
-            user: "Yasuhito Komano",
-            status: "planned",
-            description: "An easy jog to wind down after work."
-        },
-        {
-            id: 3,
-            title: "Afternoon Run",
-            date: "18 October 2024",
-            time: "14:30",
-            Distance: 7.2,
-            Duration: "00:47:22",
-            Calories: 210,
-            user: "Yasuhito Komano",
-            status: "completed",
-            description: "A challenging run on hilly terrain."
+    const {activities, setActivities} = useActivities()
+    const [activityHistoryAndPlan, setActivityHistoryAndPlan] = useState<activityHistoryAndPlanType[]>([])
+    const { user } = useUser();
+    const access_token= user?.accessToken
+    const userId = user?.id
+
+
+    useEffect(() => {
+        const firstFetchDataFromDataBase = async () => {
+            const response = await fetch(`http://localhost:8080/api/activities/${userId}`,{
+                headers : {
+                    "Content-Type" : "application/json"
+                }
+            })
+
+            if(!response.ok) {
+                throw new Error("fail to fetch activities data from database")
+            }
+            const data: activityHistoryAndPlanType[] = await response.json()
+            const Runactivities = data.filter(activity => activity.activity_type === "Run")
+
+            return Runactivities
         }
-    ])
+
+        const fetchAndSetData = async () => {
+            const data = await firstFetchDataFromDataBase();
+            setActivityHistoryAndPlan(data); // Ensure data matches activityHistoryAndPlanType[]
+        };
+
+        fetchAndSetData();
+    }, [])
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const { user } = useUser();
-    const [newActivity, setNewActivity] = useState<Activity>({
-        id: 0,
-        title: '',
-        date: '',
-        time: '',
-        Distance: 0,
-        Duration: '',
-        Calories: 0,
-        user: user?.name || "Unknown",
-        status: 'planned',
-        description: ''
+    const [newActivity, setNewActivity] = useState<NewActivityType>({
+        name: "",
+        sport_type: "Run",
+        start_date: "",
+        distance: 0,
+        elapsed_time: 0,
+        description: ""
     })
 
-    const handleSaveActivity = () => { 
-        setActivities([ 
-            ...activities,
-            { ...newActivity, id: activities.length + 1 } 
-        ])
-        setIsModalOpen(false)
+    const parseDuration = (duration: string): number => {
+        const [hours, minutes, seconds] = duration.split(':').map(Number);
+        return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
+    };
+
+
+    const handleSaveActivity = async () => { 
+        
+        const formattedActivity: NewActivityType = {
+            name: newActivity.name || 'Untitled Activity',
+            sport_type: "Run",
+            start_date: newActivity.start_date,
+            distance: (newActivity.distance || 0) ,
+            elapsed_time: newActivity.elapsed_time,
+            description: newActivity.description || '',
+        };
+
+
+    const postNewActivityToDb = async () => {
+        const res = await fetch("http://localhost:8080/api/activities", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: userId,
+                name: formattedActivity.name,
+                sport_type: formattedActivity.sport_type,
+                start_date: formattedActivity.start_date,
+                distance: formattedActivity.distance,
+                elapsed_time: formattedActivity.elapsed_time,
+                description: formattedActivity.description
+            })
+        })
+
+        if(!res.ok) {
+            throw new Error('fail to post new activity to database')
+        }
+
+        const data = await res.json();
+        console.log("data;", data);
+        
+        return data
     }
+
+    const postedData = await postNewActivityToDb()
+    
+    const fetchUpdatedActivityFromDb = async() => {
+        if(!userId) {
+            throw new Error('userId is required')
+        }
+        const res = await fetch(`http://localhost:8080/api/activities/${userId}`,{
+            headers: {
+                "Content-Type" : "application/json"
+            }
+        })
+
+        const data = await res.json();
+        console.log("datafromDB: ", data)
+        return data;
+    }
+
+    const updatedActivitiesFromDb = await fetchUpdatedActivityFromDb()
+    
+
+    setActivityHistoryAndPlan(updatedActivitiesFromDb);
+    setIsModalOpen(false);
+}
+
+    console.log("activitiesinActivitypage;", activityHistoryAndPlan);
+    
 
     return (
         <div className='flex-1 flex flex-col'>
             <div className='flex-1'>
                 <div className='max-w-6xl mx-auto p-6'>
-                    <Header />
+                    {/* <Header /> */}
                 </div>
                 <div className='flex justify-start mx-5 mb-3'>
                     <button
@@ -86,19 +151,23 @@ export default function Activitypage() {
                     </button>
                 </div>
                 <div className='flex flex-col mx-5 gap-y-3'>
-                    {activities.map((activity) => (
+                    {activityHistoryAndPlan?.map((activity, index) => (
                         <ActivityCard
-                            key={activity.id} 
-                            activityStatus={activity.status} 
-                            username={activity.user} 
-                            title={activity.title}
-                            Date={activity.date} 
-                            Time={activity.time} 
-                            description={activity.description}
-                            distance={activity.Distance}
-                            duration={activity.Duration}
-                            calories={activity.Calories}
-                            />
+                            key={activity.id || index}
+                            activityStatus={activity.activity_type === 'Run' ? 'completed' : 'planned'}
+                            // username={activity.athlete?.id.toString() || 'Unknown'}
+                            title={activity.name}
+                            Date={new Date(activity.start_time).toLocaleDateString()}
+                            Time={new Date(activity.start_time).toLocaleTimeString()}
+                            description={`Description: ${activity.description ?? 'none'}`}
+                            distance={activity.distance ? (activity.distance / 1000) : 0}
+                            duration={`${Math.floor(activity.duration! / 60)}m ${activity.duration! % 60}s`}
+                            AvgSpeed={
+                                activity.distance && activity.duration
+                                    ? (activity.distance / activity.duration).toFixed(2)
+                                    : '0.00'
+                            }
+                        />
                     ))}
                 </div>
             </div>
@@ -108,57 +177,62 @@ export default function Activitypage() {
                 <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
                     <div className='bg-white p-6 rounded w-[30%] h-[70%] overflow-y-auto'>
                         <h2 className='text-xl font-bold mb-4'>Add New Activity</h2>
-                        <p className='font-semibold'>Activity</p>
+                        <p className='font-semibold'>Title</p>
                         <div className='flex flex-col gap-3'>
-                            <select
-                                className="border p-2 rounded"
-                                value={newActivity.title}
-                                onChange={(e) =>
-                                    setNewActivity({ ...newActivity, title: e.target.value })
-                                }
-                            >
-                                <option value="">Select activity type</option>
-                                <option value="Morning Run">Morning Run</option>
-                                <option value="Evening Jog">Evening Jog</option>
-                                <option value="Afternoon Run">Afternoon Run</option>
-                            </select>
-                            <p className='font-semibold'>Distance (km)</p>
                             <input
                                 type="text"
-                                placeholder="Distance (km)"
+                                placeholder="title"
                                 className="border p-2 rounded"
-                                value={newActivity.Distance}
+                                value={newActivity.name}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, Distance: parseFloat(e.target.value) })
+                                    setNewActivity({ ...newActivity, name: e.target.value })
+                                }
+                            />
+
+                            <p className='font-semibold'>Distance (m)</p>
+                            <input
+                                type="number"
+                                placeholder="Distance (m)"
+                                className="border p-2 rounded"
+                                value={newActivity.distance}
+                                onChange={(e) =>
+                                    setNewActivity({
+                                        ...newActivity,
+                                        distance: e.target.value === "" ? 0 : parseFloat(e.target.value),
+                                    })
                                 }
                             />
                             <p className='font-semibold'>Duration</p>
                             <input
-                                type="text"
+                                type="number"
                                 placeholder="Duration (HH:MM:SS)"
                                 className="border p-2 rounded"
-                                value={newActivity.Duration}
+                                value={newActivity.elapsed_time}
                                 onChange={(e) =>
-                                    setNewActivity({ ...newActivity, Duration: e.target.value })
+                                    setNewActivity({ ...newActivity, elapsed_time: Number(e.target.value) })
                                 }
                             />
                             <p className='font-semibold'>Date</p>
                             <input
                                 type="date"
                                 className="border p-2 rounded"
-                                value={newActivity.date}
-                                onChange={(e) =>
-                                    setNewActivity({ ...newActivity, date: e.target.value })
-                                }
+                                value={newActivity.start_date ? newActivity.start_date.split("T")[0] : ""}
+                                onChange={(e) => {
+                                    const date = e.target.value;
+                                    const time = newActivity.start_date.split("T")[1] || "00:00:00";
+                                    setNewActivity({ ...newActivity, start_date: `${date}T${time}` });
+                                }}
                             />
                             <p className='font-semibold'>Start Time</p>
                             <input
                                 type="time"
                                 className="border p-2 rounded"
-                                value={newActivity.time}
-                                onChange={(e) =>
-                                    setNewActivity({ ...newActivity, time: e.target.value })
-                                }
+                                value={newActivity.start_date ? newActivity.start_date.split("T")[1]?.slice(0, 5) : ""}
+                                onChange={(e) => {
+                                    const time = e.target.value;
+                                    const date = newActivity.start_date.split("T")[0] || "1970-01-01";
+                                    setNewActivity({ ...newActivity, start_date: `${date}T${time}:00` });
+                                }}
                             />
                             <p className='font-semibold'>Description</p>
                             <textarea

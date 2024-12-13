@@ -56,8 +56,8 @@ export const saveNewActivity = async(req: Request, res: Response) => {
                 user_id: userId,
                 name: activity.name,
                 distance: activity.distance,
+                duration: activity.elapsed_time,
                 average_speed: activity.average_speed,
-                duration: activity.moving_time,
                 start_time: activity.start_date,
                 strava_activity_id: String(activity.id),
                 route_data: activity.map,
@@ -65,6 +65,7 @@ export const saveNewActivity = async(req: Request, res: Response) => {
         })
 
         res.json({ savedActivities, message: "Activities saved to database successfully" } )
+        
     } catch (error) {
         console.log('saveActivityError:', error);
         
@@ -76,22 +77,22 @@ export const saveNewActivity = async(req: Request, res: Response) => {
 export const createActivity = async(req: Request, res: Response) => {
     const {        
         userId,
-        activityType,
+        name,
+        sport_type,
+        start_date,
         distance,
-        average_speed,
-        duration,
-       startTime,
-        description,
+        elapsed_time,
+        description
     } = req.body;
 
     try {
         const data: any = {
             user_id: Number(userId),
-            activity_type: activityType || null,
-            distance: distance || 0,
-            average_speed: average_speed || 0,
-            duration: duration || 0,
-            start_time: new Date(startTime),
+            name,
+            activity_type: sport_type,
+            distance,
+            duration: elapsed_time,
+            start_time: new Date(start_date),
             description: description || null
         };
 

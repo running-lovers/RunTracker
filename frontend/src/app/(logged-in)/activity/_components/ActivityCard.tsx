@@ -5,27 +5,24 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { useUser } from "@/context/userContext";
+import { ActivityCardProps } from './ActivityCardTypes';
 
-
-type ActivityCardProps = {
-    activityStatus: "planned" | "completed",
-    username: string,
-    title: string,
-    Date: string,
-    Time: string,
-    description: string,
-    distance?: number,
-    duration?: string,
-    calories?: number
-}
-
-export default function ActivityCard({ activityStatus, username, title, Date, Time, description, distance, duration, calories }: ActivityCardProps) {
+export default function ActivityCard({ activityStatus, title, Date, Time, description, distance, duration, AvgSpeed 
+}: ActivityCardProps) {
+    const { user } = useUser();
+    const username = user?.name || "Unknown User";
     return (
         <div >
             <Card>
                 <CardHeader>
                     <div>
-                        {username.split('').map(name => name[0]).join('')}
+                    {username 
+                            ? username
+                                .split('')
+                                .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+                                .join('') 
+                            : 'U'}
                     </div>
                     <div>
                         <CardTitle>{title}</CardTitle>
@@ -33,9 +30,17 @@ export default function ActivityCard({ activityStatus, username, title, Date, Ti
                             {Date} at {Time}
                         </div>
                         <div>
-                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${activityStatus === 'completed' ? "bg-green-200 text-green-800" : "bg-blue-200 text-blue-800"}`}>
-                                {activityStatus.charAt(0).toUpperCase() + activityStatus.slice(1)}
-                            </span>
+                        <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                activityStatus === 'completed'
+                                    ? "bg-green-200 text-green-800"
+                                    : "bg-blue-200 text-blue-800"
+                            }`}
+                        >
+                            {activityStatus
+                                ? activityStatus.charAt(0).toUpperCase() + activityStatus.slice(1)
+                                : 'Unknown'}
+                        </span>
                         </div>
                     </div>
                 </CardHeader>
@@ -45,7 +50,7 @@ export default function ActivityCard({ activityStatus, username, title, Date, Ti
                         <div>
                             <div>Distance</div>
                             <div>
-                                <span>{distance}</span>
+                                <span>{distance} km.</span>
                             </div>
                         </div>
                         <div>
@@ -55,9 +60,9 @@ export default function ActivityCard({ activityStatus, username, title, Date, Ti
                             </div>
                         </div>
                         <div>
-                            <div>Calories</div>
+                            <div>Average Speed</div>
                             <div>
-                                <span>{calories}</span>
+                                <span>{AvgSpeed} m/s</span>
                             </div>
                         </div>
                     </div>
