@@ -22,6 +22,21 @@ export const fetchUserProfileFromStrava = async(acceess_token: string | null) =>
     return data;
 }
 
+export const fetchUserProfileFromDb = async(userId: number) => {
+    if(!userId) {
+        throw new Error ('userId is required')
+    }
+
+    const res = await fetch(`${apiUrl}/api/userProfile/${userId}`,{
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+    const data = await res.json();
+    return data;
+}
+
 export const postUserProfile = async(id: number, data: UserProfileType) => {
     const body = {
         userId: id,
