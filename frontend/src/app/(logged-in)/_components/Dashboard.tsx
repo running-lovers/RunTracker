@@ -13,6 +13,7 @@ import { UserProfileType } from "@/types/useProfileType";
 import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
+import RouteMap from "./RouteMap";
 
 type UserType = {
     country: string,
@@ -25,41 +26,41 @@ type UserType = {
     state: string
 }
 
-type MergedDataType = ActivityCardType & {user: UserType & { userProfile: UserProfileType}}
+type MergedDataType = ActivityCardType & { user: UserType & { userProfile: UserProfileType } }
 
 const temporalyActivities = [
     { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
     { id: 2, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Victor Sarut", startDate: "15th October, 2024 at 10:13", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" }
 ]
 
-export default function RecentActivityCard() {
-    const [activityCards, setActivityCards] = useState<MergedDataType[]>([]) 
-    const {user} = useUser();
+export default function Dashboard() {
+    const [activityCards, setActivityCards] = useState<MergedDataType[]>([])
+    const { user } = useUser();
     const userId = user?.id;
 
     useEffect(() => {
-        if(!userId) {
+        if (!userId) {
             throw new Error("userId is undefined")
         }
-        
-        const getAndPostProfileData = async() => {
+
+        const getAndPostProfileData = async () => {
             const data = await fetchUserProfileFromStrava(user.accessToken);
             const post = await postUserProfile(userId, data);
             return post
         }
         getAndPostProfileData();
 
-        const activityCard = async() => {
+        const activityCard = async () => {
             const cardData = await getActivityCardData(userId);
             setActivityCards(cardData);
         }
 
         activityCard()
     }, [user])
-           
+
     console.log('acticityCards: ', activityCards);
-    
-    
+
+
 
     return (
         <>
@@ -72,7 +73,7 @@ export default function RecentActivityCard() {
                                 <div className="flex items-center space-x-4 space-y-5">
                                     <img src={"#"} alt="#" />
                                     <div>
-                                        <p className="font-semibold">{data.user.firstname}{data.user.lastname}</p>
+                                        <p className="font-semibold">{data.user.userProfile.firstname}{data.user.userProfile.lastname}</p>
                                         <p className="text-sm text-muted-foreground">{data.start_time}</p>
                                     </div>
                                 </div>
@@ -81,7 +82,7 @@ export default function RecentActivityCard() {
                                     <ChevronDown className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>
-                            <div className="grid grid-cols-3 gap-4 text-sm mt-2">
+                            <div className="flex justify-evenly text-sm mt-2">
                                 <div>
                                     <p className="text-muted-foreground">Distance</p>
                                     <p className="font-medium">{data.distance}</p>
@@ -94,9 +95,9 @@ export default function RecentActivityCard() {
                                     <p className="text-muted-foreground">Average Speed</p>
                                     <p className="font-medium">{data.average_speed}</p>
                                 </div>
-                                <div>
-                                    <img src="#" alt="Running route" className="h-full w-full object-cover" />
-                                </div>
+                            </div>
+                            <div className="w-full mt-3">
+                                {data.route_data ? <RouteMap encodedPolyline={data.route_data.summary_polyline} /> : <div>no map</div>}
                             </div>
                         </div>
                     </CardContent>

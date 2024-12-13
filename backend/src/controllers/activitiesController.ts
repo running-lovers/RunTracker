@@ -32,11 +32,11 @@ export const getActivitiesByUserId = async(req: Request, res: Response) => {
 
 //save new activities from strava
 export const saveNewActivity = async(req: Request, res: Response) => {
-    const {userId, activities }= req.body as {userId: number , activities: any[]}
+    const {userId, activities}= req.body as {userId: number , activities: any[], access_token: string}
     if(!userId || !activities) {
         throw new Error('userId and activities are required')
     }    
-
+    
     try {
         const existingActivities = await prisma.activity.findMany({
             where: {
@@ -49,7 +49,6 @@ export const saveNewActivity = async(req: Request, res: Response) => {
         const existingActivityIds = new Set(existingActivities.map((activity) => activity.strava_activity_id))        
         
         const newActivities = activities.filter((activity) => !existingActivityIds.has(String(activity.id)))
-        
 
         const savedActivities = await prisma.activity.createMany({
             data: newActivities.map((activity) => ({
@@ -61,6 +60,7 @@ export const saveNewActivity = async(req: Request, res: Response) => {
                 duration: activity.moving_time,
                 start_time: activity.start_date,
                 strava_activity_id: String(activity.id),
+                route_data: activity.map,
             }))
         })
 
@@ -89,7 +89,7 @@ export const createActivity = async(req: Request, res: Response) => {
             user_id: Number(userId),
             activity_type: activityType || null,
             distance: distance || 0,
-            average_speed: activityType || 0,
+            average_speed: average_speed || 0,
             duration: duration || 0,
             start_time: new Date(startTime),
             description: description || null
