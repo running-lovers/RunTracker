@@ -5,18 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useUser } from "@/context/userContext";
 import { followUser, unfollowUser } from "@/lib/connections";
 import Image from 'next/image';
-
-const STATIC_DATA = {
-  stats: {
-    weekly: { distance: "●●● km", pace: "●'●●\"/km", time: "●h ●●m", calories: "●,●●● kcal" },
-    monthly: { distance: "XXX km", pace: "X'XX\"/km", time: "XXh XXm", calories: "XX,XXX kcal" },
-    yearly: { distance: "■■■ km", pace: "■'■■\"/km", time: "■■■h ■■m", calories: "■■■,■■■ kcal" },
-  },
-  activities: [
-    { id: 1, title: "Sample Activity A", distance: "●●.● km", time: "●●:●●", pace: "●'●●\"/km", date: "X days ago" },
-    { id: 2, title: "Sample Activity B", distance: "■■.■ km", time: "■■:■■", pace: "■'■■\"/km", date: "X days ago" },
-  ],
-};
+import { getActivitiesFromDb } from "@/lib/activity";
 
 interface FriendProfile {
   id: number;
@@ -25,21 +14,49 @@ interface FriendProfile {
   followersCount: number;
   followingCount: number;
   isFollowing?: boolean;
-  avatarUrl?: string;  // Add avatar URL field
+  avatarUrl?: string;
 }
 
 interface FollowingUser {
   id: number;
 }
 
+interface ActivitySummary {
+  distance: string;
+  pace: string;
+  time: string;
+  calories: string;
+}
+
+interface Activity {
+  id: number;
+  name: string;
+  title: string;
+  distance: number;
+  time: string;
+  pace: string;
+  date: string;
+  duration: number;
+  calories?: number;
+  start_time: string;
+}
+
 const FriendProfile: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const { user: currentUser } = useUser();
-  const [activeTab] = useState<"weekly" | "monthly" | "yearly">("weekly");
   const [friend, setFriend] = useState<FriendProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activitySummary, setActivitySummary] = useState<ActivitySummary>({
+    distance: "0 km",
+    pace: "0'00\"/km",
+    time: "0h 00m",
+    calories: "0 kcal"
+  });
+  const [displayLimit, setDisplayLimit] = useState<number>(5); // Show first 5 activities by default
+  const [stravaStatus, setStravaStatus] = useState<'connected' | 'private' | 'loading'>('loading');
 
   const handleFollowToggle = async () => {
     if (!currentUser || !friend) return;
@@ -67,6 +84,35 @@ const FriendProfile: React.FC = () => {
     }
   };
 
+  // Add function to calculate summary stats
+  const calculateActivitySummary = (activities: Activity[]) => {
+    if (activities.length === 0) return;
+
+    const totalDistance = activities.reduce((sum, activity) => sum + activity.distance, 0);
+    const totalDuration = activities.reduce((sum, activity) => sum + activity.duration, 0);
+    const totalCalories = activities.reduce((sum, activity) => sum + (activity.calories || 0), 0);
+    
+    let avgPaceSeconds = 0;
+    if (totalDistance > 0) {
+      avgPaceSeconds = (totalDuration / (totalDistance / 1000));
+      
+      if (avgPaceSeconds < 180 || avgPaceSeconds > 900) {
+        avgPaceSeconds = 0;
+      }
+    }
+
+    const formattedStats = {
+      distance: `${(totalDistance / 1000).toFixed(1)} km`,
+      pace: avgPaceSeconds > 0 
+        ? `${Math.floor(avgPaceSeconds / 60)}'${Math.floor(avgPaceSeconds % 60).toString().padStart(2, '0')}" min/km` 
+        : 'N/A',
+      time: `${Math.floor(totalDuration / 3600)}:${Math.floor((totalDuration % 3600) / 60).toString().padStart(2, '0')} hours`,
+      calories: `${totalCalories.toLocaleString()} kcal`
+    };
+
+    setActivitySummary(formattedStats);
+  };
+
   useEffect(() => {
     const fetchFriendDetail = async () => {
       try {
@@ -84,6 +130,56 @@ const FriendProfile: React.FC = () => {
         const isFollowing = followingUsers.some((u) => u.id === parseInt(params.userId as string));
 
         setFriend({ ...data, isFollowing });
+
+        if (!params.userId || typeof params.userId !== 'string') return;
+        const activitiesData = await getActivitiesFromDb(parseInt(params.userId));
+        
+        // Check if Strava data is accessible
+        if (!activitiesData || activitiesData.length === 0) {
+          setActivities([]);
+          setActivitySummary({
+            distance: "Private",
+            pace: "Private",
+            time: "Private",
+            calories: "Private"
+          });
+          setStravaStatus('private');
+          return;
+        }
+
+        setStravaStatus('connected');
+
+        const filteredActivities = activitiesData.filter((activity: Activity) => 
+          new Date(activity.start_time) <= new Date()
+        );
+
+        // Calculate summary before formatting activities for display
+        calculateActivitySummary(filteredActivities);
+
+        const formattedActivities = filteredActivities
+          .sort((a: Activity, b: Activity) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
+          .map((activity: Activity) => {
+            const distanceKm = (activity.distance / 1000).toFixed(2);
+            const hours = Math.floor(activity.duration / 3600);
+            const minutes = Math.floor((activity.duration % 3600) / 60);
+            const timeFormatted = `${hours}:${minutes.toString().padStart(2, '0')}`;
+            const paceSeconds = (activity.duration / (activity.distance / 1000));
+            const paceMinutes = Math.floor(paceSeconds / 60);
+            const paceRemainingSeconds = Math.floor(paceSeconds % 60);
+            const paceFormatted = `${paceMinutes}'${paceRemainingSeconds.toString().padStart(2, '0')}"`;
+            const daysAgo = Math.floor((new Date().getTime() - new Date(activity.start_time).getTime()) / (1000 * 60 * 60 * 24));
+            return {
+              id: activity.id,
+              title: activity.name || 'Untitled Activity',
+              distance: `${distanceKm} km`,
+              time: timeFormatted,
+              pace: paceFormatted,
+              date: `${daysAgo} days ago`
+            };
+          });
+
+        setActivities(formattedActivities);
+
       } catch (error) {
         console.error('Error details:', error);
         setError('Failed to load friend details');
@@ -128,25 +224,65 @@ const FriendProfile: React.FC = () => {
 
       {/* Friend Info */}
       <div className="p-6 bg-gray-100 rounded shadow">
-        <div className="flex items-center gap-4">
-          {/* Avatar Image */}
-          <div className="w-16 h-16 rounded-full overflow-hidden relative">
-            <Image 
-              src={friend.avatarUrl || '/default-avatar.png'}
-              alt={`${friend.name}'s avatar`}
-              fill
-              className="object-cover"
-            />
-          </div>
-          
+        <div className="flex items-center space-x-4">
+          {friend?.avatarUrl ? (
+            // For users with public Strava profiles and valid avatar URL
+            <div className="w-16 h-16 rounded-full overflow-hidden">
+              <Image
+                src={friend.avatarUrl}
+                alt={`${friend.name}'s profile`}
+                width={64}
+                height={64}
+                className="object-cover"
+                onError={(e) => {
+                  // If image fails to load, show default SVG icon
+                  const target = e.target as HTMLImageElement;
+                  target.parentElement!.innerHTML = `
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                      <svg 
+                        class="w-8 h-8 text-gray-400" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round" 
+                          stroke-width="2" 
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                        />
+                      </svg>
+                    </div>
+                  `;
+                }}
+              />
+            </div>
+          ) : (
+            // Default SVG icon for users without valid avatar URL
+            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+              <svg 
+                className="w-8 h-8 text-gray-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                />
+              </svg>
+            </div>
+          )}
           <div>
-            <h2 className="text-2xl font-bold">{friend.name}</h2>
+            <h2 className="text-2xl font-bold">{friend?.name}</h2>
             <div className="mt-2 flex gap-4 text-gray-500">
               <div>
-                <span className="font-semibold">{friend.followersCount}</span> followers
+                <span className="font-semibold">{friend?.followersCount}</span> followers
               </div>
               <div>
-                <span className="font-semibold">{friend.followingCount}</span> following
+                <span className="font-semibold">{friend?.followingCount}</span> following
               </div>
             </div>
           </div>
@@ -156,42 +292,99 @@ const FriendProfile: React.FC = () => {
       {/* Activity Summary */}
       <div className="p-6 bg-gray-100 rounded shadow">
         <h3 className="text-xl font-semibold">Activity Summary</h3>
-        {/* ... タブ部分 ... */}
-        <div className="mt-6 grid grid-cols-2 gap-y-4">
-          <div>
-            <p className="text-sm text-gray-500">Total Distance</p>
-            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].distance}</p>
+        {stravaStatus === 'private' ? (
+          <div className="text-center py-6">
+            <div className="text-gray-500">
+              <div className="w-12 h-12 mx-auto mb-3 bg-gray-200 rounded-full flex items-center justify-center">
+                <svg 
+                  className="w-8 h-8 text-gray-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h4 className="font-medium mb-2">Private Strava Profile</h4>
+              <p className="text-sm">This user&apos;s Strava activities are currently private</p>
+              <p className="text-xs mt-2 text-gray-400">Activities will appear here when made public in Strava settings</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Avg. Pace</p>
-            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].pace}</p>
+        ) : (
+          <div className="mt-6 grid grid-cols-2 gap-y-4">
+            <div>
+              <p className="text-sm text-gray-500">Total Distance</p>
+              <p className="text-2xl font-bold">{activitySummary.distance}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Avg. Pace</p>
+              <p className="text-2xl font-bold">{activitySummary.pace}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Total Time</p>
+              <p className="text-2xl font-bold">{activitySummary.time}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Calories Burned</p>
+              <p className="text-2xl font-bold">{activitySummary.calories}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Total Time</p>
-            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].time}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Calories Burned</p>
-            <p className="text-2xl font-bold">{STATIC_DATA.stats[activeTab].calories}</p>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Recent Activities */}
       <div className="p-6 bg-gray-100 rounded shadow">
         <h3 className="text-xl font-semibold">Recent Activities</h3>
+        <p className="text-xs text-gray-500 mt-1 mb-3">
+          Distance • Pace (min/km) • Duration (hours)
+        </p>
         <ul className="mt-4 space-y-4">
-          {STATIC_DATA.activities.map((activity) => (
-            <li key={activity.id} className="flex justify-between">
-              <div>
-                <h4 className="font-semibold">{activity.title}</h4>
-                <p className="text-gray-500">
-                  {activity.distance} · {activity.time} · {activity.pace}
-                </p>
+          {stravaStatus === 'private' ? (
+            // Private Strava profile message
+            <div className="text-center py-6">
+              <div className="text-gray-500">
+                <div className="w-12 h-12 mx-auto mb-3 bg-gray-200 rounded-full flex items-center justify-center">
+                  <svg 
+                    className="w-8 h-8 text-gray-400" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h4 className="font-medium mb-2">Private Strava Profile</h4>
+                <p className="text-sm">This user&apos;s Strava activities are currently private</p>
+                <p className="text-xs mt-2 text-gray-400">Activities will appear here when made public in Strava settings</p>
               </div>
-              <p className="text-gray-500">{activity.date}</p>
-            </li>
-          ))}
+            </div>
+          ) : activities.length > 0 ? (
+            // Show activities if available
+            <>
+              {activities.slice(0, displayLimit).map((activity) => (
+                <li key={activity.id} className="flex justify-between">
+                  <div>
+                    <h4 className="font-semibold">{activity.title}</h4>
+                    <p className="text-gray-500">
+                      {activity.distance} • {activity.pace}/km • {activity.time} hours
+                    </p>
+                  </div>
+                  <p className="text-gray-500">{activity.date}</p>
+                </li>
+              ))}
+              {activities.length > displayLimit && (
+                <button
+                  onClick={() => setDisplayLimit(prev => prev + 5)}
+                  className="w-full mt-4 py-2 text-gray-600 hover:text-gray-800 text-sm font-medium"
+                >
+                  Show More Activities
+                </button>
+              )}
+            </>
+          ) : (
+            // No activities found message
+            <p className="text-gray-500 text-center">No activities found</p>
+          )}
         </ul>
       </div>
     </div>

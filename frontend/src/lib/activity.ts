@@ -37,18 +37,25 @@ export const postActivities = async(params: ActivityType[], userId: number) => {
 
 //get activities of specific user from db
 export const getActivitiesFromDb = async(userId: number) => {
+    console.log('API URL:', `${apiUrl}/api/activities/${userId}`);
+    
     const res = await fetch(`${apiUrl}/api/activities/${userId}`, {
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
     })
 
     if(!res.ok) {
+        console.error('API Response:', {
+            status: res.status,
+            statusText: res.statusText
+        });
         throw new Error('fail to get activities data from server')
     }
 
     const data = await res.json();    
-
+    console.log('API Response data:', data);
     return data;
 }
 
@@ -81,3 +88,16 @@ export const getActivityCardData = async(id: number) => {
     const data = await res.json();
     return data;
 } 
+
+export const fetchUserActivities = async (userId: number) => {
+    try {
+        const response = await fetch(`http://localhost:8080/api/activities/${userId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch activities');
+        }
+        return response.json();
+    } catch (error) {
+    console.error('Error fetching activities:', error);
+    throw error;
+    }
+};

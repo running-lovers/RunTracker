@@ -117,29 +117,49 @@ export default function FriendsPage() {
                   className="flex items-center gap-4 cursor-pointer hover:opacity-80"
                   onClick={() => router.push(`/friends/${user.id}`)}
                 >
-                  {user.avatarUrl ? (
-                    <div className="w-10 h-10 rounded-full overflow-hidden">
-                      <Image
-                        src={user.avatarUrl}
-                        alt={`${user.name}'s avatar`}
-                        width={40}
-                        height={40}
-                        className="object-cover"
-                        onError={(e) => {
-                          // Fallback to default avatar on error
-                          const target = e.target as HTMLImageElement;
-                          target.src = '/default-avatar.png';
-                        }}
-                      />
+                  <div className="flex items-center gap-4">
+                    {user.avatarUrl ? (
+                      <div className="w-10 h-10 rounded-full overflow-hidden">
+                        <Image
+                          src={user.avatarUrl}
+                          alt={`${user.name}'s avatar`}
+                          width={40}
+                          height={40}
+                          className="object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `
+                                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                  <svg 
+                                    class="w-6 h-6 text-gray-400" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path 
+                                      stroke-linecap="round" 
+                                      stroke-linejoin="round" 
+                                      stroke-width="2" 
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                                    />
+                                  </svg>
+                                </div>
+                              `;
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+                        {user.name[0].toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-semibold">{user.name}</h3>
+                      <p className="text-gray-500 text-sm">{user.username}</p>
                     </div>
-                  ) : (
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
-                      {user.name[0].toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="font-semibold">{user.name}</h3>
-                    <p className="text-gray-500 text-sm">{user.username}</p>
                   </div>
                 </div>
 
