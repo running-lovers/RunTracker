@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useUser } from "@/context/userContext";
 import { followUser, unfollowUser } from "@/lib/connections";
+import Image from 'next/image';
 
 const STATIC_DATA = {
   stats: {
@@ -24,6 +25,7 @@ interface FriendProfile {
   followersCount: number;
   followingCount: number;
   isFollowing?: boolean;
+  avatarUrl?: string;  // Add avatar URL field
 }
 
 interface FollowingUser {
@@ -126,13 +128,27 @@ const FriendProfile: React.FC = () => {
 
       {/* Friend Info */}
       <div className="p-6 bg-gray-100 rounded shadow">
-        <h2 className="text-2xl font-bold">{friend.name}</h2>
-        <div className="mt-4 flex gap-4 text-gray-500">
-          <div>
-            <span className="font-semibold">{friend.followersCount}</span> followers
+        <div className="flex items-center gap-4">
+          {/* Avatar Image */}
+          <div className="w-16 h-16 rounded-full overflow-hidden relative">
+            <Image 
+              src={friend.avatarUrl || '/default-avatar.png'}
+              alt={`${friend.name}'s avatar`}
+              fill
+              className="object-cover"
+            />
           </div>
+          
           <div>
-            <span className="font-semibold">{friend.followingCount}</span> following
+            <h2 className="text-2xl font-bold">{friend.name}</h2>
+            <div className="mt-2 flex gap-4 text-gray-500">
+              <div>
+                <span className="font-semibold">{friend.followersCount}</span> followers
+              </div>
+              <div>
+                <span className="font-semibold">{friend.followingCount}</span> following
+              </div>
+            </div>
           </div>
         </div>
       </div>

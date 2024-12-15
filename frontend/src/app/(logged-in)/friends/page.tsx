@@ -5,6 +5,7 @@ import { useUser } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import { fetchAndFormatUsers, filterUsersByQuery, filterUsersByType, followUser, unfollowUser } from "@/lib/connections";
 import { ConnectionUser } from "@/types/connectionUserType";
+import Image from "next/image";
 
 export default function FriendsPage() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function FriendsPage() {
     
     fetchAndFormatUsers(currentUser.id)
         .then(users => {
-            console.log('Fetched users:', users.length);
+            console.log('API Response Data:', users);
             setUsers(users);
         })
         .catch((error) => {
@@ -116,9 +117,26 @@ export default function FriendsPage() {
                   className="flex items-center gap-4 cursor-pointer hover:opacity-80"
                   onClick={() => router.push(`/friends/${user.id}`)}
                 >
-                  <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
-                    {user.name[0].toUpperCase()}
-                  </div>
+                  {user.avatarUrl ? (
+                    <div className="w-10 h-10 rounded-full overflow-hidden">
+                      <Image
+                        src={user.avatarUrl}
+                        alt={`${user.name}'s avatar`}
+                        width={40}
+                        height={40}
+                        className="object-cover"
+                        onError={(e) => {
+                          // Fallback to default avatar on error
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/default-avatar.png';
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+                      {user.name[0].toUpperCase()}
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-semibold">{user.name}</h3>
                     <p className="text-gray-500 text-sm">{user.username}</p>
