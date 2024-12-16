@@ -16,6 +16,7 @@ export default function ProfileCard() {
     const [userProfile, setUserProfile] = useState<UserProfileType>();
     const { user } = useUser();
     const userId = user?.id
+    const DEFAULT_IMAGE_URL = "avatar/athlete/large.png";
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -45,7 +46,12 @@ export default function ProfileCard() {
                 <Card className="relative max-w-[800px] mx-auto px-5">
                     <CardContent className="w-full mt-5">
                         <div className="flex items-center space-x-6 mb-10">
-                            <FaRegUserCircle className="text-3xl" />
+                            {userProfile?.profile !== DEFAULT_IMAGE_URL ? (
+                                <img src={userProfile?.profile} alt="User Profile" referrerPolicy="no-referrer" className="w-[50px] h-[50px] rounded-full"/>
+                            ) : (
+                                <FaRegUserCircle className="w-[50px] h-[50px]" />
+                            )
+                            }
                             <div className="text-2xl font-bold">{userProfile?.firstname ? userProfile?.firstname : '-'} {userProfile ? userProfile?.lastname : '-'} </div>
                             <Button variant='ghost' size='icon' className="absolute right-5">
                                 <Edit className="w-4 h-4" />
