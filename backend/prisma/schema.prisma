@@ -50,10 +50,10 @@ model Route {
   id             Int       @id @default(autoincrement())
   user_id        Int
   route_name     String
-  coordinates    Json
+  polyline       Json
   distance       Float
-  elevation_data Json
-  is_favorite    Boolean   @default(false)
+  elevation_data Json?
+  is_favorite    Boolean?  @default(false)
   created_at     DateTime  @default(now())
   deleted_at     DateTime?
 
@@ -92,7 +92,7 @@ model Goal {
   year            String
   month           String
   total_distance  Float     @default(0)
-  average_speed    Float     @default(0)
+  average_speed   Float     @default(0)
   calories_burned Float     @default(0)
   current         Float?    @default(0)
   start_date      DateTime?
@@ -140,18 +140,18 @@ model ChatRoomUser {
 }
 
 model UserProfile {
-  id                Int       @id @default(autoincrement())
-  user_id           Int       @unique
-  firstname         String?
-  lastname          String?
-  city              String?
-  state             String?
-  country           String?
-  sex               String?
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-  profile_medium    String?
-  profile           String?
+  id             Int      @id @default(autoincrement())
+  user_id        Int      @unique
+  firstname      String?
+  lastname       String?
+  city           String?
+  state          String?
+  country        String?
+  sex            String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  profile_medium String?
+  profile        String?
 
   // Relation to User
   user User @relation(fields: [user_id], references: [id])
