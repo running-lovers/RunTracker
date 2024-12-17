@@ -45,7 +45,8 @@ export const getRoutesDataByUserId = async(req: Request, res: Response) => {
 
     try {
         const routeData = await prisma.route.findMany({
-            where: {user_id: Number(userId)}
+            where: {user_id: Number(userId)},
+            orderBy: {created_at: 'desc'}
         })
 
         res.json(routeData);

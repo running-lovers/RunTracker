@@ -10,7 +10,8 @@ type PropsType = {
 }
 
 export default function RouteCard({ route }: PropsType) {
-    console.log('routename:', route.name);
+    console.log('routeId:', route.id);
+    
     return (
         <Card>
             <CardHeader>
@@ -26,11 +27,11 @@ export default function RouteCard({ route }: PropsType) {
                 <div className='flex justify-evenly mt-4'>
                     <div>
                         <p className="text-gray-500">Distance</p>
-                        <p className="font-semibold">{route.distance}</p>
+                        <p className="font-semibold text-center">{(Number(route.distance) / 1000).toFixed(2)}km</p>
                     </div>
                     <div>
                         <p className="text-gray-500">Difficulty</p>
-                        <p className="font-semibold">{route.difficulty}</p>
+                        <p className="font-semibold text-center">{route.difficulty ? route.difficulty : "--"}</p>
                     </div>
                 </div>
             </CardContent>
