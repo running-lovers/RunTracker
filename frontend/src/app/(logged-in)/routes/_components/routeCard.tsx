@@ -10,7 +10,6 @@ type PropsType = {
 }
 
 export default function RouteCard({ route }: PropsType) {
-    console.log('routeId:', route.id);
     
     return (
         <Card>
