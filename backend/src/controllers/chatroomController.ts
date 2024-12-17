@@ -19,7 +19,7 @@ export const postChatroom = async(req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({error: 'fail to create new chatroom'})
     }
-}
+};
 
 // Get all chat rooms By userId
 // export const getChatroomsByUserId = async(req: Request, res: Response) => {

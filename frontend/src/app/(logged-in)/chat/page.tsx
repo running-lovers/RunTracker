@@ -28,9 +28,9 @@ const ChatPage: React.FC = () => {
   // console.log("User from context:", user);
   // console.log("ID", user?.strava_id)
   const [groups, setGroups] = useState<Group[]>([
-    { id: 1, name: "Running Club", description: "Great job everyone!" },
-    { id: 2, name: "Marathon Training", description: "Don't forget the long run this week!" },
-    { id: 3, name: "Local Runners", description: "Anyone up for a group run?" },
+    // { id: 1, name: "Running Club", description: "Great job everyone!" },
+    // { id: 2, name: "Marathon Training", description: "Don't forget the long run this week!" },
+    // { id: 3, name: "Local Runners", description: "Anyone up for a group run?" },
   ]);
   
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -42,10 +42,8 @@ const ChatPage: React.FC = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const users: User[] = [
-    { id: 1, name: "Alice Runner" },
-    { id: 2, name: "Bob Jogger" },
-    { id: 3, name: "Charlie Sprinter" },
-    { id: 4, name: "Diana Marathon" },
+    { id: 1, name: "Yasuhitp" },
+    { id: 2, name: "Kaz" },
   ];
 
     // Connect to Socket.IO
@@ -84,8 +82,8 @@ const ChatPage: React.FC = () => {
     setMessages([]); // Clear messages and fetch new ones (mocked for now)
     setMessages([
       // Mock data
-      { id: 1, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
-      { id: 2, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
+      { id: 111, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
+      { id: 222, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
     ]);
   };
 
@@ -109,26 +107,39 @@ const ChatPage: React.FC = () => {
   };
 
   // Create New Group
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
     if (!newGroupName.trim()) {
       alert("Please enter a group name.");
       return;
     }
-
-    const newGroup: Group = {
-      id: Date.now(),
+  
+    const payload = {
+      userId: user?.id,
       name: newGroupName,
-      description: `Created with ${selectedUsers.length} members`,
     };
-
-    // setGroups([...groups, newGroup]); //add group
-    // setGroups((prev) => [...prev, newGroup]);
-    socket?.emit("createGroup", newGroup);
-
-    setNewGroupName("");
-    setSelectedUsers([]);
-    setIsModalOpen(false);
+  
+    try {
+      const response = await fetch("http://localhost:8080/api/chatrooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to create chatroom");
+        return;
+      }
+  
+      const createdChatroom = await response.json();
+      // setGroups((prev) => [...prev, createdChatroom]);
+      socket?.emit("newGroup", createdChatroom);
+      setNewGroupName("");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error creating chatroom:", error);
+    }
   };
+  
 
   // select and Unselect User in modal
   const toggleUserSelection = (userId: number) => {

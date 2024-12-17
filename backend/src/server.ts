@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
     });
 
     //create new group
-    socket.on("createGroup", (newGroup) => {
+    socket.on("newGroup", (newGroup) => {
         io.emit("newGroup", newGroup);
     });
   
