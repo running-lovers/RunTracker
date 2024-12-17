@@ -46,6 +46,26 @@ const ChatPage: React.FC = () => {
     { id: 2, name: "Kaz" },
   ];
 
+  // Fetch Chatrooms when component loads
+  useEffect(() => {
+    const fetchChatrooms = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/chatrooms");
+        if (!response.ok) {
+          console.error("Failed to fetch chatrooms");
+          return;
+        }
+
+        const data: Group[] = await response.json();
+        setGroups(data);
+      } catch (error) {
+        console.error("Error fetching chatrooms:", error);
+      }
+    };
+
+    fetchChatrooms();
+  }, []);
+
     // Connect to Socket.IO
     useEffect(() => {
       const socketConnection = io("http://localhost:8080");

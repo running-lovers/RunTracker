@@ -83,3 +83,13 @@ export const deleteChatroom = async(req: Request, res: Response) => {
         res.status(500).json({error: 'fail to delete chatroom'})
     }
 }
+
+export const getAllChatrooms = async (req: Request, res: Response) => {
+    try {
+      const chatrooms = await prisma.chatRoom.findMany();
+      res.status(200).json(chatrooms);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch chatrooms" });
+    }
+  };
+  
