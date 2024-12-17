@@ -1,50 +1,34 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import RouteCard from "./_components/routeCard";
+import { fetchRoutesFromDb } from "@/lib/route";
+import { useUser } from "@/context/userContext";
 
 export interface RouteType {
   id: number;
-  name: string;
+  route_name: string;
   distance: string;
   difficulty: string;
   isFavorite: boolean;
   route_data: any;
 }
 
-const routes: RouteType[] = [
-  {
-    id: 1,
-    name: "Route1",
-    distance: "5.2km",
-    difficulty: "Moderate",
-    isFavorite: false,
-    route_data: {
-      "id": "a13090135700",
-      "resource_state": 2,
-      "summary_polyline": "ofxkHd{mnVa@c@RWGHWi@E?MOM?EK@CCGC?IMG?EGCA@IES]?AGUCm@SHSCG@BS@?ELBA@Gk@EGK@BYP_@ISDEIMCOQQKES?KEK@AESBMGWg@AIAA@A?CGIBGM[ICGKCCOOSKAGKEEMKACC@CGABEAQ@YLOFCBQIMCSMOGEAGGCEIC?AOGAEK?FFQ?KOBYP[HOACCG@GEAEBA?SBAA@AA?CXQCa@GWC@D?CG@ELJP?NSBADDADEODABPGHCICHCCAHB`@EQFYDNDWLAEXDA@EIOE^CQEL@??HEPAJEYMDAVP\\CFE?i@I?RBCGHCHHAJB@JADFFBXDAFHEP@DC?BLPHPTRFh@l@LBFHJDDLFBFTHJAFHVCJ?LDBPH^BHZJJXx@D@HNJH@A?@?ECPIBAB@UBAMPRM"
-    }
-  },
-  {
-    id: 2,
-    name: "Morning Run",
-    distance: "10.5km",
-    difficulty: "Hard",
-    isFavorite: true,
-    route_data: {
-      "id": "a13090135700",
-      "resource_state": 2,
-      "summary_polyline": "ofxkHd{mnVa@c@RWGHWi@E?MOM?EK@CCGC?IMG?EGCA@IES]?AGUCm@SHSCG@BS@?ELBA@Gk@EGK@BYP_@ISDEIMCOQQKES?KEK@AESBMGWg@AIAA@A?CGIBGM[ICGKCCOOSKAGKEEMKACC@CGABEAQ@YLOFCBQIMCSMOGEAGGCEIC?AOGAEK?FFQ?KOBYP[HOACCG@GEAEBA?SBAA@AA?CXQCa@GWC@D?CG@ELJP?NSBADDADEODABPGHCICHCCAHB`@EQFYDNDWLAEXDA@EIOE^CQEL@??HEPAJEYMDAVP\\CFE?i@I?RBCGHCHHAJB@JADFFBXDAFHEP@DC?BLPHPTRFh@l@LBFHJDDLFBFTHJAFHVCJ?LDBPH^BHZJJXx@D@HNJH@A?@?ECPIBAB@UBAMPRM"
-    }
-  },
-];
-
 const MyRoutes: React.FC = () => {
+  const {user} = useUser();
+  const userId = user!.id;
+  const [routeData, setRouteData] = useState<RouteType[]>([])
 
   useEffect(() => {
-    const getRouteData = 
-  })
+    const getRouteData = async() => {
+      const routeData = await fetchRoutesFromDb(userId);
+      setRouteData(routeData);
+    }
+
+    getRouteData();
+  }, [])
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -57,12 +41,12 @@ const MyRoutes: React.FC = () => {
           <TabsTrigger value="favorite">Favorite</TabsTrigger>
         </TabsList>
         <TabsContent value="history" className="space-y-4">
-          {routes.map((route) => (
+          {routeData.map((route) => (
             <RouteCard key={route.id} route={route} />
           ))}
         </TabsContent>
         <TabsContent value="favorite">
-          {routes.filter(route => route.isFavorite).map((route) => (
+          {routeData.filter(route => route.isFavorite).map((route) => (
             <RouteCard key={route.id} route={route} />
           ))}
         </TabsContent>

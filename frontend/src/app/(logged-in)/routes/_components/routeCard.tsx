@@ -10,11 +10,12 @@ type PropsType = {
 }
 
 export default function RouteCard({ route }: PropsType) {
+    console.log('routename:', route.name);
     return (
         <Card>
             <CardHeader>
                 <div className='flex justify-between'>
-                    <h2 className='text-lg font-semibold'>{route.name}</h2>
+                    <h2 className='text-lg font-semibold'>{route.route_name}</h2>
                     <Button variant="ghost" size="icon">
                         {route.isFavorite ? (<Star className='h-4 w-4 text-yellow-400 fill-yellow-400' />) : (<StarOff className='h-4 w-4 text-gray-400' />)}
                     </Button>
