@@ -13,9 +13,12 @@ interface Group {
 }
 interface Message {
   id: number;
-  sender: string;
+  sender: {
+    name: string;
+  };
   time: string;
   content: string;
+  createdAt: string;
 }
 interface User {
   id: number;
@@ -102,29 +105,44 @@ const ChatPage: React.FC = () => {
     setMessages([]); // Clear messages and fetch new ones (mocked for now)
     setMessages([
       // Mock data
-      { id: 111, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
-      { id: 222, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
+      // { id: 111, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
+      // { id: 222, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
     ]);
   };
 
   // Send message
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedGroup) return;
-
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: user?.name || "Unknown",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  
+    const newMsg = {
       content: newMessage,
+      senderId: user?.id,
+      chatroomId: selectedGroup.id,
     };
 
+    console.log("Sending message:", newMsg)
 
-    // Emit message to server
-    socket?.emit("sendMessage", { ...newMsg, groupId: selectedGroup.id });
-
-    // setMessages((prev) => [...prev, newMsg]); // Optimistic UI update
-    setNewMessage(""); //clear message
+    try {
+      const response = await fetch("http://localhost:8080/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMsg),
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to send message");
+        return;
+      }
+  
+      const savedMessage = await response.json();
+      socket?.emit("sendMessage", savedMessage);
+  
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
+  
 
   // Create New Group
   const handleCreateGroup = async () => {
@@ -261,7 +279,10 @@ const ChatPage: React.FC = () => {
               {messages.map((msg) => (
                 <div key={msg.id}>
                   <p className="text-sm font-semibold">
-                    {msg.sender} <span className="text-xs text-gray-500">{msg.time}</span>
+                    {msg.sender?.name || "Unknown"}{" "}
+                    <span className="text-xs text-gray-500">
+                      {new Date(msg.createdAt).toLocaleTimeString()}
+                    </span>
                   </p>
                   <p className="bg-gray-100 p-2 rounded">{msg.content}</p>
                 </div>
