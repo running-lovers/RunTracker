@@ -68,7 +68,7 @@ export default function FriendsPage() {
 
   return (
     <div className="flex gap-6 p-6">
-      <div className="w-2/3 p-6 bg-gray-100 rounded-lg shadow">
+      <div className="w-full p-6 bg-gray-100 rounded-lg shadow">
         {/* Header Section */}
         <h2 className="text-xl font-semibold mb-4">Friends</h2>
 

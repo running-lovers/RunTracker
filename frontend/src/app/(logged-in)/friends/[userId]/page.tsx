@@ -25,7 +25,6 @@ interface ActivitySummary {
   distance: string;
   pace: string;
   time: string;
-  calories: string;
 }
 
 interface Activity {
@@ -37,7 +36,6 @@ interface Activity {
   pace: string;
   date: string;
   duration: number;
-  calories?: number;
   start_time: string;
 }
 
@@ -52,8 +50,7 @@ const FriendProfile: React.FC = () => {
   const [activitySummary, setActivitySummary] = useState<ActivitySummary>({
     distance: "0 km",
     pace: "0'00\"/km",
-    time: "0h 00m",
-    calories: "0 kcal"
+    time: "0h 00m"
   });
   const [displayLimit, setDisplayLimit] = useState<number>(5); // Show first 5 activities by default
   const [stravaStatus, setStravaStatus] = useState<'connected' | 'private' | 'loading'>('loading');
@@ -90,24 +87,16 @@ const FriendProfile: React.FC = () => {
 
     const totalDistance = activities.reduce((sum, activity) => sum + activity.distance, 0);
     const totalDuration = activities.reduce((sum, activity) => sum + activity.duration, 0);
-    const totalCalories = activities.reduce((sum, activity) => sum + (activity.calories || 0), 0);
     
     let avgPaceSeconds = 0;
     if (totalDistance > 0) {
       avgPaceSeconds = (totalDuration / (totalDistance / 1000));
-      
-      if (avgPaceSeconds < 180 || avgPaceSeconds > 900) {
-        avgPaceSeconds = 0;
-      }
     }
 
     const formattedStats = {
       distance: `${(totalDistance / 1000).toFixed(1)} km`,
-      pace: avgPaceSeconds > 0 
-        ? `${Math.floor(avgPaceSeconds / 60)}'${Math.floor(avgPaceSeconds % 60).toString().padStart(2, '0')}" min/km` 
-        : 'N/A',
-      time: `${Math.floor(totalDuration / 3600)}:${Math.floor((totalDuration % 3600) / 60).toString().padStart(2, '0')} hours`,
-      calories: `${totalCalories.toLocaleString()} kcal`
+      pace: `${Math.floor(avgPaceSeconds / 60)}'${Math.floor(avgPaceSeconds % 60).toString().padStart(2, '0')}"/km` ,
+      time: `${Math.floor(totalDuration / 3600)}:${Math.floor((totalDuration % 3600) / 60).toString().padStart(2, '0')} hours`
     };
 
     setActivitySummary(formattedStats);
@@ -140,8 +129,7 @@ const FriendProfile: React.FC = () => {
           setActivitySummary({
             distance: "Private",
             pace: "Private",
-            time: "Private",
-            calories: "Private"
+            time: "Private"
           });
           setStravaStatus('private');
           return;
@@ -160,10 +148,10 @@ const FriendProfile: React.FC = () => {
           .sort((a: Activity, b: Activity) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
           .map((activity: Activity) => {
             const distanceKm = (activity.distance / 1000).toFixed(2);
+            const paceSeconds = activity.duration / (activity.distance / 1000);
             const hours = Math.floor(activity.duration / 3600);
             const minutes = Math.floor((activity.duration % 3600) / 60);
             const timeFormatted = `${hours}:${minutes.toString().padStart(2, '0')}`;
-            const paceSeconds = (activity.duration / (activity.distance / 1000));
             const paceMinutes = Math.floor(paceSeconds / 60);
             const paceRemainingSeconds = Math.floor(paceSeconds % 60);
             const paceFormatted = `${paceMinutes}'${paceRemainingSeconds.toString().padStart(2, '0')}"`;
@@ -323,10 +311,6 @@ const FriendProfile: React.FC = () => {
             <div>
               <p className="text-sm text-gray-500">Total Time</p>
               <p className="text-2xl font-bold">{activitySummary.time}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Calories Burned</p>
-              <p className="text-2xl font-bold">{activitySummary.calories}</p>
             </div>
           </div>
         )}
