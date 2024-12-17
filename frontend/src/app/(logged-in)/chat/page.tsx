@@ -70,6 +70,7 @@ const ChatPage: React.FC = () => {
   
       // Listen for new messages
       socketConnection.on("newMessage", (message: Message) => {
+        console.log("New Message Received:", message);
         setMessages((prev) => [...prev, message]);
       });
 
@@ -93,7 +94,7 @@ const ChatPage: React.FC = () => {
       };
     }, []);
 
-
+    //fetch message
     const fetchMessages = async (chatRoomId: number) => {
       try {
         const response = await fetch(`http://localhost:8080/api/messages/${chatRoomId}`);
@@ -110,7 +111,11 @@ const ChatPage: React.FC = () => {
   // select group
   const handleSelectGroup = (group: Group) => {
     setSelectedGroup(group);
+    setMessages([]);
     fetchMessages(group.id);
+
+    console.log(`Joining room: ${group.id}`);
+    socket?.emit("joinRoom", group.id);
   };
 
   // Send message
@@ -138,6 +143,8 @@ const ChatPage: React.FC = () => {
       }
   
       const savedMessage = await response.json();
+
+      setMessages((prev) => [...prev, savedMessage]);
       socket?.emit("sendMessage", savedMessage);
   
       setNewMessage("");

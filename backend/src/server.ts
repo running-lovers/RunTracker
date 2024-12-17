@@ -30,10 +30,17 @@ app.use('/api', indexRouter); //use indexRouter
 io.on("connection", (socket) => {
     console.log("A user connected");
   
+    //JoinRoom
+    socket.on("joinRoom", (chatRoomId) => {
+      console.log(`User joined room: ${chatRoomId}`);
+      socket.join(chatRoomId);
+    });
+
     //send message
     socket.on("sendMessage", (data) => {
       console.log("Message received: ", data);
-      io.emit("newMessage", data);
+      console.log(`Broadcasting message to room: ${data.chatRoomId}`);
+      io.to(data.chatRoomId).emit("newMessage", data);
     });
 
     //create new group
