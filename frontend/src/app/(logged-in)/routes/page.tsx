@@ -5,15 +5,7 @@ import React, { useEffect, useState } from "react";
 import RouteCard from "./_components/routeCard";
 import { fetchRoutesFromDb } from "@/lib/route";
 import { useUser } from "@/context/userContext";
-
-export interface RouteType {
-  id: number;
-  route_name: string;
-  distance: string;
-  difficulty: string;
-  isFavorite: boolean;
-  route_data: any;
-}
+import { RouteType } from "@/types/routeType";
 
 const MyRoutes: React.FC = () => {
   const {user} = useUser();

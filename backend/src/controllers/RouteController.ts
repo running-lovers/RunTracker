@@ -54,3 +54,28 @@ export const getRoutesDataByUserId = async(req: Request, res: Response) => {
         res.status(500).json({error: "fail to get routes data from db"})
     }
 }
+
+export const putRouteData = async(req: Request, res: Response) => {
+    const {routeId} = req.params;
+    const updatedData = req.body;
+
+    try {
+        const existingRoute = await prisma.route.findUnique({
+            where: {id: Number(routeId)},
+        })
+
+        if(!existingRoute) {
+            res.status(404).json({error: "Route not found"})
+            return;
+        }
+
+        const updatedRoute = await prisma.route.update({
+            where: {id: Number(routeId)},
+            data: updatedData
+        })
+
+        res.json(updatedData)
+    } catch (error) {
+        res.status(500).json({error: "fail to update route data"})
+    }
+}

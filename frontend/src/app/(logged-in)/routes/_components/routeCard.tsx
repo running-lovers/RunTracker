@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import React from 'react'
-import { RouteType } from '../page'
+import { RouteType } from "@/types/routeType";
 import RouteMap from '@/components/RouteMap'
 import { Button } from '@/components/ui/Button'
 import { Star, StarOff } from 'lucide-react'
