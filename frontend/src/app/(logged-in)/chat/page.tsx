@@ -28,13 +28,7 @@ interface User {
 const ChatPage: React.FC = () => {
   //state
   const { user } = useUser();
-  // console.log("User from context:", user);
-  // console.log("ID", user?.strava_id)
-  const [groups, setGroups] = useState<Group[]>([
-    // { id: 1, name: "Running Club", description: "Great job everyone!" },
-    // { id: 2, name: "Marathon Training", description: "Don't forget the long run this week!" },
-    // { id: 3, name: "Local Runners", description: "Anyone up for a group run?" },
-  ]);
+  const [groups, setGroups] = useState<Group[]>([]);
   
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -99,15 +93,24 @@ const ChatPage: React.FC = () => {
       };
     }, []);
 
+
+    const fetchMessages = async (chatRoomId: number) => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/messages/${chatRoomId}`);
+        if (!response.ok) throw new Error("Failed to fetch messages");
+    
+        const data: Message[] = await response.json();
+        console.log("Fetched Messages:", data);
+        setMessages(data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+    
   // select group
   const handleSelectGroup = (group: Group) => {
     setSelectedGroup(group);
-    setMessages([]); // Clear messages and fetch new ones (mocked for now)
-    setMessages([
-      // Mock data
-      // { id: 111, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
-      // { id: 222, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
-    ]);
+    fetchMessages(group.id);
   };
 
   // Send message
@@ -277,7 +280,7 @@ const ChatPage: React.FC = () => {
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto space-y-4 mb-4">
               {messages.map((msg) => (
-                <div key={msg.id}>
+                <div key={msg.id} className="flex flex-col">
                   <p className="text-sm font-semibold">
                     {msg.sender?.name || "Unknown"}{" "}
                     <span className="text-xs text-gray-500">
