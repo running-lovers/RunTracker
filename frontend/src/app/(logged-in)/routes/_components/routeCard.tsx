@@ -1,23 +1,26 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import React from 'react'
+import React, { useState } from 'react'
 import { RouteType } from "@/types/routeType";
 import RouteMap from '@/components/RouteMap'
 import { Button } from '@/components/ui/Button'
 import { Star, StarOff } from 'lucide-react'
+import { toggleIsFavorite } from '@/lib/route';
 
 type PropsType = {
     route: RouteType
+    onFavoriteToggle: (routeId: number) => void;
 }
 
-export default function RouteCard({ route }: PropsType) {
+export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
+    const [isFavorite, setIsFavorite] = useState(route.isFavorite);
     
     return (
         <Card>
             <CardHeader>
                 <div className='flex justify-between'>
                     <h2 className='text-lg font-semibold'>{route.route_name}</h2>
-                    <Button variant="ghost" size="icon">
-                        {route.isFavorite ? (<Star className='h-4 w-4 text-yellow-400 fill-yellow-400' />) : (<StarOff className='h-4 w-4 text-gray-400' />)}
+                    <Button variant="ghost" size="icon" onClick={() => onFavoriteToggle(route.id)}>
+                        {route.isFavorite  ? (<Star className='h-4 w-4 text-yellow-400 fill-yellow-400' />) : (<StarOff className='h-4 w-4 text-gray-400' />)}
                     </Button>
                 </div>
             </CardHeader>

@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React, { useEffect, useState } from "react";
 import RouteCard from "./_components/routeCard";
-import { fetchRoutesFromDb } from "@/lib/route";
+import { fetchRoutesFromDb, toggleIsFavorite } from "@/lib/route";
 import { useUser } from "@/context/userContext";
 import { RouteType } from "@/types/routeType";
 
@@ -21,6 +21,14 @@ const MyRoutes: React.FC = () => {
     getRouteData();
   }, [])
 
+  const handleFavoriteToggle = async(routeId: number) => {
+    const updatedRoute = await toggleIsFavorite(routeId, routeData.find((route) => route.id === routeId)!.isFavorite)
+
+    setRouteData((prevData) => {
+      return prevData.map((route) => (route.id === routeId ? {...route, isFavorite: updatedRoute.is_favorite}: route))
+    })
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -34,12 +42,12 @@ const MyRoutes: React.FC = () => {
         </TabsList>
         <TabsContent value="history" className="space-y-4">
           {routeData.map((route) => (
-            <RouteCard key={route.id} route={route} />
+            <RouteCard key={route.id} route={route} onFavoriteToggle={handleFavoriteToggle}/>
           ))}
         </TabsContent>
         <TabsContent value="favorite">
           {routeData.filter(route => route.isFavorite).map((route) => (
-            <RouteCard key={route.id} route={route} />
+            <RouteCard key={route.id} route={route} onFavoriteToggle={handleFavoriteToggle}/>
           ))}
         </TabsContent>
 
