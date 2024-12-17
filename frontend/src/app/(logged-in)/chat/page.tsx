@@ -171,14 +171,26 @@ const ChatPage: React.FC = () => {
   };
 
   //Delete group
-  const handleDeleteGroup = (groupId: number) => {
-      //   setGroups(groups.filter((group) => group.id !== groupId));
-
-  //   if (selectedGroup?.id === groupId) {
-  //     setSelectedGroup(null);
-  //     setMessages([]);
-  //   }
-    socket?.emit("deleteGroup", groupId);
+  const handleDeleteGroup = async (groupId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/chatrooms/${groupId}`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to delete chatroom");
+        return;
+      }
+  
+      const data = await response.json();
+      socket?.emit("deleteGroup", groupId);
+      if (selectedGroup?.id === groupId) {
+        setSelectedGroup(null);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error("Error deleting chatroom:", error);
+    }
   };
 
 

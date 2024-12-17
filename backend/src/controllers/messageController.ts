@@ -6,7 +6,11 @@ export const postMessage = async(req: Request, res: Response) => {
 
     try {
         const newMessage = await prisma.message.create({
-            data: {content: content, senderId: parseInt(senderId), chatRoomId: parseInt(chatroomId)},
+            data: {
+                content: content, 
+                senderId: parseInt(senderId), 
+                chatRoomId: parseInt(chatroomId)
+            },
             include: {sender: true}
         });
 
