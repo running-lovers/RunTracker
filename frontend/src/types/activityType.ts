@@ -10,6 +10,7 @@ export interface ActivityType {
   status: "planned" | "completed"
   description: string
   route?: RouteType
+  map: any
 }
 
 

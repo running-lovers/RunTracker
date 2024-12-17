@@ -49,8 +49,8 @@ model Connection {
 model Route {
   id             Int       @id @default(autoincrement())
   user_id        Int
-  route_name     String
-  polyline       Json
+  route_name     String    @default("none")
+  route_data     Json
   distance       Float
   elevation_data Json?
   is_favorite    Boolean?  @default(false)
