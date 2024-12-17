@@ -30,3 +30,15 @@ export const postRouteData = async(userId: number, activities: ActivityType[]) =
         throw new Error('fail to access backendAPI of RouteModel')
     }
 }
+
+export const fetchRoutesFromDb = async(userId: number) => {
+    if(!userId) {
+        throw new Error("userId is required")
+    }
+
+    try {
+        const res = await fetch(`${apiUrl}/api/route/${userId}`)
+    } catch (error) {
+        
+    }
+}

@@ -39,3 +39,17 @@ export const postRoute = async(req: Request, res: Response) => {
         
     }
 }
+
+export const getRoutesDataByUserId = async(req: Request, res: Response) => {
+    const {userId} = req.params;
+
+    try {
+        const routeData = await prisma.route.findMany({
+            where: {user_id: Number(userId)}
+        })
+
+        res.json(routeData);
+    } catch (error) {
+        res.status(500).json({error: "fail to get routes data from db"})
+    }
+}

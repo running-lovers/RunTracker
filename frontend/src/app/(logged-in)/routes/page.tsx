@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import React from "react";
+import React, { useEffect } from "react";
 import RouteCard from "./_components/routeCard";
 
 export interface RouteType {
@@ -41,6 +41,10 @@ const routes: RouteType[] = [
 ];
 
 const MyRoutes: React.FC = () => {
+
+  useEffect(() => {
+    const getRouteData = 
+  })
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
