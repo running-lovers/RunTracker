@@ -12,7 +12,7 @@ import { ActivityCardType } from "@/types/activityType";
 import { UserProfileType } from "@/types/useProfileType";
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
-import RouteMap from "./RouteMap";
+import RouteMap from "../../../components/RouteMap";
 
 type UserType = {
     country: string,
