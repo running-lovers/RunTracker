@@ -29,7 +29,6 @@ const ChatPage: React.FC = () => {
   //state
   const { user } = useUser();
   const [groups, setGroups] = useState<Group[]>([]);
-  
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -37,11 +36,12 @@ const ChatPage: React.FC = () => {
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [followingUsers, setFollowingUsers] = useState<User[]>([]);
 
-  const users: User[] = [
-    { id: 1, name: "Yasuhitp" },
-    { id: 2, name: "Kaz" },
-  ];
+  // const users: User[] = [
+  //   { id: 1, name: "Yasuhitp" },
+  //   { id: 2, name: "Kaz" },
+  // ];
 
   // Fetch Chatrooms when component loads
   useEffect(() => {
@@ -62,6 +62,27 @@ const ChatPage: React.FC = () => {
 
     fetchChatrooms();
   }, []);
+
+    // Fetch Following Users
+  useEffect(() => {
+    const fetchFollowingUsers = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/connections/${user?.id}/following`
+        );
+        if (!response.ok) throw new Error("Failed to fetch following users");
+
+        const data = await response.json();
+        setFollowingUsers(data);
+      } catch (error) {
+        console.error("Error fetching following users:", error);
+      }
+    };
+
+    if (user?.id) {
+      fetchFollowingUsers();
+    }
+  }, [user]);
 
     // Connect to Socket.IO
     useEffect(() => {
@@ -229,7 +250,7 @@ const ChatPage: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Chat Groups</h2>
           <button
-            onClick={() => setIsModalOpen(true)} // เปิด Modal
+            onClick={() => setIsModalOpen(true)}
             className="text-2xl font-bold text-gray-600"
           >
             +
@@ -335,10 +356,11 @@ const ChatPage: React.FC = () => {
                 className="w-full p-2 border rounded"
               />
             </div>
+            {/* list of following user  */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">Users</label>
               <div className="space-y-2">
-                {users.map((user) => (
+                {followingUsers.map((user) => (
                   <div key={user.id} className="flex items-center">
                     <input
                       type="checkbox"

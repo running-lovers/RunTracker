@@ -89,7 +89,6 @@ export const deleteChatroom = async(req: Request, res: Response) => {
 
         res.json(deletedChatroom)
     } catch (error) {
-        console.log("error:", error);
         res.status(500).json({error: 'fail to delete chatroom'})
     }
 }
