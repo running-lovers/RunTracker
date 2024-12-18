@@ -53,6 +53,7 @@ model Route {
   route_data     Json
   distance       Float
   elevation_data Json?
+  difficulty     String?
   is_favorite    Boolean?  @default(false)
   created_at     DateTime  @default(now())
   deleted_at     DateTime?
