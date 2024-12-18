@@ -133,8 +133,6 @@ export default function Activitypage() {
     setActivityHistoryAndPlan(updatedActivitiesFromDb);
     setIsModalOpen(false);
 }
-
-    console.log("activitiesinActivitypage;", activityHistoryAndPlan);
     
 
     return (
@@ -193,7 +191,19 @@ export default function Activitypage() {
                                     setNewActivity({ ...newActivity, name: e.target.value })
                                 }
                             />
-
+                            <p className='font-semibold'>Favorite Route</p>
+                            <input
+                                type="text"
+                                placeholder="choose favorite route"
+                                className="border p-2 rounded"
+                                value={newActivity.distance}
+                                onChange={(e) =>
+                                    setNewActivity({
+                                        ...newActivity,
+                                        distance: e.target.value === "" ? 0 : parseFloat(e.target.value),
+                                    })
+                                }
+                            />
                             <p className='font-semibold'>Distance (m)</p>
                             <input
                                 type="text"
