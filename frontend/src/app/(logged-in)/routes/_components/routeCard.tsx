@@ -4,7 +4,7 @@ import { RouteType } from "@/types/routeType";
 import RouteMap from '@/components/RouteMap'
 import { Button } from '@/components/ui/Button'
 import { Edit, Star, StarOff } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
     const [editedDifficulty, setEditedDifficulty] = useState(route.difficulty || 'Beginner');
 
     return (
-        <Card className='relative'>
+        <Card>
             <CardHeader>
                 <div className='flex justify-between'>
                     <h2 className='text-lg font-semibold'>{route.route_name}</h2>
@@ -34,7 +34,7 @@ export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
                                     <Edit className='w-4 h-4' />
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className='z-50'>
+                            <DialogContent >
                                 <DialogHeader>
                                     <DialogTitle>Edit Route</DialogTitle>
                                 </DialogHeader>
@@ -50,24 +50,34 @@ export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
                                     <div>
                                         <Label htmlFor='difficulty'>Difficulty</Label>
                                     </div>
-                                    <Select value={editedDifficulty} onValueChange={setEditedDifficulty}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Difficulty" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="Begginer">Begginer</SelectItem>
-                                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                                            <SelectItem value="advanced">Advanced</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <div>
+                                        <Select value={editedDifficulty} onValueChange={setEditedDifficulty}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Difficulty" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Begginer">Begginer</SelectItem>
+                                                <SelectItem value="intermediate">Intermediate</SelectItem>
+                                                <SelectItem value="advanced">Advanced</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
+                                <DialogFooter className='flex space-x-2'>
+                                    <Button  onClick={() => setIsEditModalOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button type='submit'>
+                                        Save
+                                    </Button>
+                                </DialogFooter>
                             </DialogContent>
                         </Dialog>
                     </div>
                 </div>
             </CardHeader>
             <CardContent>
-                <div className='z-0'>
+                <div className='relative z-0'>
                     <RouteMap encodedPolyline={route.route_data.summary_polyline} />
                 </div>
                 <div className='flex justify-evenly mt-4'>
