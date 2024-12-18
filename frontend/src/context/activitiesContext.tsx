@@ -3,6 +3,7 @@
 import { ActivityType } from "@/types/activityType";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from "react";
 import { getActivitiesFromDb, getActivitiesFromStrava, postActivities } from "@/lib/activity";
+import { postRouteData } from "@/lib/route";
 
 interface ActivitiesContextType {
     activities: ActivityType[],
@@ -38,7 +39,10 @@ export const ActivitiesProvider = ({children, onLoad}: ActivitiesProviderProps) 
                 }
                 console.log('activitiesfromstrava:', activities);
                 const RunActivities = activities.filter(activity => activity.sport_type === "Run");
+                const activitiesWithMapdata = RunActivities.filter(activity => activity.map.summary_polyline)
+                console.log("activitiesWithMapdata:", activitiesWithMapdata);
                 
+                await postRouteData(userId, activitiesWithMapdata);
                 await postActivities(RunActivities, userId);
 
                 const activitiesFromDb = await getActivitiesFromDb(userId);

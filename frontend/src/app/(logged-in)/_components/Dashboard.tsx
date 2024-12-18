@@ -8,9 +8,8 @@ import {
 import { useUser } from "@/context/userContext";
 import { getActivityCardData } from "@/lib/activity";
 import { fetchUserProfileFromStrava, postUserProfile } from "@/lib/userProfile";
-import { ActivityCardType, ActivityType } from "@/types/activityType";
+import { ActivityCardType } from "@/types/activityType";
 import { UserProfileType } from "@/types/useProfileType";
-import { ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
 import RouteMap from "./RouteMap";
@@ -27,11 +26,6 @@ type UserType = {
 }
 
 type MergedDataType = ActivityCardType & { user: UserType & { userProfile: UserProfileType } }
-
-const temporalyActivities = [
-    { id: 1, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Yasuhito Komano", startDate: "16th October, 2024 at 15:55", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" },
-    { id: 2, icon: <FaRegUserCircle className="h-10 w-10" />, name: "Victor Sarut", startDate: "15th October, 2024 at 10:13", distance: 1, time: "1:12:22", calories: 200, mapImage: "#" }
-]
 
 export default function Dashboard() {
     const [activityCards, setActivityCards] = useState<MergedDataType[]>([])
