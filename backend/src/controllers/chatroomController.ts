@@ -74,12 +74,22 @@ export const deleteChatroom = async(req: Request, res: Response) => {
     const {chatroomId} = req.params;
 
     try {
+
+        const deleteMessage = await prisma.message.deleteMany({
+            where: {chatRoomId: Number(chatroomId)}
+        })
+
+        const deleteRoomUser = await prisma.chatRoomUser.deleteMany({
+            where: {chatRoomId: Number(chatroomId)}
+        })
+
         const deletedChatroom = await prisma.chatRoom.delete({
             where: {id: parseInt(chatroomId)}
         })
 
         res.json(deletedChatroom)
     } catch (error) {
+        console.log("error:", error);
         res.status(500).json({error: 'fail to delete chatroom'})
     }
 }

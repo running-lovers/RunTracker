@@ -2,14 +2,14 @@ import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
 export const postMessage = async(req: Request, res: Response) => {
-    const {content, senderId, chatroomId} = req.body;
+    const {content, senderId, chatRoomId} = req.body;
 
     try {
         const newMessage = await prisma.message.create({
             data: {
                 content: content, 
                 senderId: parseInt(senderId), 
-                chatRoomId: parseInt(chatroomId)
+                chatRoomId: parseInt(chatRoomId)
             },
             include: {sender: true}
         });

@@ -125,7 +125,7 @@ const ChatPage: React.FC = () => {
     const newMsg = {
       content: newMessage,
       senderId: user?.id,
-      chatroomId: selectedGroup.id,
+      chatRoomId: selectedGroup.id,
     };
 
     console.log("Sending message:", newMsg)
@@ -144,7 +144,7 @@ const ChatPage: React.FC = () => {
   
       const savedMessage = await response.json();
 
-      setMessages((prev) => [...prev, savedMessage]);
+      // setMessages((prev) => [...prev, savedMessage]);
       socket?.emit("sendMessage", savedMessage);
   
       setNewMessage("");
