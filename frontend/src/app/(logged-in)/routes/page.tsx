@@ -22,12 +22,19 @@ const MyRoutes: React.FC = () => {
   }, [])
 
   const handleFavoriteToggle = async(routeId: number) => {
-    const updatedRoute = await toggleIsFavorite(routeId, routeData.find((route) => route.id === routeId)!.isFavorite)
+    const updatedRoute = await toggleIsFavorite(routeId, routeData.find((route) => route.id === routeId)!.is_favorite)
 
     setRouteData((prevData) => {
       return prevData.map((route) => (route.id === routeId ? {...route, isFavorite: updatedRoute.is_favorite}: route))
     })
   }
+
+  const onRouteUpdate = (updatedRoute: RouteType) => {
+    setRouteData((prevRouteData) => prevRouteData.map((route) => (route.id === updatedRoute.id ? updatedRoute : route)))
+  }
+
+  console.log("favorite:", routeData);
+  
 
   return (
     <div className="p-6 space-y-6">
@@ -42,15 +49,14 @@ const MyRoutes: React.FC = () => {
         </TabsList>
         <TabsContent value="history" className="space-y-4">
           {routeData.map((route) => (
-            <RouteCard key={route.id} route={route} onFavoriteToggle={handleFavoriteToggle}/>
+            <RouteCard key={route.id} route={route} onFavoriteToggle={handleFavoriteToggle}  onRouteUpdate={onRouteUpdate}/>
           ))}
         </TabsContent>
         <TabsContent value="favorite">
-          {routeData.filter(route => route.isFavorite).map((route) => (
-            <RouteCard key={route.id} route={route} onFavoriteToggle={handleFavoriteToggle}/>
+          {routeData.filter(route => route.is_favorite).map((route) => (
+            <RouteCard key={route.id} route={route} onFavoriteToggle={handleFavoriteToggle} onRouteUpdate={onRouteUpdate} />
           ))}
         </TabsContent>
-
       </Tabs>
     </div>
   );

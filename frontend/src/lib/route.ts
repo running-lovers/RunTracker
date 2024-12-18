@@ -79,3 +79,27 @@ export const toggleIsFavorite = async(routeId: number, isFavorite: boolean) => {
         throw new Error("fail to access routesAPI in backend")
     }
 }
+
+export const putRouteData = async(routeId: number, body: any) => {
+    if(!routeId) {
+        throw new Error("routeId is required")
+    }
+
+    try {
+        const res = await fetch(`${apiUrl}/api/routes/${routeId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        })
+        if(!res.ok) {
+            throw new Error ("fail to update route data")
+        }
+
+        const data = await res.json()
+        return data;
+    } catch (error) {
+        throw new Error("fail to access routesAPI in backend")
+    }
+}

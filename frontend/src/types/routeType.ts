@@ -3,6 +3,6 @@ export interface RouteType {
     route_name: string;
     distance: string;
     difficulty: string;
-    isFavorite: boolean;
+    is_favorite: boolean;
     route_data: any;
   }

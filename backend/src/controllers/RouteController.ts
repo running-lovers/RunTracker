@@ -76,6 +76,7 @@ export const putRouteData = async(req: Request, res: Response) => {
 
         res.json(updatedRoute)
     } catch (error) {
+        console.log("error:", error);
         res.status(500).json({error: "fail to update route data"})
     }
 }

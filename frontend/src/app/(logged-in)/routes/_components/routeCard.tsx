@@ -8,16 +8,33 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { putRouteData } from '@/lib/route';
 
 type PropsType = {
     route: RouteType
     onFavoriteToggle: (routeId: number) => void;
+    onRouteUpdate: (updateRoute: RouteType) => void;
 }
 
-export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
+export default function RouteCard({ route, onFavoriteToggle, onRouteUpdate }: PropsType) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editedName, setEditedName] = useState(route.route_name);
     const [editedDifficulty, setEditedDifficulty] = useState(route.difficulty || 'Beginner');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSave = async() => {
+        setIsLoading(true);
+        const body = {route_name: editedName, difficulty: editedDifficulty}
+        try {
+            const updatedRouteData = await putRouteData(route.id, body);
+            onRouteUpdate(updatedRouteData);
+            setIsEditModalOpen(false);
+        } catch (error) {
+            throw new Error("fail to send putRouteData function new route data")   
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <Card>
@@ -26,7 +43,7 @@ export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
                     <h2 className='text-lg font-semibold'>{route.route_name}</h2>
                     <div>
                         <Button variant="ghost" size="icon" onClick={() => onFavoriteToggle(route.id)}>
-                            {route.isFavorite ? (<Star className='h-4 w-4 text-yellow-400 fill-yellow-400' />) : (<StarOff className='h-4 w-4 text-gray-400' />)}
+                            {route.is_favorite ? (<Star className='h-4 w-4 text-yellow-400 fill-yellow-400' />) : (<StarOff className='h-4 w-4 text-gray-400' />)}
                         </Button>
                         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
                             <DialogTrigger asChild>
@@ -67,8 +84,8 @@ export default function RouteCard({ route, onFavoriteToggle }: PropsType) {
                                     <Button  onClick={() => setIsEditModalOpen(false)}>
                                         Cancel
                                     </Button>
-                                    <Button type='submit'>
-                                        Save
+                                    <Button onClick={handleSave} disabled={isLoading} >
+                                        {isLoading ? "Saving..." : "Save"}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>
