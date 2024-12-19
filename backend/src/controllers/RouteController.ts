@@ -39,3 +39,44 @@ export const postRoute = async(req: Request, res: Response) => {
         
     }
 }
+
+export const getRoutesDataByUserId = async(req: Request, res: Response) => {
+    const {userId} = req.params;
+
+    try {
+        const routeData = await prisma.route.findMany({
+            where: {user_id: Number(userId)},
+            orderBy: {created_at: 'desc'}
+        })
+
+        res.json(routeData);
+    } catch (error) {
+        res.status(500).json({error: "fail to get routes data from db"})
+    }
+}
+
+export const putRouteData = async(req: Request, res: Response) => {
+    const {routeId} = req.params;
+    const updatedData = req.body;
+
+    try {
+        const existingRoute = await prisma.route.findUnique({
+            where: {id: Number(routeId)},
+        })
+
+        if(!existingRoute) {
+            res.status(404).json({error: "Route not found"})
+            return;
+        }
+
+        const updatedRoute = await prisma.route.update({
+            where: {id: Number(routeId)},
+            data: updatedData
+        })
+
+        res.json(updatedRoute)
+    } catch (error) {
+        console.log("error:", error);
+        res.status(500).json({error: "fail to update route data"})
+    }
+}
