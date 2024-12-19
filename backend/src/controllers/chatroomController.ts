@@ -19,7 +19,7 @@ export const postChatroom = async(req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({error: 'fail to create new chatroom'})
     }
-}
+};
 
 // Get all chat rooms By userId
 // export const getChatroomsByUserId = async(req: Request, res: Response) => {
@@ -74,6 +74,15 @@ export const deleteChatroom = async(req: Request, res: Response) => {
     const {chatroomId} = req.params;
 
     try {
+
+        const deleteMessage = await prisma.message.deleteMany({
+            where: {chatRoomId: Number(chatroomId)}
+        })
+
+        const deleteRoomUser = await prisma.chatRoomUser.deleteMany({
+            where: {chatRoomId: Number(chatroomId)}
+        })
+
         const deletedChatroom = await prisma.chatRoom.delete({
             where: {id: parseInt(chatroomId)}
         })
@@ -83,3 +92,13 @@ export const deleteChatroom = async(req: Request, res: Response) => {
         res.status(500).json({error: 'fail to delete chatroom'})
     }
 }
+
+export const getAllChatrooms = async (req: Request, res: Response) => {
+    try {
+      const chatrooms = await prisma.chatRoom.findMany();
+      res.status(200).json(chatrooms);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch chatrooms" });
+    }
+  };
+  

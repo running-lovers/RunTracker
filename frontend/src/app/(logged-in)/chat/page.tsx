@@ -13,9 +13,12 @@ interface Group {
 }
 interface Message {
   id: number;
-  sender: string;
+  sender: {
+    name: string;
+  };
   time: string;
   content: string;
+  createdAt: string;
 }
 interface User {
   id: number;
@@ -25,14 +28,7 @@ interface User {
 const ChatPage: React.FC = () => {
   //state
   const { user } = useUser();
-  // console.log("User from context:", user);
-  // console.log("ID", user?.strava_id)
-  const [groups, setGroups] = useState<Group[]>([
-    { id: 1, name: "Running Club", description: "Great job everyone!" },
-    { id: 2, name: "Marathon Training", description: "Don't forget the long run this week!" },
-    { id: 3, name: "Local Runners", description: "Anyone up for a group run?" },
-  ]);
-  
+  const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -40,13 +36,53 @@ const ChatPage: React.FC = () => {
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [followingUsers, setFollowingUsers] = useState<User[]>([]);
 
-  const users: User[] = [
-    { id: 1, name: "Alice Runner" },
-    { id: 2, name: "Bob Jogger" },
-    { id: 3, name: "Charlie Sprinter" },
-    { id: 4, name: "Diana Marathon" },
-  ];
+  // const users: User[] = [
+  //   { id: 1, name: "Yasuhitp" },
+  //   { id: 2, name: "Kaz" },
+  // ];
+
+  // Fetch Chatrooms when component loads
+  useEffect(() => {
+    const fetchChatrooms = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/chatrooms");
+        if (!response.ok) {
+          console.error("Failed to fetch chatrooms");
+          return;
+        }
+
+        const data: Group[] = await response.json();
+        setGroups(data);
+      } catch (error) {
+        console.error("Error fetching chatrooms:", error);
+      }
+    };
+
+    fetchChatrooms();
+  }, []);
+
+    // Fetch Following Users
+  useEffect(() => {
+    const fetchFollowingUsers = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/connections/${user?.id}/following`
+        );
+        if (!response.ok) throw new Error("Failed to fetch following users");
+
+        const data = await response.json();
+        setFollowingUsers(data);
+      } catch (error) {
+        console.error("Error fetching following users:", error);
+      }
+    };
+
+    if (user?.id) {
+      fetchFollowingUsers();
+    }
+  }, [user]);
 
     // Connect to Socket.IO
     useEffect(() => {
@@ -55,6 +91,7 @@ const ChatPage: React.FC = () => {
   
       // Listen for new messages
       socketConnection.on("newMessage", (message: Message) => {
+        console.log("New Message Received:", message);
         setMessages((prev) => [...prev, message]);
       });
 
@@ -78,57 +115,100 @@ const ChatPage: React.FC = () => {
       };
     }, []);
 
+    //fetch message
+    const fetchMessages = async (chatRoomId: number) => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/messages/${chatRoomId}`);
+        if (!response.ok) throw new Error("Failed to fetch messages");
+    
+        const data: Message[] = await response.json();
+        console.log("Fetched Messages:", data);
+        setMessages(data);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+    
   // select group
   const handleSelectGroup = (group: Group) => {
     setSelectedGroup(group);
-    setMessages([]); // Clear messages and fetch new ones (mocked for now)
-    setMessages([
-      // Mock data
-      { id: 1, sender: "Victor Sarut", time: "2:30 PM", content: "Great run today! Keep it up!" },
-      { id: 2, sender: "Yasuhito Komano", time: "2:35 PM", content: "Thanks! I'm trying to reach my monthly goal of 80km. Already at 56.7km!" },
-    ]);
+    setMessages([]);
+    fetchMessages(group.id);
+
+    console.log(`Joining room: ${group.id}`);
+    socket?.emit("joinRoom", group.id);
   };
 
   // Send message
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedGroup) return;
-
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: user?.name || "Unknown",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+  
+    const newMsg = {
       content: newMessage,
+      senderId: user?.id,
+      chatRoomId: selectedGroup.id,
     };
 
+    console.log("Sending message:", newMsg)
 
-    // Emit message to server
-    socket?.emit("sendMessage", { ...newMsg, groupId: selectedGroup.id });
+    try {
+      const response = await fetch("http://localhost:8080/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMsg),
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to send message");
+        return;
+      }
+  
+      const savedMessage = await response.json();
 
-    // setMessages((prev) => [...prev, newMsg]); // Optimistic UI update
-    setNewMessage(""); //clear message
+      // setMessages((prev) => [...prev, savedMessage]);
+      socket?.emit("sendMessage", savedMessage);
+  
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
+  
 
   // Create New Group
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
     if (!newGroupName.trim()) {
       alert("Please enter a group name.");
       return;
     }
-
-    const newGroup: Group = {
-      id: Date.now(),
+  
+    const payload = {
+      userId: user?.id,
       name: newGroupName,
-      description: `Created with ${selectedUsers.length} members`,
     };
-
-    // setGroups([...groups, newGroup]); //add group
-    // setGroups((prev) => [...prev, newGroup]);
-    socket?.emit("createGroup", newGroup);
-
-    setNewGroupName("");
-    setSelectedUsers([]);
-    setIsModalOpen(false);
+  
+    try {
+      const response = await fetch("http://localhost:8080/api/chatrooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to create chatroom");
+        return;
+      }
+  
+      const createdChatroom = await response.json();
+      // setGroups((prev) => [...prev, createdChatroom]);
+      socket?.emit("newGroup", createdChatroom);
+      setNewGroupName("");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error creating chatroom:", error);
+    }
   };
+  
 
   // select and Unselect User in modal
   const toggleUserSelection = (userId: number) => {
@@ -140,14 +220,26 @@ const ChatPage: React.FC = () => {
   };
 
   //Delete group
-  const handleDeleteGroup = (groupId: number) => {
-      //   setGroups(groups.filter((group) => group.id !== groupId));
-
-  //   if (selectedGroup?.id === groupId) {
-  //     setSelectedGroup(null);
-  //     setMessages([]);
-  //   }
-    socket?.emit("deleteGroup", groupId);
+  const handleDeleteGroup = async (groupId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/chatrooms/${groupId}`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        console.error("Failed to delete chatroom");
+        return;
+      }
+  
+      const data = await response.json();
+      socket?.emit("deleteGroup", groupId);
+      if (selectedGroup?.id === groupId) {
+        setSelectedGroup(null);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error("Error deleting chatroom:", error);
+    }
   };
 
 
@@ -158,7 +250,7 @@ const ChatPage: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Chat Groups</h2>
           <button
-            onClick={() => setIsModalOpen(true)} // เปิด Modal
+            onClick={() => setIsModalOpen(true)}
             className="text-2xl font-bold text-gray-600"
           >
             +
@@ -216,9 +308,12 @@ const ChatPage: React.FC = () => {
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto space-y-4 mb-4">
               {messages.map((msg) => (
-                <div key={msg.id}>
+                <div key={msg.id} className="flex flex-col">
                   <p className="text-sm font-semibold">
-                    {msg.sender} <span className="text-xs text-gray-500">{msg.time}</span>
+                    {msg.sender?.name || "Unknown"}{" "}
+                    <span className="text-xs text-gray-500">
+                      {new Date(msg.createdAt).toLocaleTimeString()}
+                    </span>
                   </p>
                   <p className="bg-gray-100 p-2 rounded">{msg.content}</p>
                 </div>
@@ -261,10 +356,11 @@ const ChatPage: React.FC = () => {
                 className="w-full p-2 border rounded"
               />
             </div>
+            {/* list of following user  */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-1">Users</label>
               <div className="space-y-2">
-                {users.map((user) => (
+                {followingUsers.map((user) => (
                   <div key={user.id} className="flex items-center">
                     <input
                       type="checkbox"

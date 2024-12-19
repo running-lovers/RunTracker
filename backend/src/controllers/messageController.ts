@@ -2,11 +2,15 @@ import { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
 export const postMessage = async(req: Request, res: Response) => {
-    const {content, senderId, chatroomId} = req.body;
+    const {content, senderId, chatRoomId} = req.body;
 
     try {
         const newMessage = await prisma.message.create({
-            data: {content: content, senderId: parseInt(senderId), chatRoomId: parseInt(chatroomId)},
+            data: {
+                content: content, 
+                senderId: parseInt(senderId), 
+                chatRoomId: parseInt(chatRoomId)
+            },
             include: {sender: true}
         });
 
@@ -17,20 +21,25 @@ export const postMessage = async(req: Request, res: Response) => {
 }
 
 //get all message in specific chat message
-export const getAllMessageByChatId = async(req:Request, res: Response) => {
-    const {chatroomId} = req.params;
-
+export const getAllMessageByChatId = async (req: Request, res: Response) => {
+    const { chatroomId } = req.params;
+  
     try {
-        const messages = await prisma.message.findMany({
-            where: {chatRoomId: parseInt(chatroomId)},
-            include: {sender: true}, orderBy: {createdAt: 'asc'}
-        })
-
-        res.json(messages);
+      const messages = await prisma.message.findMany({
+        where: { chatRoomId: parseInt(chatroomId) },
+        include: {
+          sender: {
+            select: { name: true },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+  
+      res.json(messages);
     } catch (error) {
-        res.status(500).json({error: 'fail to fetch messages'})
+      res.status(500).json({ error: "fail to fetch messages" });
     }
-}
+  };
 
 export const updateMessage = async(req: Request, res: Response) => {
     const {messageId} = req.params;

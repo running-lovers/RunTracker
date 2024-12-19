@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteChatroom, getChatroomByChatroomId, postChatroom, updateChatroom } from "../controllers/chatroomController";
+import { deleteChatroom, getAllChatrooms, getChatroomByChatroomId, postChatroom, updateChatroom } from "../controllers/chatroomController";
 
 export const router = Router();
 
@@ -8,3 +8,4 @@ router.post('/', postChatroom)
 router.get('/:chatroomId', getChatroomByChatroomId)
 router.put('/:chatroomId', updateChatroom)
 router.delete('/:chatroomId', deleteChatroom)
+router.get('/', getAllChatrooms);
