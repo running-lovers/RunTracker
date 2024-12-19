@@ -63,9 +63,6 @@ export default function Activitypage() {
         getFavoriteRoutes()
     }, [])
 
-    console.log('favoriteRoutes: ', favoriteRoutes);
-
-
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [newActivity, setNewActivity] = useState<NewActivityType>({
@@ -185,7 +182,7 @@ export default function Activitypage() {
                             Date={new Date(activity.start_time).toLocaleDateString()}
                             Time={new Date(activity.start_time).toLocaleTimeString()}
                             description={`Description: ${activity.description ?? 'none'}`}
-                            distance={activity.distance ? (activity.distance / 1000) : 0}
+                            distance={activity.distance ? Number((activity.distance / 1000).toFixed(2)) : 0}
                             duration={`${Math.floor(activity.duration! / 60)}m ${activity.duration! % 60}s`}
                             AvgSpeed={
                                 activity.distance && activity.duration

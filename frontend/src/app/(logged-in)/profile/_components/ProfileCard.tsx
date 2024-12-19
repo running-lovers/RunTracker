@@ -37,9 +37,6 @@ export default function ProfileCard() {
         fetchUserProfile();
     }, [])
 
-    console.log('userProfileData: ', userProfile);
-
-
     return (
         <div className="mt-5">
             <h1 className="text-3xl font-bold">Information</h1>
