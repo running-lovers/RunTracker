@@ -3,5 +3,5 @@ export interface ConnectionUser {
   name: string;
   username: string;
   isFollowing: boolean;
-  isFollower?: boolean;
+  avatarUrl?: string; // Add avatar URL field
 }

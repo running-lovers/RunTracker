@@ -5,6 +5,10 @@ interface RawUserConnection {
   relationship?: 'following' | 'follower';
   isFollowing?: boolean;
   isFollower?: boolean;
+  userProfile?: {
+    profile_medium?: string | null;
+    profile?: string | null;
+  } | null;
 }
 
 import { ConnectionUser } from "@/types/connectionUserType";
@@ -80,29 +84,33 @@ export const filterUsersByQuery = (users: ConnectionUser[], query: string) => {
   );
 };
 
-export const fetchAndFormatUsers = async (currentUserId: number): Promise<ConnectionUser[]> => {
+export const fetchAndFormatUsers = async (userId: number) => {
   try {
-      const response = await fetch(`http://localhost:8080/api/connections/${currentUserId}/all`);
-      if (!response.ok) {
-          throw new Error('Failed to fetch users');
+    const response = await fetch(`http://localhost:8080/api/connections/${userId}/all`);
+    const data = await response.json();
+
+    const formattedUsers = data.map((user: RawUserConnection) => {
+      let avatarUrl = user.userProfile?.profile_medium;
+      
+      // Add error handling for avatar URL
+      if (avatarUrl && !avatarUrl.startsWith('http')) {
+        avatarUrl = `https://dgalywyr863hv.cloudfront.net/${avatarUrl}`;
       }
 
-      const data = await response.json();
-      console.log('Raw data from backend:', data);
+      return {
+        id: user.id,
+        name: user.name,
+        username: user.strava_id?.toString() || '',
+        isFollowing: user.isFollowing || false,
+        isFollower: user.isFollower || false,
+        avatarUrl: avatarUrl || '/default-avatar.png', // Provide a default avatar
+      };
+    });
 
-      const formattedUsers = data.map((user: RawUserConnection) => ({
-          id: user.id,
-          name: user.name,
-          username: user.strava_id?.toString() || '',
-          isFollowing: user.isFollowing || false,
-          isFollower: user.isFollower || false
-      }));
-
-      console.log('Formatted users:', formattedUsers);
-      return formattedUsers;
+    return formattedUsers;
   } catch (error) {
-      console.error('Error fetching users:', error);
-      throw error;
+    console.error('Error:', error);
+    throw error;
   }
 };
 

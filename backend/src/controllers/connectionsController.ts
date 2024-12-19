@@ -162,7 +162,13 @@
                 select: {
                     id: true,
                     name: true,
-                    strava_id: true
+                    strava_id: true,
+                    userProfile: {
+                        select: {
+                            profile_medium: true,
+                            profile: true
+                        }
+                    }
                 }
             });
     
@@ -192,7 +198,8 @@
                 return {
                     ...user,
                     isFollowing,
-                    isFollower
+                    isFollower,
+                    userProfile: user.userProfile
                 };
             });
     
@@ -225,6 +232,12 @@
                     id: true,
                     name: true,
                     strava_id: true,
+                    userProfile: {
+                        select: {
+                            profile_medium: true,
+                            profile: true
+                        }
+                    }
                 }
             });
     
@@ -249,10 +262,16 @@
                 }
             });
     
+            let avatarUrl = user.userProfile?.profile_medium;
+            if (avatarUrl && !avatarUrl.startsWith('http')) {
+                avatarUrl = `https://dgalywyr863hv.cloudfront.net/${avatarUrl}`;
+            }
+    
             const profileData = {
                 ...user,
                 followersCount,
-                followingCount
+                followingCount,
+                avatarUrl: avatarUrl || null
             };
     
             console.log('Sending profile data:', profileData);
