@@ -152,119 +152,138 @@ export const getFollowingUsers = async (req: Request, res: Response): Promise<vo
     }
 }
 
-export const getFollowingAndFollowers = async (req: Request, res: Response): Promise<void> => {
-    const { userId } = req.params;
-
-    try {
-        const allUsers = await prisma.user.findMany({
-            where: {
-                NOT: {
-                    id: parseInt(userId)
+    export const getFollowingAndFollowers = async(req: Request, res: Response): Promise<void> => {
+        const {userId} = req.params;
+    
+        try {
+            const allUsers = await prisma.user.findMany({
+                where: {
+                    NOT: {
+                        id: parseInt(userId)
+                    }
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    strava_id: true,
+                    userProfile: {
+                        select: {
+                            profile_medium: true,
+                            profile: true
+                        }
+                    }
                 }
-            },
-            select: {
-                id: true,
-                name: true,
-                strava_id: true
+            });
+    
+            const connections = await prisma.connection.findMany({
+                where: {
+                    OR: [
+                        { user_id: parseInt(userId) },
+                        { following_user_id: parseInt(userId) }
+                    ],
+                    deleted_at: null
+                }
+            });
+    
+            const formattedUsers = allUsers.map(user => {
+                const isFollowing = connections.some(conn => 
+                    conn.user_id === parseInt(userId) && 
+                    conn.following_user_id === user.id &&
+                    conn.deleted_at === null
+                );
+    
+                const isFollower = connections.some(conn => 
+                    conn.following_user_id === parseInt(userId) && 
+                    conn.user_id === user.id &&
+                    conn.deleted_at === null
+                );
+    
+                return {
+                    ...user,
+                    isFollowing,
+                    isFollower,
+                    userProfile: user.userProfile
+                };
+            });
+    
+            console.log('Sending formatted users:', formattedUsers);
+            return res.json(formattedUsers);
+        } catch (error) {
+            console.error('Error fetching connections:', error);
+            return res.status(500).json({
+                error: 'Failed to fetch connections'
+            });
+        }
+    };
+
+    export const getFriendDetail: RequestHandler = async (req, res): Promise<void> => {
+        const { userId } = req.params;
+    
+        try {
+            console.log('Received request for userId:', userId);
+    
+            if (!userId || isNaN(parseInt(userId))) {
+                res.status(400).json({ error: 'Invalid user ID' });
+                return;
             }
-        });
-
-        const connections = await prisma.connection.findMany({
-            where: {
-                OR: [
-                    { user_id: parseInt(userId) },
-                    { following_user_id: parseInt(userId) }
-                ],
-                deleted_at: null
+    
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: parseInt(userId)
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    strava_id: true,
+                    userProfile: {
+                        select: {
+                            profile_medium: true,
+                            profile: true
+                        }
+                    }
+                }
+            });
+    
+            console.log('Found user:', user);
+    
+            if (!user) {
+                res.status(404).json({ error: 'User not found' });
+                return;
             }
-        });
-
-        const formattedUsers = allUsers.map(user => {
-            const isFollowing = connections.some(conn =>
-                conn.user_id === parseInt(userId) &&
-                conn.following_user_id === user.id &&
-                conn.deleted_at === null
-            );
-
-            const isFollower = connections.some(conn =>
-                conn.following_user_id === parseInt(userId) &&
-                conn.user_id === user.id &&
-                conn.deleted_at === null
-            );
-
-            return {
+    
+            const followersCount = await prisma.connection.count({
+                where: {
+                    following_user_id: parseInt(userId),
+                    deleted_at: null
+                }
+            });
+    
+            const followingCount = await prisma.connection.count({
+                where: {
+                    user_id: parseInt(userId),
+                    deleted_at: null
+                }
+            });
+    
+            let avatarUrl = user.userProfile?.profile_medium;
+            if (avatarUrl && !avatarUrl.startsWith('http')) {
+                avatarUrl = `https://dgalywyr863hv.cloudfront.net/${avatarUrl}`;
+            }
+    
+            const profileData = {
                 ...user,
-                isFollowing,
-                isFollower
+                followersCount,
+                followingCount,
+                avatarUrl: avatarUrl || null
             };
-        });
-
-        console.log('Sending formatted users:', formattedUsers);
-        res.json(formattedUsers);
-    } catch (error) {
-        console.error('Error fetching connections:', error);
-        res.status(500).json({
-            error: 'Failed to fetch connections'
-        });
-    }
-};
-
-export const getFriendDetail: RequestHandler = async (req, res): Promise<void> => {
-    const { userId } = req.params;
-
-    try {
-        console.log('Received request for userId:', userId);
-
-        if (!userId || isNaN(parseInt(userId))) {
-            res.status(400).json({ error: 'Invalid user ID' });
-            return;
+    
+            console.log('Sending profile data:', profileData);
+            res.json(profileData);
+        } catch (error) {
+            console.error('Error details:', error);
+            res.status(500).json({ 
+                error: 'Failed to fetch friend detail',
+                details: error instanceof Error ? error.message : 'Unknown error'
+            });
         }
-
-        const user = await prisma.user.findUnique({
-            where: {
-                id: parseInt(userId)
-            },
-            select: {
-                id: true,
-                name: true,
-                strava_id: true,
-            }
-        });
-
-        console.log('Found user:', user);
-
-        if (!user) {
-            res.status(404).json({ error: 'User not found' });
-            return;
-        }
-
-        const followersCount = await prisma.connection.count({
-            where: {
-                following_user_id: parseInt(userId),
-                deleted_at: null
-            }
-        });
-
-        const followingCount = await prisma.connection.count({
-            where: {
-                user_id: parseInt(userId),
-                deleted_at: null
-            }
-        });
-
-        const profileData = {
-            ...user,
-            followersCount,
-            followingCount
-        };
-
-        console.log('Sending profile data:', profileData);
-        res.json(profileData);
-    } catch (error) {
-        console.error('Error details:', error);
-        res.status(500).json({
-            error: 'Failed to fetch friend detail',
-            details: error instanceof Error ? error.message : 'Unknown error'
-        });
-    }
-};
+    };
