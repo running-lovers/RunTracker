@@ -1,12 +1,13 @@
 'use client'
 
-import { ActivityType, NewActivityType } from '@/types/activityType'
+import { NewActivityType } from '@/types/activityType'
 import React, { useEffect, useState } from 'react'
-import Header from './_components/Header'
 import ActivityCard from './_components/ActivityCard'
 import { useUser } from "@/context/userContext";
 import { useActivities } from '@/context/activitiesContext'
-import { getActivitiesFromStrava, postActivities } from '@/lib/activity'
+import { fetchFavoriteRoutes } from '@/lib/route'
+import { RouteType } from '@/types/routeType';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type activityHistoryAndPlanType = {
     id: number,
@@ -21,22 +22,23 @@ type activityHistoryAndPlanType = {
 }
 
 export default function Activitypage() {
-    const {activities, setActivities} = useActivities()
+    const { activities, setActivities } = useActivities()
     const [activityHistoryAndPlan, setActivityHistoryAndPlan] = useState<activityHistoryAndPlanType[]>([])
     const { user } = useUser();
-    const access_token= user?.accessToken
-    const userId = user?.id
+    const access_token = user?.accessToken
+    const userId = user!.id
+    const [favoriteRoutes, setFavoriteRoutes] = useState<RouteType[]>([])
 
 
     useEffect(() => {
         const firstFetchDataFromDataBase = async () => {
-            const response = await fetch(`http://localhost:8080/api/activities/${userId}`,{
-                headers : {
-                    "Content-Type" : "application/json"
+            const response = await fetch(`http://localhost:8080/api/activities/${userId}`, {
+                headers: {
+                    "Content-Type": "application/json"
                 }
             })
 
-            if(!response.ok) {
+            if (!response.ok) {
                 throw new Error("fail to fetch activities data from database")
             }
             const data: activityHistoryAndPlanType[] = await response.json()
@@ -52,7 +54,17 @@ export default function Activitypage() {
         };
 
         fetchAndSetData();
+
+        const getFavoriteRoutes = async () => {
+            const favoriteRoutes = await fetchFavoriteRoutes(userId);
+            setFavoriteRoutes(favoriteRoutes)
+        }
+
+        getFavoriteRoutes()
     }, [])
+
+    console.log('favoriteRoutes: ', favoriteRoutes);
+
 
     // state Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -71,69 +83,79 @@ export default function Activitypage() {
     };
 
 
-    const handleSaveActivity = async () => { 
-        
+    const handleSaveActivity = async () => {
+
         const formattedActivity: NewActivityType = {
             name: newActivity.name || 'Untitled Activity',
             sport_type: "Run",
             start_date: newActivity.start_date,
-            distance: (newActivity.distance || 0) ,
+            distance: (newActivity.distance || 0),
             elapsed_time: newActivity.elapsed_time,
             description: newActivity.description || '',
         };
 
 
-    const postNewActivityToDb = async () => {
-        const res = await fetch("http://localhost:8080/api/activities", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: userId,
-                name: formattedActivity.name,
-                sport_type: formattedActivity.sport_type,
-                start_date: formattedActivity.start_date,
-                distance: formattedActivity.distance,
-                elapsed_time: formattedActivity.elapsed_time,
-                description: formattedActivity.description
+        const postNewActivityToDb = async () => {
+            const res = await fetch("http://localhost:8080/api/activities", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    name: formattedActivity.name,
+                    sport_type: formattedActivity.sport_type,
+                    start_date: formattedActivity.start_date,
+                    distance: formattedActivity.distance,
+                    elapsed_time: formattedActivity.elapsed_time,
+                    description: formattedActivity.description
+                })
             })
-        })
 
-        if(!res.ok) {
-            throw new Error('fail to post new activity to database')
-        }
-
-        const data = await res.json();
-        console.log("data;", data);
-        
-        return data
-    }
-
-    const postedData = await postNewActivityToDb()
-    
-    const fetchUpdatedActivityFromDb = async() => {
-        if(!userId) {
-            throw new Error('userId is required')
-        }
-        const res = await fetch(`http://localhost:8080/api/activities/${userId}`,{
-            headers: {
-                "Content-Type" : "application/json"
+            if (!res.ok) {
+                throw new Error('fail to post new activity to database')
             }
-        })
 
-        const data = await res.json();
-        console.log("datafromDB: ", data)
-        return data;
+            const data = await res.json();
+            console.log("data;", data);
+
+            return data
+        }
+
+        const postedData = await postNewActivityToDb()
+
+        const fetchUpdatedActivityFromDb = async () => {
+            if (!userId) {
+                throw new Error('userId is required')
+            }
+            const res = await fetch(`http://localhost:8080/api/activities/${userId}`, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            const data = await res.json();
+            console.log("datafromDB: ", data)
+            return data;
+        }
+
+        const updatedActivitiesFromDb = await fetchUpdatedActivityFromDb()
+
+
+        setActivityHistoryAndPlan(updatedActivitiesFromDb);
+        setIsModalOpen(false);
     }
 
-    const updatedActivitiesFromDb = await fetchUpdatedActivityFromDb()
-    
-
-    setActivityHistoryAndPlan(updatedActivitiesFromDb);
-    setIsModalOpen(false);
-}
-    
+    const handleFavorite = (selectedRouteName: string) => {
+        const selectedRoute = favoriteRoutes.find(route => route.route_name === selectedRouteName);
+        if (selectedRoute) {
+          setNewActivity(prev => ({
+            ...prev,
+            name: selectedRoute.route_name,
+            distance: Number(selectedRoute.distance)
+          }));
+        }
+      };
 
     return (
         <div className='flex-1 flex flex-col'>
@@ -180,8 +202,19 @@ export default function Activitypage() {
                 <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center'>
                     <div className='bg-white p-6 rounded w-[30%] h-[70%] overflow-y-auto'>
                         <h2 className='text-xl font-bold mb-4'>Add New Activity</h2>
-                        <p className='font-semibold'>Title</p>
                         <div className='flex flex-col gap-3'>
+                            <p className='font-semibold'>Favorite Route</p>
+                            <Select onValueChange={handleFavorite}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder='Favorite Route' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {favoriteRoutes.length === 0 ? <SelectItem value='none'>None</SelectItem> : favoriteRoutes.map((route) => (
+                                        <SelectItem key={route.id} value={route.route_name}>{route.route_name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className='font-semibold'>Title</p>
                             <input
                                 type="text"
                                 placeholder="title"
@@ -189,19 +222,6 @@ export default function Activitypage() {
                                 value={newActivity.name}
                                 onChange={(e) =>
                                     setNewActivity({ ...newActivity, name: e.target.value })
-                                }
-                            />
-                            <p className='font-semibold'>Favorite Route</p>
-                            <input
-                                type="text"
-                                placeholder="choose favorite route"
-                                className="border p-2 rounded"
-                                value={newActivity.distance}
-                                onChange={(e) =>
-                                    setNewActivity({
-                                        ...newActivity,
-                                        distance: e.target.value === "" ? 0 : parseFloat(e.target.value),
-                                    })
                                 }
                             />
                             <p className='font-semibold'>Distance (m)</p>

@@ -25,7 +25,7 @@ const MyRoutes: React.FC = () => {
     const updatedRoute = await toggleIsFavorite(routeId, routeData.find((route) => route.id === routeId)!.is_favorite)
 
     setRouteData((prevData) => {
-      return prevData.map((route) => (route.id === routeId ? {...route, isFavorite: updatedRoute.is_favorite}: route))
+      return prevData.map((route) => (route.id === routeId ? {...route, is_favorite: updatedRoute.is_favorite}: route))
     })
   }
 

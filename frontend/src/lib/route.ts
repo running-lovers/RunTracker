@@ -103,3 +103,26 @@ export const putRouteData = async(routeId: number, body: any) => {
         throw new Error("fail to access routesAPI in backend")
     }
 }
+
+export const fetchFavoriteRoutes = async(userId: number) => {
+    if(!userId) {
+        throw new Error("userId is required")
+    }
+
+    try {
+        const res = await fetch(`${apiUrl}/api/routes/favorite/${userId}`, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        if(!res.ok) {
+            throw new Error("fail to get favorite route from db")
+        }
+
+        const data = res.json()
+        return data;
+    } catch (error) {
+        throw new Error("fail to access routeAPI")
+    }
+}

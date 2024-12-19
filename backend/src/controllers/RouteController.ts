@@ -92,7 +92,8 @@ export const getFavoriteRouteByUserId = async(req: Request, res: Response) => {
                 route_name: true,
                 route_data: true,
                 difficulty: true,
-                distance: true
+                distance: true,
+                is_favorite: true,
             }
         })
 
