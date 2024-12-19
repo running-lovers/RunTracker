@@ -207,10 +207,10 @@ export const getFollowingUsers = async (req: Request, res: Response): Promise<vo
             });
     
             console.log('Sending formatted users:', formattedUsers);
-            return res.json(formattedUsers);
+            res.json(formattedUsers);
         } catch (error) {
             console.error('Error fetching connections:', error);
-            return res.status(500).json({
+            res.status(500).json({
                 error: 'Failed to fetch connections'
             });
         }
