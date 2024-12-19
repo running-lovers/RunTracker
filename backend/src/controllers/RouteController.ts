@@ -80,3 +80,25 @@ export const putRouteData = async(req: Request, res: Response) => {
         res.status(500).json({error: "fail to update route data"})
     }
 }
+
+export const getFavoriteRouteByUserId = async(req: Request, res: Response) => {
+    const {userId} = req.params;
+
+    try {
+        const favoriteRoutes = await prisma.route.findMany({
+            where: {user_id: Number(userId), is_favorite: true,},
+            select: {
+                id: true,
+                route_name: true,
+                route_data: true,
+                difficulty: true,
+                distance: true,
+                is_favorite: true,
+            }
+        })
+
+        res.json(favoriteRoutes)
+    } catch (error) {
+        res.status(500).json({error: "fail to get favorite routes from DB"})
+    }
+}
