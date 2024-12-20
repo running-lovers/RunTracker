@@ -5,6 +5,7 @@ import { FaRegUserCircle } from "react-icons/fa";
 import NavList from "./NavList/NavList"
 import { Button } from "../ui/Button";
 import { useUser } from "@/context/userContext";
+import { LogOut } from 'lucide-react';
 
 export default function LeftSidebar() {
 
@@ -44,7 +45,7 @@ export default function LeftSidebar() {
                 <nav>
                     <NavList />
                 </nav>
-                <Button onClick={handleLogout}>Logout</Button>
+                <nav className="bg-[#2A2D3E] flex justify-start  text-gray-300  hover:bg-white/10 hover:text-white rounded-md py-2 cursor-pointer" onClick={handleLogout}><span className="pl-4"><LogOut /></span><span className="pl-4">Log out</span></nav>
                 <div className="flex items-center absolute bottom-4 left-4">
                     <FaRegUserCircle className="text-gray-300 text-3xl" />
                     <div className="ml-2 text-gray-300 text-xl">{user?.name}</div>

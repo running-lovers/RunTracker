@@ -64,10 +64,6 @@ export default function Dashboard() {
         return `${hours}h${minutes}min`
     }
 
-    console.log('acticityCards: ', activityCards);
-
-
-
     return (
         <>
             <h1 className="text-2xl font-bold ml-3 mt-5">Recent Activities</h1>
